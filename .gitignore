@@ -7,10 +7,7 @@
 *.txt
 *.nupkg
 *.p7s
-*.db
 *._
-
-data/
 
 Core/ArcaeaHash.cs
 Core/TaikariApi.cs
