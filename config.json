@@ -1,0 +1,19 @@
+{
+    "api_entry": "years/19",
+    "app_version": "3.12.3c",
+    "host": "arcapi-v2.lowiro.com",
+    "cert_name": "cert-3.12.3c.p12",
+    "cert_password": "HelloWorld",
+    "root_path": "./data",
+    "open_register": false,
+    "api_salt": [],
+    "nodes": [
+        {
+            "url": "arcapi-v2.lowiro.com",
+            "port": 443
+        }
+    ],
+    "whitelist": [
+        ".*"
+    ]
+}
