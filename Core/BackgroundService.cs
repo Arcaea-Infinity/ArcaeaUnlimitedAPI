@@ -125,7 +125,15 @@ internal static class BackgroundService
 
                 var tmpfetch = new TestFetch();
                 tmpfetch.Init();
-                Config.WriteConfig(tmpfetch.TestLogin().Result);
+
+                var result = tmpfetch.TestLogin().Result;
+                Config.WriteConfig(result);
+                
+                if (result)
+                {
+                    ArcaeaFetch.Init();
+                    NeedUpdate = false;
+                }
 
                 Version = info.Version;
                 File.Delete(apkpth);
