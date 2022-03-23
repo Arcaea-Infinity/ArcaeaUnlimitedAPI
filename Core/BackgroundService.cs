@@ -116,5 +116,6 @@ internal static class BackgroundService
         var psi = new ProcessStartInfo { FileName = "aria2c", Arguments = $"--dir=/etc/botarcapi/data/update/ {url}" };
         using var p = Process.Start(psi);
         p?.WaitForExit();
+        p?.Close();
     }
 }
