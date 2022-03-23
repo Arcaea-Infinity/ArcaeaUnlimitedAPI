@@ -19,7 +19,7 @@ public partial class PublicApi
     {
         if (!UserAgentCheck() || PathList.All(i => !path.StartsWith(i))) return NotFound(null);
         if (NeedUpdate) return Error.NeedUpdate;
-        return Success(ArcaeaHash.GenerateChallenge("", body ?? "", path, time));
+        return Success(ArcaeaFetch.GenerateChallenge("", body ?? "", path, time));
     }
 
     [HttpPost("/botarcapi/challenge")]
@@ -29,7 +29,7 @@ public partial class PublicApi
         if (NeedUpdate) return Error.NeedUpdate;
         if (data.Select(i => i.path).Any(path => PathList.All(i => !path.StartsWith(i)))) return NotFound(null);
 
-        return Success(data.Select(i => ArcaeaHash.GenerateChallenge("", i.body ?? "", i.path, i.time)));
+        return Success(data.Select(i => ArcaeaFetch.GenerateChallenge("", i.body ?? "", i.path, i.time)));
     }
 
     // ReSharper disable ClassNeverInstantiated.Global

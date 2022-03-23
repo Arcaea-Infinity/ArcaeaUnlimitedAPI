@@ -81,7 +81,6 @@ internal static class BackgroundService
                         var rawdir = $"{dirpth}/assets/songs/{(i.NeedDownload ? "dl_" : "")}{i.Id}";
 
                         for (var j = 0; j < i.Difficulties.Count; ++j)
-                        {
                             if (j == 2)
                             {
                                 var pth = $"{destdir}/{i.Id}.jpg";
@@ -94,7 +93,6 @@ internal static class BackgroundService
                                 var rawpth = $"{rawdir}/{j}.jpg";
                                 if (!File.Exists(pth) && File.Exists(rawpth)) File.Move(rawpth, pth);
                             }
-                        }
 
                         Thread.Sleep(300);
                         ArcaeaSongs.Insert(i);
@@ -107,11 +105,27 @@ internal static class BackgroundService
                                 song.BynRating = 0;
                                 song.BynNote = 0;
                                 song.Ratings[3] = song.BynRating;
-                                
+
                                 DatabaseManager.Song.Update(song);
                             }
                         }
                     }
+
+                var lib = ArcaeaDecrypt.ReadLib($"{dirpth}/lib/arm64-v8a/libcocos2dcpp.so").Result;
+                var salt = ArcaeaDecrypt.GetSalt(lib);
+                var cert = ArcaeaDecrypt.GetCert(lib);
+                var entry = ArcaeaDecrypt.GetApiEntry(lib);
+
+                File.WriteAllBytes($"{Config.DataRootPath}/cert-{info.Version}.p12", cert);
+
+                Config.ApiSalt = salt;
+                Config.ApiEntry = entry;
+                Config.CertFileName = $"cert-{info.Version}.p12";
+                Config.Appversion = info.Version;
+
+                var tmpfetch = new TestFetch();
+                tmpfetch.Init();
+                Config.WriteConfig(tmpfetch.TestLogin().Result);
 
                 Version = info.Version;
                 File.Delete(apkpth);

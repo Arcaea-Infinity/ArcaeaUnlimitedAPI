@@ -15,14 +15,17 @@ internal static class ArcaeaFetch
     private static HttpClient _client = null!;
     private static string _apientry = null!;
     private static int _maxRetryCount = 3;
+    private static ArcaeaHash _arcaeaHash = null!;
 
     internal static void Init()
     {
+        _apientry = Config.ApiEntry;
+        _arcaeaHash = new();
+        _arcaeaHash.Init();
         var certificate = new X509Certificate2($"{Config.DataRootPath}/{Config.CertFileName}", Config.CertPassword);
         var handler = new HttpClientHandler();
         handler.ClientCertificates.Add(certificate);
         handler.ServerCertificateCustomValidationCallback = (_, _, _, _) => true;
-        _apientry = Config.ApiEntry;
         _client = new(handler);
         _client.Timeout = TimeSpan.FromSeconds(30);
         _client.DefaultRequestHeaders.Add("Host", Config.Host);
@@ -49,7 +52,7 @@ internal static class ArcaeaFetch
         request.Headers.Add("DeviceId", info.DeviceId);
         request.Headers.Add("Accept-Encoding", "identity");
         request.Headers.Authorization = new("Bearer", info.Token);
-        request.Headers.Add("X-Random-Challenge", ArcaeaHash.GenerateChallenge("GET", "", url));
+        request.Headers.Add("X-Random-Challenge", GenerateChallenge("GET", "", url));
         request.Headers.Add("i", info.UserID.ToString());
 
         var (success, result) = await LogResult(resturl, request);
@@ -77,7 +80,7 @@ internal static class ArcaeaFetch
         request.Headers.Add("Accept-Encoding", "identity");
         request.Headers.Authorization = new("Bearer", info.Token);
         request.Content = new StringContent(data, Encoding.UTF8, new("application/x-www-form-urlencoded"));
-        request.Headers.Add("X-Random-Challenge", ArcaeaHash.GenerateChallenge("POST", data, resturl));
+        request.Headers.Add("X-Random-Challenge", GenerateChallenge("POST", data, resturl));
         request.Headers.Add("i", info.UserID.ToString());
 
         var (success, result) = await LogResult(resturl, request);
@@ -105,7 +108,7 @@ internal static class ArcaeaFetch
             = new("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{info.Name}:{info.Password}")));
         request.Headers.Add("DeviceId", info.DeviceId);
         request.Content = new StringContent(data, Encoding.UTF8, new("application/x-www-form-urlencoded"));
-        request.Headers.Add("X-Random-Challenge", ArcaeaHash.GenerateChallenge("POST", data, resturl));
+        request.Headers.Add("X-Random-Challenge", GenerateChallenge("POST", data, resturl));
         request.Headers.Add("i", info.UserID.ToString());
 
         var (success, result) = await LogResult(resturl, request);
@@ -130,7 +133,7 @@ internal static class ArcaeaFetch
                                       });
         var request = new HttpRequestMessage(HttpMethod.Post, $"{node}/{_apientry}/{resturl}");
         request.Content = new StringContent(data, Encoding.UTF8, new("application/x-www-form-urlencoded"));
-        request.Headers.Add("X-Random-Challenge", ArcaeaHash.GenerateChallenge("POST", data, resturl));
+        request.Headers.Add("X-Random-Challenge", GenerateChallenge("POST", data, resturl));
 
         var (_, result) = await LogResult(resturl, request);
         return result;
@@ -169,6 +172,10 @@ internal static class ArcaeaFetch
         new FormUrlEncodedContent(submitData).ReadAsStringAsync().Result;
 
 #endregion
+
+
+    internal static string GenerateChallenge(string method, string body, string path, ulong time = 0) =>
+        _arcaeaHash.GenerateChallenge(method, body, path, time);
 
     internal static async Task<bool> GetToken(this AccountInfo accountInfo)
     {

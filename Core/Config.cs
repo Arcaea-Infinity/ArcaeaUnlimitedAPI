@@ -13,7 +13,6 @@ internal static class GlobalConfig
         Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("config.json"))!;
 
         ArcaeaFetch.Init();
-        ArcaeaHash.Init();
         BackgroundService.Init();
     }
 }
@@ -36,18 +35,23 @@ public class ConfigItem
 
     [JsonProperty("open_register")] public bool? OpenRegister { get; set; }
 
-    [JsonProperty("api_salt")] public List<byte> ApiSalt { get; set; }
+    [JsonProperty("api_salt")] public byte[] ApiSalt { get; set; }
 
     [JsonProperty("nodes")] public List<Node> Nodes { get; set; }
 
     [JsonProperty("whitelist")] public List<string> Whitelist { get; set; }
+
+    internal void WriteConfig(bool rewrite) =>
+        File.WriteAllText(rewrite
+                              ? "config.json"
+                              : "config_temperate.json", JsonConvert.SerializeObject(this));
 }
 
 public class Node
 {
     [JsonProperty("url")] public string Url { get; set; }
     [JsonProperty("port")] public int? Port { get; set; }
-    [JsonIgnore] internal bool Active { get; set; } = true;
+    [JsonProperty("active")] internal bool Active { get; set; } = true;
 
     public override string ToString() => $"https://{Url}:{Port ?? 443}";
 }

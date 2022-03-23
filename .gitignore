@@ -9,9 +9,11 @@
 *.p7s
 *._
 
+[Bb]in/
+[Oo]bj/
+
 Core/ArcaeaHash.cs
 Core/TaikariApi.cs
 Core/ChallengeApi.cs
-
-[Bb]in/
-[Oo]bj/
+Core/ArcaeaDecrypt.cs
+Core/TestFetch.cs
