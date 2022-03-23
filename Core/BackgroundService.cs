@@ -3,6 +3,7 @@ using System.IO.Compression;
 using System.Timers;
 using ArcaeaUnlimitedAPI.Beans;
 using ArcaeaUnlimitedAPI.Json.Songlist;
+using ArcaeaUnlimitedAPI.PublicApi;
 using Newtonsoft.Json;
 using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 using static ArcaeaUnlimitedAPI.Core.Utils;
@@ -46,7 +47,7 @@ internal static class BackgroundService
         }
     }
 
-    internal static void ArcUpdate(object? source, ElapsedEventArgs? e)
+    private static void ArcUpdate(object? source, ElapsedEventArgs? e)
     {
         lock (_lockobj)
         {
@@ -80,6 +81,7 @@ internal static class BackgroundService
                         var rawdir = $"{dirpth}/assets/songs/{(i.NeedDownload ? "dl_" : "")}{i.Id}";
 
                         for (var j = 0; j < i.Difficulties.Count; ++j)
+                        {
                             if (j == 2)
                             {
                                 var pth = $"{destdir}/{i.Id}.jpg";
@@ -92,9 +94,23 @@ internal static class BackgroundService
                                 var rawpth = $"{rawdir}/{j}.jpg";
                                 if (!File.Exists(pth) && File.Exists(rawpth)) File.Move(rawpth, pth);
                             }
+                        }
 
                         Thread.Sleep(300);
                         ArcaeaSongs.Insert(i);
+
+                        if (i.Difficulties.Count == 4)
+                        {
+                            var song = ArcaeaSongs.GetById(i.Id);
+                            if (song?.BynRating == -1)
+                            {
+                                song.BynRating = 0;
+                                song.BynNote = 0;
+                                song.Ratings[3] = song.BynRating;
+                                
+                                DatabaseManager.Song.Update(song);
+                            }
+                        }
                     }
 
                 Version = info.Version;
@@ -113,9 +129,13 @@ internal static class BackgroundService
 
     private static void DownloadApk(string url)
     {
-        var psi = new ProcessStartInfo { FileName = "aria2c", Arguments = $"--dir=/etc/botarcapi/data/update/ {url}" };
+        var psi = new ProcessStartInfo
+                  {
+                      FileName = "aria2c", Arguments = $"--dir={Config.DataRootPath}/update/ {url}"
+                  };
         using var p = Process.Start(psi);
         p?.WaitForExit();
+        p?.Kill();
         p?.Close();
     }
 }
