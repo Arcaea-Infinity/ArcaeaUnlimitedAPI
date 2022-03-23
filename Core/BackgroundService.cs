@@ -2,6 +2,7 @@
 using System.IO.Compression;
 using System.Timers;
 using ArcaeaUnlimitedAPI.Beans;
+using ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
 using ArcaeaUnlimitedAPI.Json.Songlist;
 using ArcaeaUnlimitedAPI.PublicApi;
 using Newtonsoft.Json;
@@ -111,29 +112,7 @@ internal static class BackgroundService
                         }
                     }
 
-                var lib = ArcaeaDecrypt.ReadLib($"{dirpth}/lib/arm64-v8a/libcocos2dcpp.so").Result;
-                var salt = ArcaeaDecrypt.GetSalt(lib);
-                var cert = ArcaeaDecrypt.GetCert(lib);
-                var entry = ArcaeaDecrypt.GetApiEntry(lib);
-
-                File.WriteAllBytes($"{Config.DataRootPath}/cert-{info.Version}.p12", cert);
-
-                Config.ApiSalt = salt;
-                Config.ApiEntry = entry;
-                Config.CertFileName = $"cert-{info.Version}.p12";
-                Config.Appversion = info.Version;
-
-                var tmpfetch = new TestFetch();
-                tmpfetch.Init();
-
-                var result = tmpfetch.TestLogin().Result;
-                Config.WriteConfig(result);
-                
-                if (result)
-                {
-                    ArcaeaFetch.Init();
-                    NeedUpdate = false;
-                }
+                AutoDecrypt(dirpth, info);
 
                 Version = info.Version;
                 File.Delete(apkpth);
@@ -146,6 +125,33 @@ internal static class BackgroundService
             {
                 Directory.Delete(dirpth, true);
             }
+        }
+    }
+
+    private static void AutoDecrypt(string dirpth, ArcUpdateValue info)
+    {
+        var lib = ArcaeaDecrypt.ReadLib($"{dirpth}/lib/arm64-v8a/libcocos2dcpp.so").Result;
+        var salt = ArcaeaDecrypt.GetSalt(lib);
+        var cert = ArcaeaDecrypt.GetCert(lib);
+        var entry = ArcaeaDecrypt.GetApiEntry(lib);
+
+        File.WriteAllBytes($"{Config.DataRootPath}/cert-{info.Version}.p12", cert);
+
+        Config.ApiSalt = salt;
+        Config.ApiEntry = entry;
+        Config.CertFileName = $"cert-{info.Version}.p12";
+        Config.Appversion = info.Version;
+
+        var tmpfetch = new TestFetch();
+        tmpfetch.Init();
+
+        var result = tmpfetch.TestLogin().Result;
+        Config.WriteConfig(result);
+
+        if (result)
+        {
+            ArcaeaFetch.Init();
+            NeedUpdate = false;
         }
     }
 
