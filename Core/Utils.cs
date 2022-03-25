@@ -22,10 +22,9 @@ internal static class Utils
         try
         {
             var obj
-                = JsonConvert
-                    .DeserializeObject<
-                        ResponseRoot>(await WebHelper
-                                           .GetString("https://webapi.lowiro.com/webapi/serve/static/bin/arcaea/apk"));
+                = JsonConvert.DeserializeObject<ResponseRoot>(await
+                                                                  WebHelper
+                                                                      .GetString("https://webapi.lowiro.com/webapi/serve/static/bin/arcaea/apk"));
 
             return obj?.Success != true
                 ? null
@@ -38,15 +37,16 @@ internal static class Utils
         }
     }
 
-    internal static async Task TestNode(Node node)
+    internal static async void TestNode(Node node)
     {
         try
         {
-            var msg = new HttpRequestMessage()
+            var msg = new HttpRequestMessage
                       {
-                          Method = HttpMethod.Get, RequestUri = new(node + $"/{Config.ApiEntry}/we/love/arcarea/forever")
+                          Method = HttpMethod.Get,
+                          RequestUri = new(node + $"/{Config.ApiEntry}/we/love/arcarea/forever")
                       };
-            
+
             msg.Headers.Host = Config.Host;
 
             node.Active = (await WebHelper.Client.SendAsync(msg)).StatusCode == HttpStatusCode.MethodNotAllowed;
@@ -57,7 +57,7 @@ internal static class Utils
             node.Active = false;
         }
     }
-    
+
     private static class WebHelper
     {
         internal static readonly HttpClient Client;

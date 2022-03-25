@@ -10,11 +10,213 @@ namespace ArcaeaUnlimitedAPI.Core;
 
 internal static class ArcaeaFetch
 {
+    internal static string GenerateChallenge(string method, string body, string path, ulong time = 0) =>
+        _arcaeaHash.GenerateChallenge(method, body, path, time);
+
+    internal static async Task<bool> GetToken(this AccountInfo accountInfo)
+    {
+        try
+        {
+            var info = await Login(accountInfo);
+            if (info is null) return false;
+
+            if (info.Success)
+            {
+                accountInfo.Token = info.AccessToken!;
+                DatabaseManager.Account.Update(accountInfo);
+                return true;
+            }
+
+            if (info.ErrorCode == "5") NeedUpdate = true;
+
+            if (info.ErrorCode == "106")
+            {
+                accountInfo.Banned = "true";
+                DatabaseManager.Account.Update(accountInfo);
+            }
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Log.ExceptionError(ex);
+            return false;
+        }
+    }
+
+    internal static async Task<(bool, List<FriendsItem>?)> UserMe(this AccountInfo accountInfo, bool tryagain = true)
+    {
+        var info = await Get("user/me", accountInfo, null);
+        if (info is null) return (false, null);
+
+        if (info.Success)
+        {
+            var value = info.DeserializeContent<UserMeValue>();
+            accountInfo.UserID = value.UserID;
+            accountInfo.Ucode = value.UserCode;
+            DatabaseManager.Account.Update(accountInfo);
+            return (true, value.Friends);
+        }
+
+        if (info.ErrorCode == "5")
+        {
+            NeedUpdate = true;
+            return (false, null);
+        }
+
+        if (info.Code == "UnauthorizedError" || info.ErrorCode != null)
+        {
+            accountInfo.Token = "";
+            DatabaseManager.Account.Update(accountInfo);
+            if (!tryagain || !await accountInfo.GetToken()) return (false, null);
+            return await accountInfo.UserMe(false);
+        }
+
+        return (false, null);
+    }
+
+    internal static async Task<bool> ClearFriend(this AccountInfo accountInfo)
+    {
+        var (success, friends) = await accountInfo.UserMe();
+
+        if (success)
+            foreach (var friend in friends!)
+                await accountInfo.DeleteFriend(friend.UserID.ToString());
+
+        return success;
+    }
+
+    private static async Task DeleteFriend(this AccountInfo accountInfo, string friendID) =>
+        await Post("friend/me/delete", accountInfo, new() { { "friend_id", friendID } });
+
+    internal static async Task<(bool, List<FriendsItem>?)> AddFriend(this AccountInfo accountInfo, string usercode)
+    {
+        var info = await Post("friend/me/add", accountInfo, new() { { "friend_code", usercode } });
+
+        if (info is null) return (false, null);
+
+        if (info.ErrorCode == "5")
+        {
+            NeedUpdate = true;
+            return (false, null);
+        }
+
+        if (info.Value is null) return (false, null);
+        var value = info.DeserializeContent<AddFriendValue>();
+        return (info.Success, value.Friends);
+    }
+
+    internal static async Task<(bool, List<Records>?)> FriendRank(this AccountInfo accountInfo, string songID,
+                                                                  int difficulty)
+    {
+        try
+        {
+            var info = await Get("score/song/friend", accountInfo,
+                                 new()
+                                 {
+                                     { "song_id", songID },
+                                     { "difficulty", difficulty.ToString() },
+                                     { "start", "0" },
+                                     { "limit", "11" }
+                                 });
+
+            if (info is null) return (false, null);
+
+            if (info.ErrorCode == "5")
+            {
+                NeedUpdate = true;
+                return (false, null);
+            }
+
+            if (info.Value is null) return (false, null);
+            var value = info.DeserializeContent<List<Records>>();
+            return (info.Success, value);
+        }
+        catch (Exception ex)
+        {
+            Log.ExceptionError(ex);
+            return (false, null);
+        }
+    }
+
+    internal static async Task RegisterTask()
+    {
+        if (BackgroundService.TimerCount % 144 != 0) return;
+
+        foreach (var node in Config.Nodes)
+            try
+            {
+                for (var i = 0; i < 3; ++i)
+                {
+                    var name = RandomStringGenerator.GetRandString();
+                    var password = RandomStringGenerator.GetRandString();
+                    var email = RandomStringGenerator.GetRandString() + "@gmail.com";
+                    var deviceID = RandomStringGenerator.GetRandDeviceID();
+
+                    await Task.Delay(300);
+
+                    var info = await Register(node, name, password, email, deviceID);
+                    if (info is null) continue;
+
+                    if (info.ErrorCode == "124") return;
+                    if (info.ErrorCode == "5")
+                    {
+                        NeedUpdate = true;
+                        return;
+                    }
+
+                    if (info.Success)
+                    {
+                        var value = info.DeserializeContent<RegisterValue>();
+                        var account = new AccountInfo
+                                      {
+                                          Name = name,
+                                          Password = password,
+                                          DeviceId = deviceID,
+                                          UserID = value.UserID,
+                                          Token = value.AccessToken,
+                                          Banned = "false"
+                                      };
+
+                        AccountInfo.Insert(account);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.ExceptionError(ex);
+                continue;
+            }
+    }
+
+    private static class RandomStringGenerator
+    {
+        private const string TemplateHex = "0123456789abcdef";
+
+        private const string TemplateNormal = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkimnopqrstuvwxyz";
+
+        private static readonly Random Random = new();
+
+        public static string GetRandString()
+        {
+            var res = new StringBuilder();
+            for (var i = 0; i < 10; i++) res.Append(TemplateNormal[Random.Next(36)]);
+            return res.ToString();
+        }
+
+        public static string GetRandDeviceID()
+        {
+            var res = new StringBuilder();
+            for (var i = 0; i < 32; i++) res.Append(TemplateHex[Random.Next(16)]);
+            return res.ToString();
+        }
+    }
+
 #region Privite Methods
 
     private static HttpClient _client = null!;
     private static string _apientry = null!;
-    private static int _maxRetryCount = 3;
+    private static readonly int _maxRetryCount = 3;
     private static ArcaeaHash _arcaeaHash = null!;
 
     internal static void Init()
@@ -172,207 +374,4 @@ internal static class ArcaeaFetch
         new FormUrlEncodedContent(submitData).ReadAsStringAsync().Result;
 
 #endregion
-
-
-    internal static string GenerateChallenge(string method, string body, string path, ulong time = 0) =>
-        _arcaeaHash.GenerateChallenge(method, body, path, time);
-
-    internal static async Task<bool> GetToken(this AccountInfo accountInfo)
-    {
-        try
-        {
-            var info = await Login(accountInfo);
-            if (info is null) return false;
-
-            if (info.Success)
-            {
-                accountInfo.Token = info.AccessToken!;
-                DatabaseManager.Account.Update(accountInfo);
-                return true;
-            }
-
-            if (info.ErrorCode == "5") NeedUpdate = true;
-
-            if (info.ErrorCode == "106")
-            {
-                accountInfo.Banned = "true";
-                DatabaseManager.Account.Update(accountInfo);
-            }
-
-            return false;
-        }
-        catch (Exception ex)
-        {
-            Log.ExceptionError(ex);
-            return false;
-        }
-    }
-
-    internal static async Task<(bool, List<FriendsItem>?)> UserMe(this AccountInfo accountInfo, bool tryagain = true)
-    {
-        var info = await Get("user/me", accountInfo, null);
-        if (info is null) return (false, null);
-
-        if (info.Success)
-        {
-            var value = info.DeserializeContent<UserMeValue>();
-            accountInfo.UserID = value.UserID;
-            accountInfo.Ucode = value.UserCode;
-            DatabaseManager.Account.Update(accountInfo);
-            return (true, value.Friends);
-        }
-
-        if (info.ErrorCode == "5")
-        {
-            NeedUpdate = true;
-            return (false, null);
-        }
-
-        if (info.Code == "UnauthorizedError" || info.ErrorCode != null)
-        {
-            accountInfo.Token = "";
-            DatabaseManager.Account.Update(accountInfo);
-            if (!tryagain || !await accountInfo.GetToken()) return (false, null);
-            return await accountInfo.UserMe(false);
-        }
-
-        return (false, null);
-    }
-
-    internal static async Task<bool> ClearFriend(this AccountInfo accountInfo)
-    {
-        var (success, friends) = await accountInfo.UserMe();
-
-        if (success)
-            foreach (var friend in friends!)
-                await accountInfo.DeleteFriend(friend.UserID.ToString());
-
-        return success;
-    }
-
-    private static async Task DeleteFriend(this AccountInfo accountInfo, string friendID) =>
-        await Post("friend/me/delete", accountInfo, new() { { "friend_id", friendID } });
-
-    internal static async Task<(bool, List<FriendsItem>?)> AddFriend(this AccountInfo accountInfo, string usercode)
-    {
-        var info = await Post("friend/me/add", accountInfo, new() { { "friend_code", usercode } });
-
-        if (info is null) return (false, null);
-
-        if (info.ErrorCode == "5")
-        {
-            NeedUpdate = true;
-            return (false, null);
-        }
-
-        if (info.Value is null) return (false, null);
-        var value = info.DeserializeContent<AddFriendValue>();
-        return (info.Success, value.Friends);
-    }
-
-    internal static async Task<(bool, List<Records>?)> FriendRank(this AccountInfo accountInfo, string songID,
-                                                                  int difficulty)
-    {
-        try
-        {
-            var info = await Get("score/song/friend", accountInfo,
-                                 new()
-                                 {
-                                     { "song_id", songID },
-                                     { "difficulty", difficulty.ToString() },
-                                     { "start", "0" },
-                                     { "limit", "11" }
-                                 });
-
-            if (info is null) return (false, null);
-
-            if (info.ErrorCode == "5")
-            {
-                NeedUpdate = true;
-                return (false, null);
-            }
-
-            if (info.Value is null) return (false, null);
-            var value = info.DeserializeContent<List<Records>>();
-            return (info.Success, value);
-        }
-        catch (Exception ex)
-        {
-            Log.ExceptionError(ex);
-            return (false, null);
-        }
-    }
-
-    internal static async Task RegisterTask()
-    {
-        if (BackgroundService.TimerCount % 144 != 0) return;
-
-        foreach (var node in Config.Nodes)
-            try
-            {
-                for (var i = 0; i < 3; ++i)
-                {
-                    var name = RandomStringGenerator.GetRandString();
-                    var password = RandomStringGenerator.GetRandString();
-                    var email = RandomStringGenerator.GetRandString() + "@gmail.com";
-                    var deviceID = RandomStringGenerator.GetRandDeviceID();
-
-                    Thread.Sleep(300);
-
-                    var info = await Register(node, name, password, email, deviceID);
-                    if (info is null) continue;
-
-                    if (info.ErrorCode == "124") return;
-                    if (info.ErrorCode == "5")
-                    {
-                        NeedUpdate = true;
-                        return;
-                    }
-
-                    if (info.Success)
-                    {
-                        var value = info.DeserializeContent<RegisterValue>();
-                        var account = new AccountInfo
-                                      {
-                                          Name = name,
-                                          Password = password,
-                                          DeviceId = deviceID,
-                                          UserID = value.UserID,
-                                          Token = value.AccessToken,
-                                          Banned = "false"
-                                      };
-
-                        AccountInfo.Insert(account);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.ExceptionError(ex);
-                continue;
-            }
-    }
-
-    private static class RandomStringGenerator
-    {
-        private const string TemplateHex = "0123456789abcdef";
-
-        private const string TemplateNormal = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkimnopqrstuvwxyz";
-
-        private static readonly Random Random = new();
-
-        public static string GetRandString()
-        {
-            var res = new StringBuilder();
-            for (var i = 0; i < 10; i++) res.Append(TemplateNormal[Random.Next(36)]);
-            return res.ToString();
-        }
-
-        public static string GetRandDeviceID()
-        {
-            var res = new StringBuilder();
-            for (var i = 0; i < 32; i++) res.Append(TemplateHex[Random.Next(16)]);
-            return res.ToString();
-        }
-    }
 }

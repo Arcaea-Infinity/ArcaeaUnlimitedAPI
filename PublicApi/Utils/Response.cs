@@ -130,13 +130,15 @@ internal class Response
         /// <summary>
         ///     errorCode = -23
         /// </summary>
-        internal static readonly Response BelowTheThreshold = Exception(-23, "potential is below the threshold of querying best30 (7.0)");
+        internal static readonly Response BelowTheThreshold
+            = Exception(-23, "potential is below the threshold of querying best30 (7.0)");
 
         /// <summary>
         ///     errorCode = -24
         /// </summary>
-        internal static readonly Response NeedUpdate = Exception(-24, "need to update arcaea, please contact maintainer");
-        
+        internal static readonly Response NeedUpdate
+            = Exception(-24, "need to update arcaea, please contact maintainer");
+
         /// <summary>
         ///     errorCode = -233
         /// </summary>

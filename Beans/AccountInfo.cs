@@ -8,7 +8,7 @@ namespace ArcaeaUnlimitedAPI.Beans;
 #pragma warning disable CS8618
 
 [Table("accounts")]
-[DatabaseManager.CreateTableSql("CREATE TABLE `accounts` (`name` TEXT NOT NULL,`passwd` TEXT NOT NULL,`device` TEXT NOT NULL DEFAULT '',`uid` INTEGER DEFAULT 0,`ucode`  TEXT DEFAULT '', `token`  TEXT DEFAULT '',`banned` TEXT NOT NULL DEFAULT 'false' CHECK(`banned` IN('true', 'false')),PRIMARY KEY (`name` ASC));")]
+[DatabaseManager.CreateTableSqlAttribute("CREATE TABLE `accounts` (`name` TEXT NOT NULL,`passwd` TEXT NOT NULL,`device` TEXT NOT NULL DEFAULT '',`uid` INTEGER DEFAULT 0,`ucode`  TEXT DEFAULT '', `token`  TEXT DEFAULT '',`banned` TEXT NOT NULL DEFAULT 'false' CHECK(`banned` IN('true', 'false')),PRIMARY KEY (`name` ASC));")]
 internal class AccountInfo
 {
     private static readonly Lazy<ConcurrentQueue<AccountInfo>> Queue

@@ -11,8 +11,8 @@ namespace ArcaeaUnlimitedAPI.Beans;
 
 [Serializable]
 [Table("songs")]
-[DatabaseManager.CreateTableSql(
-                                   "CREATE TABLE `songs`(`sid` TEXT PRIMARY KEY ASC NOT NULL, `name_en` TEXT NOT NULL DEFAULT '', `name_jp` TEXT NOT NULL DEFAULT '', `bpm` TEXT NOT NULL DEFAULT '', `bpm_base` INTEGER NOT NULL DEFAULT 0, `pakset` TEXT NOT NULL DEFAULT '', `artist` TEXT NOT NULL DEFAULT '', `time` INTEGER NOT NULL DEFAULT 0, `side` INTEGER NOT NULL DEFAULT 0, `date` INTEGER NOT NULL DEFAULT 0, `version` TEXT NOT NULL DEFAULT '', `world_unlock` TEXT NOT NULL DEFAULT 'false', `remote_download` TEXT NOT NULL DEFAULT 'false', `rating_pst` INTEGER NOT NULL DEFAULT 0, `rating_prs` INTEGER NOT NULL DEFAULT 0, `rating_ftr` INTEGER NOT NULL DEFAULT 0, `rating_byn` INTEGER NOT NULL DEFAULT (- 1), `notes_pst` INTEGER NOT NULL DEFAULT 0, `notes_prs` INTEGER NOT NULL DEFAULT 0, `notes_ftr` INTEGER NOT NULL DEFAULT 0, `notes_byn` INTEGER NOT NULL DEFAULT (- 1), `chart_designer_pst` TEXT NOT NULL DEFAULT '', `chart_designer_prs` TEXT NOT NULL DEFAULT '', `chart_designer_ftr` TEXT NOT NULL DEFAULT '', `chart_designer_byn` TEXT NOT NULL DEFAULT '', `jacket_designer_pst` TEXT NOT NULL DEFAULT '', `jacket_designer_prs` TEXT NOT NULL DEFAULT '', `jacket_designer_ftr` TEXT NOT NULL DEFAULT '', `jacket_designer_byn` TEXT NOT NULL DEFAULT '', `jacket_override_pst` TEXT NOT NULL DEFAULT 'false', `jacket_override_prs` TEXT NOT NULL DEFAULT 'false', `jacket_override_ftr` TEXT NOT NULL DEFAULT 'false', `jacket_override_byn` TEXT NOT NULL DEFAULT 'false', CHECK(`side` IN (0, 1)), CHECK(`world_unlock` IN ('true', 'false')), CHECK(`remote_download` IN ('true', 'false')));")]
+[DatabaseManager.CreateTableSqlAttribute(
+                                            "CREATE TABLE `songs`(`sid` TEXT PRIMARY KEY ASC NOT NULL, `name_en` TEXT NOT NULL DEFAULT '', `name_jp` TEXT NOT NULL DEFAULT '', `bpm` TEXT NOT NULL DEFAULT '', `bpm_base` INTEGER NOT NULL DEFAULT 0, `pakset` TEXT NOT NULL DEFAULT '', `artist` TEXT NOT NULL DEFAULT '', `time` INTEGER NOT NULL DEFAULT 0, `side` INTEGER NOT NULL DEFAULT 0, `date` INTEGER NOT NULL DEFAULT 0, `version` TEXT NOT NULL DEFAULT '', `world_unlock` TEXT NOT NULL DEFAULT 'false', `remote_download` TEXT NOT NULL DEFAULT 'false', `rating_pst` INTEGER NOT NULL DEFAULT 0, `rating_prs` INTEGER NOT NULL DEFAULT 0, `rating_ftr` INTEGER NOT NULL DEFAULT 0, `rating_byn` INTEGER NOT NULL DEFAULT (- 1), `notes_pst` INTEGER NOT NULL DEFAULT 0, `notes_prs` INTEGER NOT NULL DEFAULT 0, `notes_ftr` INTEGER NOT NULL DEFAULT 0, `notes_byn` INTEGER NOT NULL DEFAULT (- 1), `chart_designer_pst` TEXT NOT NULL DEFAULT '', `chart_designer_prs` TEXT NOT NULL DEFAULT '', `chart_designer_ftr` TEXT NOT NULL DEFAULT '', `chart_designer_byn` TEXT NOT NULL DEFAULT '', `jacket_designer_pst` TEXT NOT NULL DEFAULT '', `jacket_designer_prs` TEXT NOT NULL DEFAULT '', `jacket_designer_ftr` TEXT NOT NULL DEFAULT '', `jacket_designer_byn` TEXT NOT NULL DEFAULT '', `jacket_override_pst` TEXT NOT NULL DEFAULT 'false', `jacket_override_prs` TEXT NOT NULL DEFAULT 'false', `jacket_override_ftr` TEXT NOT NULL DEFAULT 'false', `jacket_override_byn` TEXT NOT NULL DEFAULT 'false', CHECK(`side` IN (0, 1)), CHECK(`world_unlock` IN ('true', 'false')), CHECK(`remote_download` IN ('true', 'false')));")]
 internal class ArcaeaSongs
 {
     [NonSerialized] internal static readonly Lazy<ConcurrentDictionary<string, ArcaeaSongs>> SongList;
@@ -22,6 +22,8 @@ internal class ArcaeaSongs
     [NonSerialized] private static readonly ConcurrentDictionary<string, string> Abbreviations = new();
 
     [NonSerialized] internal static readonly List<(string sid, int dif, int rating)> SortByRating;
+
+    private static readonly ConcurrentDictionary<string, ArcaeaSongs?[]> Aliascache = new();
 
     static ArcaeaSongs()
     {
@@ -183,7 +185,7 @@ internal class ArcaeaSongs
     {
         if (usejsonlist && SongJsonList.Value.ContainsKey(SongId)) return SongJsonList.Value[SongId];
 
-        var obj = new SongsItem()
+        var obj = new SongsItem
                   {
                       Id = SongId,
                       TitleLocalized = new()
@@ -258,8 +260,6 @@ internal class ArcaeaSongs
     internal static IEnumerable<string> GetAlias(ArcaeaSongs song) =>
         AliasList.Value.Where(i => i.SongId == song.SongId).Select(i => i.Alias);
 
-    private static readonly ConcurrentDictionary<string, ArcaeaSongs?[]> Aliascache = new();
-
     internal static ArcaeaSongs?[] GetByAlias(string alias)
     {
         var empty = new ArcaeaSongs[] { };
@@ -293,7 +293,7 @@ internal class ArcaeaSongs
 
             if (StringCompareHelper.Contains(songdata.SongnameEn, alias)) dic.Enqueue(songdata.SongId, 3);
             if (StringCompareHelper.Contains(alias, songdata.SongnameEn)) dic.Enqueue(songdata.SongId, 6);
-            
+
             if (!string.IsNullOrEmpty(songdata.SongnameJp))
             {
                 if (StringCompareHelper.Contains(songdata.SongnameJp, alias)) dic.Enqueue(songdata.SongId, 3);

@@ -24,7 +24,7 @@ public partial class PublicApi
         var (song, dif) = ArcaeaSongs.RandomSong(lower, upper);
 
         if (song is null) return Error.InvalidRange;
-        
+
         if (withsonginfo) return Success(new { id = song.SongId, ratingClass = dif, songinfo = song.ToJson() });
         return Success(new { id = song.SongId, ratingClass = dif });
     }

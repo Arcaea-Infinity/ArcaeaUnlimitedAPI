@@ -1,9 +1,11 @@
-# ArcaeaUnlimitedAPI 
+# ArcaeaUnlimitedAPI
+
 (or BotArcAPI CSharp implementation)
 
 A fast and easy Arcaea API for your bot.
 
 ### Note
+
 > Accessing the api requires a specific User-Agent
 
 ### Nuget Packages Dependencies
@@ -15,6 +17,7 @@ A fast and easy Arcaea API for your bot.
 | Newtonsoft.Json                         | 13.0.1  |
 
 ### Other Sortware Dependence
+
 + ariac2
 
 ### API Entry
@@ -65,6 +68,7 @@ A fast and easy Arcaea API for your bot.
 + `{apiurl}/botarcapi/song/alias?songid=gl`
 
 + ##### Return data
+
 ```json
 {
     "status": -5,
@@ -77,6 +81,7 @@ specially,
 + `{apiurl}/botarcapi/song/info?songname=lc`
 
 + ##### Return data
+
 ```json
 {
   "status": -8,
@@ -91,5 +96,6 @@ specially,
 ```
 
 ### License
+
 Licensed under `616 SB License`.
 

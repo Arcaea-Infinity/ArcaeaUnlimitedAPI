@@ -20,6 +20,16 @@ internal static class BackgroundService
 
     private static volatile object _lockobj = new();
 
+    private static string Version
+    {
+        get => _version ??= File.ReadAllText($"{Config.DataRootPath}/arcversion");
+        set
+        {
+            _version = value;
+            File.WriteAllText($"{Config.DataRootPath}/arcversion", value);
+        }
+    }
+
     internal static void Init()
     {
         Timer timer = new(600000);
@@ -35,17 +45,7 @@ internal static class BackgroundService
 
     private static void TestNodes(object? source, ElapsedEventArgs? e)
     {
-        if (TimerCount % 12 == 0) Config.Nodes.AsParallel().Select(TestNode);
-    }
-
-    private static string Version
-    {
-        get => _version ??= File.ReadAllText($"{Config.DataRootPath}/arcversion");
-        set
-        {
-            _version = value;
-            File.WriteAllText($"{Config.DataRootPath}/arcversion", value);
-        }
+        if (TimerCount % 12 == 0) Config.Nodes.ForEach(TestNode);
     }
 
     private static void ArcUpdate(object? source, ElapsedEventArgs? e)

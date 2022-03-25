@@ -6,12 +6,6 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 
 internal static class DatabaseManager
 {
-    // ReSharper disable once UnusedParameter.Local
-    internal class CreateTableSqlAttribute : Attribute
-    {
-        internal CreateTableSqlAttribute(string sql) { }
-    }
-
     internal static readonly Lazy<SQLiteConnection> Song = new(() => new($"{DatabaseDir()}/arcsong.db",
                                                                          SQLiteOpenFlags.ReadWrite
                                                                          | SQLiteOpenFlags.SharedCache
@@ -50,4 +44,11 @@ internal static class DatabaseManager
 
     internal static void Update<T>(this Lazy<SQLiteConnection> connection, T obj) where T : new() =>
         connection.Value.Update(obj);
+
+    // ReSharper disable once UnusedParameter.Local
+    [AttributeUsage(AttributeTargets.Class)]
+    internal class CreateTableSqlAttribute : Attribute
+    {
+        internal CreateTableSqlAttribute(string sql) { }
+    }
 }

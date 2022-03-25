@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ArcaeaUnlimitedAPI.Core;
+using Microsoft.AspNetCore.Mvc;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
@@ -6,10 +7,10 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 public partial class PublicApi
 {
     [HttpGet("/botarcapi/update")]
-    public object GetUpdate()
+    public async Task<object> GetUpdate()
     {
         if (!UserAgentCheck()) return NotFound(null);
-        var obj = Core.Utils.GetLatestVersion().Result;
+        var obj = await Utils.GetLatestVersion();
 
         return obj is not null
             ? Success(obj)

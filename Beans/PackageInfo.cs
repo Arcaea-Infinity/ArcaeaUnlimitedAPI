@@ -8,7 +8,7 @@ namespace ArcaeaUnlimitedAPI.Beans;
 
 [Serializable]
 [Table("packages")]
-[DatabaseManager.CreateTableSql("CREATE TABLE `packages`(`id` TEXT PRIMARY KEY NOT NULL, `name` TEXT NOT NULL DEFAULT '');")]
+[DatabaseManager.CreateTableSqlAttribute("CREATE TABLE `packages`(`id` TEXT PRIMARY KEY NOT NULL, `name` TEXT NOT NULL DEFAULT '');")]
 internal class PackageInfo
 {
     private static Lazy<ConcurrentDictionary<string, PackageInfo>> _list
@@ -17,7 +17,7 @@ internal class PackageInfo
     [PrimaryKey] [Column("id")] public string PackageId { get; set; }
 
     [Column("name")] public string Name { get; set; }
-   
+
     internal static PackageInfo? GetById(string id) =>
         _list.Value.TryGetValue(id, out var value)
             ? value

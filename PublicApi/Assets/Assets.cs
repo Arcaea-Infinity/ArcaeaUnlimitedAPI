@@ -25,7 +25,7 @@ public partial class PublicApi
                                 0 when song.JacketOverridePst == "true" => "_0",
                                 1 when song.JacketOverridePrs == "true" => "_1",
                                 3 when song.JacketOverrideByn == "true" => "_3",
-                                _                                       => "",
+                                _                                       => ""
                             };
 
             fileinfo = new($"{Config.DataRootPath}/sourse/songs/{song.SongId}{difextend}.jpg");

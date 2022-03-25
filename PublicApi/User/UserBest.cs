@@ -67,6 +67,7 @@ public partial class PublicApi
             response.RecentScore = response.AccountInfo.RecentScore.FirstOrDefault();
             if (withsonginfo) response.RecentSonginfo = ArcaeaSongs.GetById(response.RecentScore?.SongID)?.ToJson();
         }
+
         response.AccountInfo.RecentScore = null!;
 
         return Success(response);

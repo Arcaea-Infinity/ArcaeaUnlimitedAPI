@@ -22,7 +22,7 @@ internal static class NodeInfo
             node = GetNode(out var curnodeindex);
             if (curnodeindex == nodeindex)
             {
-                Config.Nodes.AsParallel().Select(Utils.TestNode);
+                Config.Nodes.ForEach(Utils.TestNode);
                 Log.FunctionError("Node", "ranout.");
                 return null;
             }
