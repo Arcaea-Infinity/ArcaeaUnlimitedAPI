@@ -44,7 +44,7 @@ public class ConfigItem
     internal void WriteConfig(bool rewrite) =>
         File.WriteAllText(rewrite
                               ? "config.json"
-                              : "config_temperate.json", JsonConvert.SerializeObject(this));
+                              : "config_temp.json", JsonConvert.SerializeObject(this));
 }
 
 public class Node
