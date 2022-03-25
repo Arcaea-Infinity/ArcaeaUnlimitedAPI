@@ -25,7 +25,7 @@ internal static class Log
         {
             var time = DateTime.Now;
             await File.AppendAllTextAsync($"{GlobalConfig.Config.DataRootPath}/log/apierr_{time:yyMMdd}.log",
-                                          $"\n\n{time}\n{resturl}: code: {json.ErrorCode ?? json.Code}");
+                                          $"\n\n{time}\n{resturl}: code: {json.ErrorCode?.ToString() ?? json.Code}");
         }
         catch
         {

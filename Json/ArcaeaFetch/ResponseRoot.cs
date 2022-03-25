@@ -6,7 +6,7 @@ public class ResponseRoot
 {
     [JsonProperty("success")] public bool Success { get; set; }
     [JsonProperty("code")] public string? Code { get; set; }
-    [JsonProperty("error_code")] public string? ErrorCode { get; set; }
+    [JsonProperty("error_code")] public int? ErrorCode { get; set; }
     [JsonProperty("access_token")] public string? AccessToken { get; set; }
     [JsonProperty("value")] public dynamic? Value { get; set; }
 

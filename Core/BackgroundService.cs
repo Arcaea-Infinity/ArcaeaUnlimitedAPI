@@ -143,7 +143,7 @@ internal static class BackgroundService
         Config.Appversion = info.Version;
 
         var tmpfetch = new TestFetch();
-        tmpfetch.Init();
+        tmpfetch.Init(Config);
 
         var result = tmpfetch.TestLogin().Result;
         Config.WriteConfig(result);

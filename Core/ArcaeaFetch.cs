@@ -18,18 +18,17 @@ internal static class ArcaeaFetch
         try
         {
             var info = await Login(accountInfo);
-            if (info is null) return false;
 
-            if (info.Success)
+            if (info?.Success == true)
             {
                 accountInfo.Token = info.AccessToken!;
                 DatabaseManager.Account.Update(accountInfo);
                 return true;
             }
 
-            if (info.ErrorCode == "5") NeedUpdate = true;
+            if (info?.ErrorCode == 5) NeedUpdate = true;
 
-            if (info.ErrorCode == "106")
+            if (info?.ErrorCode == 106)
             {
                 accountInfo.Banned = "true";
                 DatabaseManager.Account.Update(accountInfo);
@@ -58,7 +57,7 @@ internal static class ArcaeaFetch
             return (true, value.Friends);
         }
 
-        if (info.ErrorCode == "5")
+        if (info.ErrorCode == 5)
         {
             NeedUpdate = true;
             return (false, null);
@@ -95,7 +94,7 @@ internal static class ArcaeaFetch
 
         if (info is null) return (false, null);
 
-        if (info.ErrorCode == "5")
+        if (info.ErrorCode == 5)
         {
             NeedUpdate = true;
             return (false, null);
@@ -122,7 +121,7 @@ internal static class ArcaeaFetch
 
             if (info is null) return (false, null);
 
-            if (info.ErrorCode == "5")
+            if (info.ErrorCode == 5)
             {
                 NeedUpdate = true;
                 return (false, null);
@@ -156,16 +155,15 @@ internal static class ArcaeaFetch
                     await Task.Delay(300);
 
                     var info = await Register(node, name, password, email, deviceID);
-                    if (info is null) continue;
 
-                    if (info.ErrorCode == "124") return;
-                    if (info.ErrorCode == "5")
+                    if (info?.ErrorCode == 124) return;
+                    if (info?.ErrorCode == 5)
                     {
                         NeedUpdate = true;
                         return;
                     }
 
-                    if (info.Success)
+                    if (info?.Success == true)
                     {
                         var value = info.DeserializeContent<RegisterValue>();
                         var account = new AccountInfo
@@ -355,7 +353,7 @@ internal static class ArcaeaFetch
             }
 
             var result = JsonConvert.DeserializeObject<ResponseRoot>(await resp.Content.ReadAsStringAsync())!;
-            if (!result.Success && result.ErrorCode != "401") Log.ApiError(resturl, result);
+            if (!result.Success && result.ErrorCode != 401) Log.ApiError(resturl, result);
 
             return (success, result);
         }
