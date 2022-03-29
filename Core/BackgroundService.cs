@@ -70,15 +70,15 @@ internal static class BackgroundService
                 foreach (var file in new DirectoryInfo($"{dirpth}/assets/char/").GetFiles()
                                                                                 .Where(file =>
                                                                                            !File
-                                                                                               .Exists($"{Config.DataRootPath}/sourse/char/{file.Name}")))
-                    file.MoveTo($"{Config.DataRootPath}/sourse/char/{file.Name}");
+                                                                                               .Exists($"{Config.DataRootPath}/source/char/{file.Name}")))
+                    file.MoveTo($"{Config.DataRootPath}/source/char/{file.Name}");
 
                 var list = JsonConvert.DeserializeObject<Songlist>(File.ReadAllText($"{dirpth}/assets/songs/songlist"));
 
                 if (list is not null)
                     foreach (var i in list.Songs)
                     {
-                        var destdir = $"{Config.DataRootPath}/sourse/songs";
+                        var destdir = $"{Config.DataRootPath}/source/songs";
                         var rawdir = $"{dirpth}/assets/songs/{(i.NeedDownload ? "dl_" : "")}{i.Id}";
 
                         for (var j = 0; j < i.Difficulties.Count; ++j)

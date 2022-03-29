@@ -401,7 +401,7 @@ internal class ArcaeaSongs
                     item.BynRating = @const;
                     item.BynNote = friend.RecentScore[0].MissCount + friend.RecentScore[0].NearCount
                                                                    + friend.RecentScore[0].PerfectCount;
-                    var path = $"{GlobalConfig.Config.DataRootPath}/sourse/songs/{item.SongId}_3.jpg";
+                    var path = $"{GlobalConfig.Config.DataRootPath}/source/songs/{item.SongId}_3.jpg";
                     item.JacketOverrideByn = File.Exists(path)
                         ? "true"
                         : "false";

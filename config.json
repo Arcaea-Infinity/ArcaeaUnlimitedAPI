@@ -4,7 +4,7 @@
   "host": "arcapi-v2.lowiro.com",
   "cert_name": "cert-3.12.4c.p12",
   "cert_password": "HelloWorld",
-  "root_path": "/etc/arcaeaunlimitedapi/data",
+  "data_path": "/etc/arcaeaunlimitedapi/data",
   "open_register": false,
   "api_salt": [],
   "nodes": [

@@ -31,7 +31,7 @@ public class ConfigItem
 
     [JsonProperty("cert_password")] public string CertPassword { get; set; }
 
-    [JsonProperty("root_path")] public string DataRootPath { get; set; }
+    [JsonProperty("data_path")] public string DataRootPath { get; set; }
 
     [JsonProperty("open_register")] public bool? OpenRegister { get; set; }
 
