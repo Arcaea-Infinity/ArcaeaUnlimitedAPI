@@ -31,11 +31,11 @@ public class ConfigItem
 
     [JsonProperty("cert_password")] public string CertPassword { get; set; }
 
-    [JsonProperty("data_path")] public string DataRootPath { get; set; }
+    [JsonProperty("data_path")] public string DataPath { get; set; }
 
     [JsonProperty("open_register")] public bool? OpenRegister { get; set; }
 
-    [JsonProperty("api_salt")] public byte[] ApiSalt { get; set; }
+    [JsonProperty("api_salt")] public List<byte> ApiSalt { get; set; }
 
     [JsonProperty("nodes")] public List<Node> Nodes { get; set; }
 

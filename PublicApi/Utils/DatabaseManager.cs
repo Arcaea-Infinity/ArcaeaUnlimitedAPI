@@ -27,7 +27,7 @@ internal static class DatabaseManager
         = new(() => new($"{DatabaseDir()}/arcbest30.db",
                         SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.FullMutex));
 
-    private static string DatabaseDir() => $"{GlobalConfig.Config.DataRootPath}/database";
+    private static string DatabaseDir() => $"{GlobalConfig.Config.DataPath}/database";
 
     internal static TableQuery<T> Where<T>(this Lazy<SQLiteConnection> connection, Expression<Func<T, bool>> predExpr)
         where T : new() =>

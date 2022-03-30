@@ -22,11 +22,11 @@ internal static class BackgroundService
 
     private static string Version
     {
-        get => _version ??= File.ReadAllText($"{Config.DataRootPath}/arcversion");
+        get => _version ??= File.ReadAllText($"{Config.DataPath}/arcversion");
         set
         {
             _version = value;
-            File.WriteAllText($"{Config.DataRootPath}/arcversion", value);
+            File.WriteAllText($"{Config.DataPath}/arcversion", value);
         }
     }
 
@@ -54,10 +54,11 @@ internal static class BackgroundService
         {
             var info = GetLatestVersion().Result;
             if (info?.Url is null || Version == info.Version) return;
+            
             if (Config.Appversion != info.Version) NeedUpdate = true;
             var dirname = info.Version;
-            var apkpth = $"{Config.DataRootPath}/update/arcaea_{dirname}.apk";
-            var dirpth = $"{Config.DataRootPath}/update/{dirname}dir/";
+            var apkpth = $"{Config.DataPath}/update/arcaea_{dirname}.apk";
+            var dirpth = $"{Config.DataPath}/update/{dirname}dir/";
 
             try
             {
@@ -70,15 +71,15 @@ internal static class BackgroundService
                 foreach (var file in new DirectoryInfo($"{dirpth}/assets/char/").GetFiles()
                                                                                 .Where(file =>
                                                                                            !File
-                                                                                               .Exists($"{Config.DataRootPath}/source/char/{file.Name}")))
-                    file.MoveTo($"{Config.DataRootPath}/source/char/{file.Name}");
+                                                                                               .Exists($"{Config.DataPath}/source/char/{file.Name}")))
+                    file.MoveTo($"{Config.DataPath}/source/char/{file.Name}");
 
                 var list = JsonConvert.DeserializeObject<Songlist>(File.ReadAllText($"{dirpth}/assets/songs/songlist"));
 
                 if (list is not null)
                     foreach (var i in list.Songs)
                     {
-                        var destdir = $"{Config.DataRootPath}/source/songs";
+                        var destdir = $"{Config.DataPath}/source/songs";
                         var rawdir = $"{dirpth}/assets/songs/{(i.NeedDownload ? "dl_" : "")}{i.Id}";
 
                         for (var j = 0; j < i.Difficulties.Count; ++j)
@@ -135,9 +136,9 @@ internal static class BackgroundService
         var cert = ArcaeaDecrypt.GetCert(lib);
         var entry = ArcaeaDecrypt.GetApiEntry(lib);
 
-        File.WriteAllBytes($"{Config.DataRootPath}/cert-{info.Version}.p12", cert);
+        File.WriteAllBytes($"{Config.DataPath}/cert-{info.Version}.p12", cert);
 
-        Config.ApiSalt = salt;
+        Config.ApiSalt = salt.ToList();
         Config.ApiEntry = entry;
         Config.CertFileName = $"cert-{info.Version}.p12";
         Config.Appversion = info.Version;
@@ -159,7 +160,7 @@ internal static class BackgroundService
     {
         var psi = new ProcessStartInfo
                   {
-                      FileName = "aria2c", Arguments = $"--dir={Config.DataRootPath}/update/ {url}"
+                      FileName = "aria2c", Arguments = $"--dir={Config.DataPath}/update/ {url}"
                   };
         using var p = Process.Start(psi);
         p?.WaitForExit();

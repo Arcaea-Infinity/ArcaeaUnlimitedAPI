@@ -2,7 +2,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using ArcaeaUnlimitedAPI.Core;
-using ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
 using ArcaeaUnlimitedAPI.Json.Songlist;
 using ArcaeaUnlimitedAPI.PublicApi;
 using SQLite;
@@ -342,11 +341,11 @@ internal class ArcaeaSongs
         }
     }
 
-    internal static void UpdateRating(FriendsItem friend)
+    internal static void UpdateRating(Records record)
     {
-        var songId = friend.RecentScore[0].SongID;
-        var difficulty = friend.RecentScore[0].Difficulty;
-        var @const = (int)Math.Round(CalcSongConst(friend.RecentScore[0].Score, friend.RecentScore[0].Rating) * 10);
+        var songId = record.SongID;
+        var difficulty = record.Difficulty;
+        var @const = (int)Math.Round(CalcSongConst(record.Score, record.Rating) * 10);
         if (@const == 0) return;
 
         var item = GetById(songId);
@@ -360,8 +359,8 @@ internal class ArcaeaSongs
                 if (item.PstRating != @const)
                 {
                     item.PstRating = @const;
-                    item.PstNote = friend.RecentScore[0].MissCount + friend.RecentScore[0].NearCount
-                                                                   + friend.RecentScore[0].PerfectCount;
+                    item.PstNote = record.MissCount + record.NearCount
+                                                     + record.PerfectCount;
                     SongJsonList.Value[item.SongId] = item.ToJson();
                     DatabaseManager.Song.Update(item);
                     Sort();
@@ -373,8 +372,8 @@ internal class ArcaeaSongs
                 if (item.PrsRating != @const)
                 {
                     item.PrsRating = @const;
-                    item.PrsNote = friend.RecentScore[0].MissCount + friend.RecentScore[0].NearCount
-                                                                   + friend.RecentScore[0].PerfectCount;
+                    item.PrsNote = record.MissCount + record.NearCount
+                                                     + record.PerfectCount;
                     SongJsonList.Value[item.SongId] = item.ToJson();
                     DatabaseManager.Song.Update(item);
                     Sort();
@@ -386,8 +385,8 @@ internal class ArcaeaSongs
                 if (item.FtrRating != @const)
                 {
                     item.FtrRating = @const;
-                    item.FtrNote = friend.RecentScore[0].MissCount + friend.RecentScore[0].NearCount
-                                                                   + friend.RecentScore[0].PerfectCount;
+                    item.FtrNote = record.MissCount + record.NearCount
+                                                     + record.PerfectCount;
                     SongJsonList.Value[item.SongId] = item.ToJson();
                     DatabaseManager.Song.Update(item);
                     Sort();
@@ -399,9 +398,9 @@ internal class ArcaeaSongs
                 if (item.BynRating != @const)
                 {
                     item.BynRating = @const;
-                    item.BynNote = friend.RecentScore[0].MissCount + friend.RecentScore[0].NearCount
-                                                                   + friend.RecentScore[0].PerfectCount;
-                    var path = $"{GlobalConfig.Config.DataRootPath}/source/songs/{item.SongId}_3.jpg";
+                    item.BynNote = record.MissCount + record.NearCount
+                                                     + record.PerfectCount;
+                    var path = $"{GlobalConfig.Config.DataPath}/source/songs/{item.SongId}_3.jpg";
                     item.JacketOverrideByn = File.Exists(path)
                         ? "true"
                         : "false";

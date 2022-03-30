@@ -222,7 +222,7 @@ internal static class ArcaeaFetch
         _apientry = Config.ApiEntry;
         _arcaeaHash = new();
         _arcaeaHash.Init();
-        var certificate = new X509Certificate2($"{Config.DataRootPath}/{Config.CertFileName}", Config.CertPassword);
+        var certificate = new X509Certificate2($"{Config.DataPath}/{Config.CertFileName}", Config.CertPassword);
         var handler = new HttpClientHandler();
         handler.ClientCertificates.Add(certificate);
         handler.ServerCertificateCustomValidationCallback = (_, _, _, _) => true;
@@ -297,7 +297,7 @@ internal static class ArcaeaFetch
         if (NeedUpdate) return default;
 
         var resturl = "auth/login";
-        var data = SubmitDataToString(new() { { "grant_type", "client_credentials" } });
+        var data = "grant_type=client_credentials";
 
         var node = NodeInfo.Alloc();
         if (node is null) return default;

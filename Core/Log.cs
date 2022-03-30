@@ -9,7 +9,7 @@ internal static class Log
         try
         {
             var time = DateTime.Now;
-            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataRootPath}/log/apierr_{time:yyMMdd}.log",
+            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/apierr_{time:yyMMdd}.log",
                                           $"\n\n{time}\n{resturl}: query failed");
         }
         catch
@@ -24,7 +24,7 @@ internal static class Log
         try
         {
             var time = DateTime.Now;
-            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataRootPath}/log/apierr_{time:yyMMdd}.log",
+            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/apierr_{time:yyMMdd}.log",
                                           $"\n\n{time}\n{resturl}: code: {json.ErrorCode?.ToString() ?? json.Code}");
         }
         catch
@@ -40,7 +40,7 @@ internal static class Log
         {
             var time = DateTime.Now;
 
-            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataRootPath}/log/apierr_{time:yyMMdd}.log",
+            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/apierr_{time:yyMMdd}.log",
                                           $"\n\n{time}\n{resturl}: httpstatus: {httpstatus}");
         }
         catch
@@ -56,7 +56,7 @@ internal static class Log
         {
             var time = DateTime.Now;
 
-            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataRootPath}/log/functionerr_{time:yyMMdd}.log",
+            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/functionerr_{time:yyMMdd}.log",
                                           $"\n\n{time}\n{function}: {content}");
         }
         catch
@@ -71,7 +71,7 @@ internal static class Log
         try
         {
             var time = DateTime.Now;
-            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataRootPath}/log/exception_{time:yyMMdd}.log",
+            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/exception_{time:yyMMdd}.log",
                                           $"\n\n{time}\n{ex}");
         }
         catch
@@ -86,7 +86,7 @@ internal static class Log
         try
         {
             var time = DateTime.Now;
-            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataRootPath}/log/http_{time:yyMMdd}.log",
+            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/http_{time:yyMMdd}.log",
                                           $"\n\n{time}\n{uri}\n{message}");
         }
         catch

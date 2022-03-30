@@ -8,7 +8,7 @@ namespace ArcaeaUnlimitedAPI.Beans;
 
 [Serializable]
 [Table("players")]
-[DatabaseManager.CreateTableSqlAttribute("CREATE TABLE `players` (`uid`  INTEGER NOT NULL,`code` TEXT NOT NULL,`name` TEXT NOT NULL,`ptt`  INTEGER DEFAULT -1,`join_date` INTEGER NOT NULL,PRIMARY KEY (`uid` ASC));")]
+[DatabaseManager.CreateTableSqlAttribute("CREATE TABLE `players` (`uid`  INTEGER NOT NULL,`code` TEXT NOT NULL,`name` TEXT NOT NULL,`ptt` INTEGER DEFAULT -1,`join_date` INTEGER NOT NULL,PRIMARY KEY (`uid` ASC));")]
 internal class PlayerInfo
 {
     [PrimaryKey] [Column("uid")] public string UserID { get; set; }

@@ -118,12 +118,13 @@ public partial class PublicApi : ControllerBase
         player.Update(friend);
 
         // insert new record into database
-        if (friend.RecentScore.Any())
+        if (friend.RecentScore?.Any() == true)
         {
             // Time > 2021/01/01 'cause 616 changed the calc func of ptt in 2020
-            if (friend.RecentScore[0].TimePlayed > 1609430400000) ArcaeaSongs.UpdateRating(friend);
+            if (friend.RecentScore[0].TimePlayed > 1609430400000)
+                ArcaeaSongs.UpdateRating(friend.RecentScore[0]);
 
-            Records.Insert(friend);
+            Records.Insert(friend,friend.RecentScore[0]);
         }
 
         return friend;

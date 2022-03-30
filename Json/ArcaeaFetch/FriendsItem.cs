@@ -20,5 +20,5 @@ public class FriendsItem
     [JsonProperty("rating")] public int Rating { get; set; }
     [JsonProperty("join_date")] public long JoinDate { get; set; }
     [JsonProperty("character")] public int Character { get; set; }
-    [JsonProperty("recent_score")] public List<Records> RecentScore { get; set; }
+    [JsonProperty("recent_score")] public List<Records>? RecentScore { get; set; }
 }

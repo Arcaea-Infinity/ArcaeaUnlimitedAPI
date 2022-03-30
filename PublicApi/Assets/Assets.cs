@@ -28,10 +28,10 @@ public partial class PublicApi
                                 _                                       => ""
                             };
 
-            fileinfo = new($"{Config.DataRootPath}/source/songs/{song.SongId}{difextend}.jpg");
+            fileinfo = new($"{Config.DataPath}/source/songs/{song.SongId}{difextend}.jpg");
         }
         else
-            fileinfo = new($"{Config.DataRootPath}/source/songs/{file}.jpg");
+            fileinfo = new($"{Config.DataPath}/source/songs/{file}.jpg");
 
         if (!fileinfo.Exists) return NotFound(Error.FileUnavailable);
 
@@ -46,7 +46,7 @@ public partial class PublicApi
         // check for request arguments
         if (!int.TryParse(partner, out _)) return NotFound(Error.InvalidPartner);
 
-        var fileinfo = new FileInfo($"{Config.DataRootPath}/source/char/{partner}{(awakened ? "u" : "")}_icon.png");
+        var fileinfo = new FileInfo($"{Config.DataPath}/source/char/{partner}{(awakened ? "u" : "")}_icon.png");
 
         if (!fileinfo.Exists) return NotFound(Error.FileUnavailable);
 
@@ -61,7 +61,7 @@ public partial class PublicApi
         // check for request arguments
         if (!int.TryParse(partner, out _)) return NotFound(Error.InvalidPartner);
 
-        var fileinfo = new FileInfo($"{Config.DataRootPath}/source/char/{partner}{(awakened ? "u" : "")}.png");
+        var fileinfo = new FileInfo($"{Config.DataPath}/source/char/{partner}{(awakened ? "u" : "")}.png");
 
         if (!fileinfo.Exists) return NotFound(Error.FileUnavailable);
 

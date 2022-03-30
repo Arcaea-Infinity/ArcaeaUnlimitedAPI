@@ -61,12 +61,10 @@ public class Records
                        .ToList();
 
 
-    public static void Insert(FriendsItem friend)
+    public static void Insert(FriendsItem friend, Records record)
     {
-        var record = friend.RecentScore[0];
         record.UserID = friend.UserID;
         record.Potential = friend.Rating;
-
         DatabaseManager.Record.InsertOrReplace(record);
     }
 }

@@ -61,20 +61,22 @@ public partial class PublicApi
 
         if (withsonginfo)
         {
-            response.Best30Songinfo = response.Best30List?.Select(i => ArcaeaSongs.GetById(i.SongID)!.ToJson());
+            if (response.Best30List is not  null)
+                response.Best30Songinfo = response.Best30List.Select(i => ArcaeaSongs.GetById(i.SongID)!.ToJson());
 
             if (response.Best30Overflow is not null)
                 response.Best30OverflowSonginfo
-                    = response.Best30Overflow?.Select(i => ArcaeaSongs.GetById(i.SongID)!.ToJson());
+                    = response.Best30Overflow.Select(i => ArcaeaSongs.GetById(i.SongID)!.ToJson());
         }
 
         if (withrecent)
         {
-            response.RecentScore = response.AccountInfo.RecentScore.FirstOrDefault();
+            if (response.AccountInfo.RecentScore is not null)
+                response.RecentScore = response.AccountInfo.RecentScore.FirstOrDefault();
             if (withsonginfo) response.RecentSonginfo = ArcaeaSongs.GetById(response.RecentScore?.SongID)?.ToJson();
         }
 
-        response.AccountInfo.RecentScore = null!;
+        response.AccountInfo.RecentScore = null;
 
         return Success(response);
     }
@@ -90,7 +92,7 @@ public partial class PublicApi
             var friend = RecordPlayers(account, player, out var recorderror);
             if (friend is null) return (null, recorderror!);
             if (friend.Rating is >= 0 and < 700) return (null, Error.BelowTheThreshold);
-            if (!friend.RecentScore.Any()) return (null, Error.NotPlayedYet);
+            if (friend.RecentScore?.Any() != true) return (null, Error.NotPlayedYet);
 
             // read best30 cache from database
             var best30Cache = UserBest30Response.GetById(friend.UserID);
