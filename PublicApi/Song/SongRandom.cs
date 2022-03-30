@@ -14,7 +14,7 @@ public partial class PublicApi
         if (start is null && end is null)
         {
             var rsong = ArcaeaCharts.RandomSong();
-            if (withsonginfo) return Success(new { id = rsong[0].SongID, songinfo = rsong });
+            if (withsonginfo) return Success(new { id = rsong[0].SongID, songinfo = rsong.ToJson() });
             return Success(new { id = rsong[0].SongID });
         }
 

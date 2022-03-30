@@ -207,8 +207,9 @@ public class ArcaeaCharts
     internal static void Insert(SongItem item)
     {
         var ls = new ArcaeaSong(item.Id);
+        var song = GetById(item.Id);
 
-        for (var i = 0; i < item.Difficulties.Count; i++)
+        for (var i = song?.Count ?? 0; i < item.Difficulties.Count; i++)
         {
             var chart = new ArcaeaCharts
                         {
@@ -241,7 +242,11 @@ public class ArcaeaCharts
             DatabaseManager.Song.Value.Insert(chart);
         }
 
-        SongList.TryAdd(item.Id, ls);
+        if (ls.Count > 0)
+            if (song is null)
+                SongList.TryAdd(item.Id, ls);
+            else
+                SongList[item.Id].AddRange(ls);
     }
 
     internal static void UpdateRating(Records record)
@@ -363,12 +368,8 @@ public class ArcaeaCharts
 
 internal class ArcaeaSong : IEnumerable<ArcaeaCharts>, IEquatable<ArcaeaSong>
 {
-    [JsonRequired]
-    [JsonProperty("difficulties")]
     private readonly List<ArcaeaCharts> _charts;
 
-    [JsonRequired]
-    [JsonProperty("song_id")]
     internal readonly string SongID;
 
     internal int Count => _charts.Count;
@@ -379,9 +380,14 @@ internal class ArcaeaSong : IEnumerable<ArcaeaCharts>, IEquatable<ArcaeaSong>
         SongID = songID;
     }
 
+    internal object ToJson() => new { song_id = SongID, difficulties = _charts };
+
     public ArcaeaCharts this[int index] => _charts[index];
 
     public void Add(ArcaeaCharts chart) => _charts.Add(chart);
+
+    public void AddRange(ArcaeaSong ls) => _charts.AddRange(ls);
+
     public IEnumerator<ArcaeaCharts> GetEnumerator() => _charts.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

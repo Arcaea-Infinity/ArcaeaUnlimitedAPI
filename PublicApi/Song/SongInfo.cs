@@ -26,6 +26,6 @@ public partial class PublicApi
 
         if (song is null) return songerror ?? Error.InvalidSongNameorID;
 
-        return Success(song);
+        return Success(song.ToJson());
     }
 }

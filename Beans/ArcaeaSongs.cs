@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
-using System.Text.RegularExpressions;
 using ArcaeaUnlimitedAPI.Core;
 using ArcaeaUnlimitedAPI.Json.Songlist;
 using ArcaeaUnlimitedAPI.PublicApi;
