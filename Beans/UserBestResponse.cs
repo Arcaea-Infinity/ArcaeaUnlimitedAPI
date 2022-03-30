@@ -12,9 +12,9 @@ public class UserBestResponse
 
     [JsonProperty("record")] public Records Record { get; set; }
 
-    [JsonProperty("songinfo")] public SongsItem[]? Songinfo { get; set; }
+    [JsonProperty("songinfo")] public SongItem[]? Songinfo { get; set; }
 
     [JsonProperty("recent_score")] public Records? RecentScore { get; set; }
 
-    [JsonProperty("recent_songinfo")] public SongsItem? RecentSonginfo { get; set; }
+    [JsonProperty("recent_songinfo")] public SongItem? RecentSonginfo { get; set; }
 }

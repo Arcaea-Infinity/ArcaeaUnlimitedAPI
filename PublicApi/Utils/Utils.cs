@@ -48,10 +48,15 @@ public partial class PublicApi : ControllerBase
 
         var players = PlayerInfo.GetByAny(user);
 
-        if (players.Count < 1)
+        if (players.Count == 0)
         {
-            error = Error.UserNotFound;
-            return null;
+            if (!int.TryParse(user, out var ucode) || ucode is < 0 or > 999999999)
+            {
+                error = Error.UserNotFound;
+                return null;
+            }
+
+            return new() { Code = user.PadLeft(9, '0') };
         }
 
         if (players.Count > 1)
@@ -92,6 +97,35 @@ public partial class PublicApi : ControllerBase
 
         return ls[0];
     }
+    
+    private static ArcaeaSong? QuerySongInfoExperimental(string? songname, string? songid, out Response? error)
+    {
+        error = null;
+
+        if (!string.IsNullOrWhiteSpace(songid)) return ArcaeaCharts.GetById(songid);
+
+        if (string.IsNullOrWhiteSpace(songname))
+        {
+            error = Error.InvalidSongNameorID;
+            return null;
+        }
+
+        var ls = ArcaeaCharts.GetByAlias(songname);
+
+        if (ls.Count < 1)
+        {
+            error = Error.SongNotFound;
+            return null;
+        }
+
+        if (ls.Count > 1)
+        {
+            error = Error.TooManySongs(ls);
+            return null;
+        }
+
+        return ls[0];
+    }
 
     private static FriendsItem? RecordPlayers(AccountInfo account, PlayerInfo player, out Response? error)
     {
@@ -122,57 +156,14 @@ public partial class PublicApi : ControllerBase
         {
             // Time > 2021/01/01 'cause 616 changed the calc func of ptt in 2020
             if (friend.RecentScore[0].TimePlayed > 1609430400000)
+            {
                 ArcaeaSongs.UpdateRating(friend.RecentScore[0]);
+                ArcaeaCharts.UpdateRating(friend.RecentScore[0]);
+            }
 
-            Records.Insert(friend,friend.RecentScore[0]);
+            Records.Insert(friend, friend.RecentScore[0]);
         }
 
         return friend;
     }
-
-
-    private static (int, int) RangeConverter(string? start, string? end)
-    {
-        int upper, lower;
-        if (start == null)
-        {
-            if (end == null) return (-1, -1);
-
-            (lower, upper) = ConvertToArcaeaRange(end);
-        }
-        else
-        {
-            if (end is null)
-                (lower, upper) = ConvertToArcaeaRange(start);
-
-            else
-            {
-                (lower, _) = ConvertToArcaeaRange(start);
-                (_, upper) = ConvertToArcaeaRange(end);
-            }
-        }
-
-        return (lower, upper);
-    }
-
-    private static (int, int) ConvertToArcaeaRange(string rawdata) =>
-        rawdata switch
-        {
-            "11"  => (110, 116),
-            "10p" => (107, 109),
-            "10"  => (100, 106),
-            "9p"  => (97, 99),
-            "9"   => (90, 96),
-            "8"   => (80, 89),
-            "7"   => (70, 79),
-            "6"   => (60, 69),
-            "5"   => (50, 59),
-            "4"   => (40, 49),
-            "3"   => (30, 39),
-            "2"   => (20, 29),
-            "1"   => (10, 19),
-            _ => double.TryParse(rawdata, out var value)
-                ? ((int)Math.Round(value * 10), (int)Math.Round(value * 10))
-                : (-1, -1)
-        };
 }

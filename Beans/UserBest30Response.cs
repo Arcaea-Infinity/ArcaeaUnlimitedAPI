@@ -39,16 +39,16 @@ public class UserBest30Response
     public List<Records>? Best30Overflow { get; set; }
 
     [JsonProperty("best30_songinfo")] [Ignore]
-    public IEnumerable<SongsItem>? Best30Songinfo { get; set; }
+    public IEnumerable<SongItem>? Best30Songinfo { get; set; }
 
     [JsonProperty("best30_overflow_songinfo")] [Ignore]
-    public IEnumerable<SongsItem>? Best30OverflowSonginfo { get; set; }
+    public IEnumerable<SongItem>? Best30OverflowSonginfo { get; set; }
 
     [JsonProperty("recent_score")] [Ignore]
     public Records? RecentScore { get; set; }
 
     [JsonProperty("recent_songinfo")] [Ignore]
-    public SongsItem? RecentSonginfo { get; set; }
+    public SongItem? RecentSonginfo { get; set; }
 
     internal static UserBest30Response? GetById(int userid)
     {

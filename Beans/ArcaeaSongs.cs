@@ -15,7 +15,7 @@ namespace ArcaeaUnlimitedAPI.Beans;
 internal class ArcaeaSongs
 {
     [NonSerialized] internal static readonly Lazy<ConcurrentDictionary<string, ArcaeaSongs>> SongList;
-    [NonSerialized] internal static readonly Lazy<ConcurrentDictionary<string, SongsItem>> SongJsonList;
+    [NonSerialized] internal static readonly Lazy<ConcurrentDictionary<string, SongItem>> SongJsonList;
     [NonSerialized] internal static readonly Lazy<IEnumerable<ArcaeaAlias>> AliasList;
 
     [NonSerialized] private static readonly ConcurrentDictionary<string, string> Abbreviations = new();
@@ -132,12 +132,12 @@ internal class ArcaeaSongs
         }
     }
 
-    internal static ArcaeaSongs GetFromJson(SongsItem item) =>
+    internal static ArcaeaSongs GetFromJson(SongItem item) =>
         new()
         {
             SongId = item.Id,
             SongnameEn = item.TitleLocalized.En,
-            SongnameJp = item.TitleLocalized.Ja,
+            SongnameJp = item.TitleLocalized.Ja ?? "",
             Bpm = item.Bpm,
             BpmBase = item.BpmBase,
             Pakset = item.Set,
@@ -180,11 +180,11 @@ internal class ArcaeaSongs
                     : "false"
         };
 
-    public SongsItem ToJson(bool usejsonlist = true)
+    public SongItem ToJson(bool usejsonlist = true)
     {
         if (usejsonlist && SongJsonList.Value.ContainsKey(SongId)) return SongJsonList.Value[SongId];
 
-        var obj = new SongsItem
+        var obj = new SongItem
                   {
                       Id = SongId,
                       TitleLocalized = new()
@@ -268,12 +268,12 @@ internal class ArcaeaSongs
         if (Aliascache.ContainsKey(alias)) return Aliascache[alias];
 
         var data = GetById(alias)
-                   ?? GetById(AliasList.Value.FirstOrDefault(c => StringCompareHelper.Equals(c.Alias, alias))?.SongId)
-                   ?? SongList.Value.Values.FirstOrDefault(c => StringCompareHelper.Equals(c.SongnameEn, alias));
+                   ?? GetById(AliasList.Value.FirstOrDefault(c => Utils.StringCompareHelper.Equals(c.Alias, alias))?.SongId)
+                   ?? SongList.Value.Values.FirstOrDefault(c => Utils.StringCompareHelper.Equals(c.SongnameEn, alias));
 
         if (data != null) return new[] { data };
 
-        var abbrdata = Abbreviations.Where(c => StringCompareHelper.Equals(c.Value, alias)).Select(i => GetById(i.Key))
+        var abbrdata = Abbreviations.Where(c => Utils.StringCompareHelper.Equals(c.Value, alias)).Select(i => GetById(i.Key))
                                     .Distinct().ToArray();
 
         if (abbrdata.Length > 0) return abbrdata;
@@ -281,22 +281,22 @@ internal class ArcaeaSongs
         var dic = new PriorityQueue<string, byte>();
         foreach (var arcaeaAlias in AliasList.Value)
         {
-            if (StringCompareHelper.Contains(arcaeaAlias.Alias, alias)) dic.Enqueue(arcaeaAlias.SongId, 1);
-            if (StringCompareHelper.Contains(alias, arcaeaAlias.Alias)) dic.Enqueue(arcaeaAlias.SongId, 4);
+            if (Utils.StringCompareHelper.Contains(arcaeaAlias.Alias, alias)) dic.Enqueue(arcaeaAlias.SongId, 1);
+            if (Utils.StringCompareHelper.Contains(alias, arcaeaAlias.Alias)) dic.Enqueue(arcaeaAlias.SongId, 4);
         }
 
         foreach (var songdata in SongList.Value.Values)
         {
-            if (StringCompareHelper.Contains(songdata.SongId, alias)) dic.Enqueue(songdata.SongId, 2);
-            if (StringCompareHelper.Contains(alias, songdata.SongId)) dic.Enqueue(songdata.SongId, 5);
+            if (Utils.StringCompareHelper.Contains(songdata.SongId, alias)) dic.Enqueue(songdata.SongId, 2);
+            if (Utils.StringCompareHelper.Contains(alias, songdata.SongId)) dic.Enqueue(songdata.SongId, 5);
 
-            if (StringCompareHelper.Contains(songdata.SongnameEn, alias)) dic.Enqueue(songdata.SongId, 3);
-            if (StringCompareHelper.Contains(alias, songdata.SongnameEn)) dic.Enqueue(songdata.SongId, 6);
+            if (Utils.StringCompareHelper.Contains(songdata.SongnameEn, alias)) dic.Enqueue(songdata.SongId, 3);
+            if (Utils.StringCompareHelper.Contains(alias, songdata.SongnameEn)) dic.Enqueue(songdata.SongId, 6);
 
             if (!string.IsNullOrEmpty(songdata.SongnameJp))
             {
-                if (StringCompareHelper.Contains(songdata.SongnameJp, alias)) dic.Enqueue(songdata.SongId, 3);
-                if (StringCompareHelper.Contains(alias, songdata.SongnameJp)) dic.Enqueue(songdata.SongId, 6);
+                if (Utils.StringCompareHelper.Contains(songdata.SongnameJp, alias)) dic.Enqueue(songdata.SongId, 3);
+                if (Utils.StringCompareHelper.Contains(alias, songdata.SongnameJp)) dic.Enqueue(songdata.SongId, 6);
             }
         }
 
@@ -313,30 +313,14 @@ internal class ArcaeaSongs
         return result;
     }
 
-    internal static IEnumerable<(ArcaeaSongs song, int dif)> GetByConstRange(int lowerlimit, int upperlimit)
+    internal static void Insert(SongItem songItem)
     {
-        return SongList.Value.Values.SelectMany(c => c.Ratings, (c, i) => new { c, i })
-                       .Where(t => t.i >= lowerlimit && t.i <= upperlimit).Select(t => (t.c, t.c.Ratings.IndexOf(t.i)));
-    }
-
-    internal static (ArcaeaSongs?, int) RandomSong(int lowerlimit, int upperlimit)
-    {
-        var ls = GetByConstRange(lowerlimit, upperlimit).ToArray();
-        return ls.Length > 0
-            ? RandomHelper.GetRandomItem(ls)
-            : (null, -1);
-    }
-
-    internal static ArcaeaSongs RandomSong() => RandomHelper.GetRandomItem(SongList.Value.Values.ToArray());
-
-    internal static void Insert(SongsItem songsItem)
-    {
-        if (GetById(songsItem.Id) is null)
+        if (GetById(songItem.Id) is null)
         {
-            var item = GetFromJson(songsItem);
+            var item = GetFromJson(songItem);
             item.Init();
-            SongList.Value.TryAdd(songsItem.Id, item);
-            SongJsonList.Value.TryAdd(songsItem.Id, item.ToJson());
+            SongList.Value.TryAdd(songItem.Id, item);
+            SongJsonList.Value.TryAdd(songItem.Id, item.ToJson());
             DatabaseManager.Song.Value.Insert(item);
         }
     }
@@ -413,36 +397,13 @@ internal class ArcaeaSongs
         }
     }
 
-    private static double CalcSongConst(int score, double rating)
-    {
-        return score switch
-               {
-                   >= 10000000 => rating - 2,
-                   >= 9800000  => rating - 1 - (double)(score - 9800000) / 200000,
-                   _ => rating > 0
-                       ? rating - (double)(score - 9500000) / 300000
-                       : 0
-               };
-    }
-
-    internal static class StringCompareHelper
-    {
-        private static readonly Regex Reg = new(@"\s|\(|\)|（|）", RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
-        internal static bool Contains(string? raw, string? seed) =>
-            seed != null && raw != null
-                         && Reg.Replace(raw, "").IndexOf(Reg.Replace(seed, ""), StringComparison.OrdinalIgnoreCase)
-                         >= 0;
-
-        internal static bool Equals(string? raw, string? seed) =>
-            seed != null && raw != null
-                         && string.Equals(Reg.Replace(raw, ""), Reg.Replace(seed, ""),
-                                          StringComparison.OrdinalIgnoreCase);
-    }
-
-    internal static class RandomHelper
-    {
-        private static readonly Random Random = new();
-        internal static T GetRandomItem<T>(T[] ls) => ls[Random.Next(ls.Length)];
-    }
+    private static double CalcSongConst(int score, double rating) =>
+        score switch
+        {
+            >= 10000000 => rating - 2,
+            >= 9800000  => rating - 1 - (double)(score - 9800000) / 200000,
+            _ => rating > 0
+                ? rating - (double)(score - 9500000) / 300000
+                : 0
+        };
 }

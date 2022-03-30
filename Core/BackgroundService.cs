@@ -96,8 +96,9 @@ internal static class BackgroundService
                                 if (!File.Exists(pth) && File.Exists(rawpth)) File.Move(rawpth, pth);
                             }
 
-                        Thread.Sleep(300);
                         ArcaeaSongs.Insert(i);
+                        Thread.Sleep(300);
+                        ArcaeaCharts.Insert(i);
 
                         if (i.Difficulties.Count == 4)
                         {

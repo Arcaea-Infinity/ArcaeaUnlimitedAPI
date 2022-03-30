@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Text.RegularExpressions;
 using ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
 using Newtonsoft.Json;
 using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
@@ -70,5 +71,30 @@ internal static class Utils
         }
 
         internal static async Task<string> GetString(string url) => await Client.GetStringAsync(new Uri(url));
+    }
+
+    internal static class StringCompareHelper
+    {
+        private static readonly Regex Reg = new(@"\s|\(|\)|（|）", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+        internal static bool Contains(string? raw, string? seed) =>
+            seed != null && raw != null
+                         && Reg.Replace(raw, "").IndexOf(Reg.Replace(seed, ""), StringComparison.OrdinalIgnoreCase)
+                         >= 0;
+
+        internal static bool Equals(string? raw, string? seed) =>
+            seed != null && raw != null
+                         && string.Equals(Reg.Replace(raw, ""), Reg.Replace(seed, ""),
+                                          StringComparison.OrdinalIgnoreCase);
+    }
+
+    internal static class RandomHelper
+    {
+        private static readonly Random Random = new();
+
+        internal static T? GetRandomItem<T>(T?[] ls) =>
+            ls.Any()
+                ? ls[Random.Next(ls.Length)]
+                : default;
     }
 }

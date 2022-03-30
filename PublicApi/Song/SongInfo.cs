@@ -16,4 +16,16 @@ public partial class PublicApi
 
         return Success(song.ToJson());
     }
+    
+    [HttpGet("/botarcapi/test/song/info")]
+    public object GetSongInfoExperimental(string? songname, string? songid)
+    {
+        if (!UserAgentCheck()) return NotFound(null);
+
+        var song = QuerySongInfoExperimental(songname, songid, out var songerror);
+
+        if (song is null) return songerror ?? Error.InvalidSongNameorID;
+
+        return Success(song);
+    }
 }

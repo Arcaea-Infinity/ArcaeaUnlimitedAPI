@@ -12,5 +12,5 @@ public class UserInfoResponse
 
     [JsonProperty("recent_score")] public List<Records>? RecentScore { get; set; }
 
-    [JsonProperty("songinfo")] public IEnumerable<SongsItem>? Songinfo { get; set; }
+    [JsonProperty("songinfo")] public IEnumerable<SongItem>? Songinfo { get; set; }
 }
