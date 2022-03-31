@@ -68,6 +68,9 @@ internal static class BackgroundService
                 Directory.CreateDirectory(dirpth);
                 ZipFile.ExtractToDirectory(apkpth, dirpth);
 
+                if (!File.Exists($"{Config.DataPath}/source/songs/melodyoflove_night.jpg"))
+                    File.Move($"{dirpth}/assets/songs/dl_melodyoflove/base_night.jpg",$"{Config.DataPath}/source/songs/melodyoflove_night.jpg");
+
                 foreach (var file in new DirectoryInfo($"{dirpth}/assets/char/").GetFiles()
                                                                                 .Where(file =>
                                                                                            !File
