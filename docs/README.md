@@ -4,6 +4,8 @@
 
 A fast and easy Arcaea API for your bot.
 
+For the deploy tutorial of AUA, please refer to the sub-branch branch.
+
 ### Note
 
 > Accessing the api requires a specific User-Agent
