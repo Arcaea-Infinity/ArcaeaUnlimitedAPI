@@ -18,7 +18,7 @@ internal static class BackgroundService
 
     private static string? _version;
 
-    private static volatile object _lockobj = new();
+    private static volatile int _running;
 
     private static string Version
     {
@@ -50,11 +50,13 @@ internal static class BackgroundService
 
     private static void ArcUpdate(object? source, ElapsedEventArgs? e)
     {
-        lock (_lockobj)
+        if (Interlocked.CompareExchange(ref _running, 1, 0) != 0) return;
+
+        try
         {
             var info = GetLatestVersion().Result;
             if (info?.Url is null || Version == info.Version) return;
-            
+
             if (Config.Appversion != info.Version) NeedUpdate = true;
             var dirname = info.Version;
             var apkpth = $"{Config.DataPath}/update/arcaea_{dirname}.apk";
@@ -69,7 +71,8 @@ internal static class BackgroundService
                 ZipFile.ExtractToDirectory(apkpth, dirpth);
 
                 if (!File.Exists($"{Config.DataPath}/source/songs/melodyoflove_night.jpg"))
-                    File.Move($"{dirpth}/assets/songs/dl_melodyoflove/base_night.jpg",$"{Config.DataPath}/source/songs/melodyoflove_night.jpg");
+                    File.Move($"{dirpth}/assets/songs/dl_melodyoflove/base_night.jpg",
+                              $"{Config.DataPath}/source/songs/melodyoflove_night.jpg");
 
                 foreach (var file in new DirectoryInfo($"{dirpth}/assets/char/").GetFiles()
                                                                                 .Where(file =>
@@ -117,54 +120,62 @@ internal static class BackgroundService
                         }
                     }
 
-                AutoDecrypt(dirpth, info);
+                AutoDecrypt(dirpth, info.Version);
 
                 Version = info.Version;
                 File.Delete(apkpth);
-            }
-            catch (Exception ex)
-            {
-                Log.ExceptionError(ex);
             }
             finally
             {
                 Directory.Delete(dirpth, true);
             }
         }
+        catch (Exception ex)
+        {
+            Log.ExceptionError(ex);
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _running, 0);
+        }
     }
 
-    private static void AutoDecrypt(string dirpth, ArcUpdateValue info)
+    private static async void AutoDecrypt(string dirpth, string version)
     {
-        var lib = ArcaeaDecrypt.ReadLib($"{dirpth}/lib/arm64-v8a/libcocos2dcpp.so").Result;
-        var salt = ArcaeaDecrypt.GetSalt(lib);
-        var cert = ArcaeaDecrypt.GetCert(lib);
-        var entry = ArcaeaDecrypt.GetApiEntry(lib);
-
-        File.WriteAllBytes($"{Config.DataPath}/cert-{info.Version}.p12", cert);
-
-        Config.ApiSalt = salt.ToList();
-        Config.ApiEntry = entry;
-        Config.CertFileName = $"cert-{info.Version}.p12";
-        Config.Appversion = info.Version;
-
-        var tmpfetch = new TestFetch();
-
-        var result =  tmpfetch.Init(Config) && tmpfetch.TestLogin().Result;
-        Config.WriteConfig(result);
-
-        if (result)
+        try
         {
-            ArcaeaFetch.Init();
-            NeedUpdate = false;
+            var lib = await ArcaeaDecrypt.ReadLib($"{dirpth}/lib/arm64-v8a/libcocos2dcpp.so");
+            var salt = ArcaeaDecrypt.GetSalt(lib);
+            var cert = ArcaeaDecrypt.GetCert(lib);
+            var entry = ArcaeaDecrypt.GetApiEntry(lib);
+
+            await File.WriteAllBytesAsync($"{Config.DataPath}/cert-{version}.p12", cert);
+
+            Config.ApiSalt = salt.ToList();
+            Config.ApiEntry = entry;
+            Config.CertFileName = $"cert-{version}.p12";
+            Config.Appversion = version;
+
+            Config.WriteConfig(false);
+
+            var tmpfetch = new TestFetch();
+
+            if (tmpfetch.Init(Config) && tmpfetch.TestLogin().Result)
+            {
+                Config.WriteConfig(true);
+                ArcaeaFetch.Init();
+                NeedUpdate = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.ExceptionError(ex);
         }
     }
 
     private static void DownloadApk(string url)
     {
-        var psi = new ProcessStartInfo
-                  {
-                      FileName = "aria2c", Arguments = $"--dir={Config.DataPath}/update/ {url}"
-                  };
+        var psi = new ProcessStartInfo { FileName = "aria2c", Arguments = $"--dir={Config.DataPath}/update/ {url}" };
         using var p = Process.Start(psi);
         p?.WaitForExit();
         p?.Kill();
