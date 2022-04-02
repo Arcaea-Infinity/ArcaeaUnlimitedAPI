@@ -16,9 +16,9 @@ internal class AccountInfo
 
     [PrimaryKey] [Column("name")] public string Name { get; set; }
     [Column("passwd")] public string Password { get; set; }
-    [Column("device")] public string DeviceId { get; set; }
+    [Column("device")] public string DeviceID { get; set; }
     [Column("uid")] public int UserID { get; set; }
-    [Column("ucode")] public string Ucode { get; set; }
+    [Column("ucode")] public string Code { get; set; }
     [Column("token")] public string Token { get; set; }
     [Column("banned")] public string Banned { get; set; }
 

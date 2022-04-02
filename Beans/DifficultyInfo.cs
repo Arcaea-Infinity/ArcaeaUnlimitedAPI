@@ -1,33 +1,43 @@
-﻿namespace ArcaeaUnlimitedAPI.Beans;
+﻿using System.Collections.Concurrent;
+
+namespace ArcaeaUnlimitedAPI.Beans;
 
 #pragma warning disable CS8618
 
-internal class DifficultyInfo
+internal static class DifficultyInfo
 {
-    private static readonly List<DifficultyInfo> List = new()
-                                                        {
-                                                            new() { Index = 0, Alias = new[] { "0", "pst", "past" } },
-                                                            new()
-                                                            {
-                                                                Index = 1, Alias = new[] { "1", "prs", "present" }
-                                                            },
-                                                            new() { Index = 2, Alias = new[] { "2", "ftr", "future" } },
-                                                            new()
-                                                            {
-                                                                Index = 3, Alias = new[] { "3", "byn", "byd", "beyond" }
-                                                            }
-                                                        };
+    private static readonly ConcurrentDictionary<sbyte, string[]> List;
 
-    private sbyte Index { get; init; }
-    private string[] Alias { get; init; }
+    static DifficultyInfo()
+    {
+        List = new();
+
+        List.TryAdd(0, new[] { "0", "pst", "past" });
+        List.TryAdd(1, new[] { "1", "prs", "present" });
+        List.TryAdd(2, new[] { "2", "ftr", "future" });
+        List.TryAdd(3, new[] { "3", "byn", "byd", "beyond" });
+    }
 
     internal static bool TryParse(string? dif, out sbyte value)
     {
-        value = dif is null
-            ? (sbyte)-1
-            : List
-              .FirstOrDefault(info => info.Alias.Any(i => string.Equals(i, dif, StringComparison.OrdinalIgnoreCase)))
-              ?.Index ?? -1;
-        return value != -1;
+        if (dif is null)
+        {
+            value = -1;
+            return false;
+        }
+
+        foreach (var (index,alias) in List)
+        {
+            if (alias.Any(t => string.Equals(t, dif, StringComparison.OrdinalIgnoreCase)))
+            {
+                value = index;
+                return true;
+            }
+        }
+
+        {
+            value = -1;
+            return false;
+        }
     }
 }

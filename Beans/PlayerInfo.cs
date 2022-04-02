@@ -17,7 +17,7 @@ internal class PlayerInfo
 
     [Column("name")] public string Name { get; set; }
 
-    [Column("ptt")] public int Ptt { get; set; }
+    [Column("ptt")] public int Potential { get; set; }
 
     [Column("join_date")] public long JoinDate { get; set; }
 
@@ -31,7 +31,7 @@ internal class PlayerInfo
     {
         UserID = item.UserID.ToString();
         Name = item.Name;
-        Ptt = item.Rating;
+        Potential = item.Rating;
         JoinDate = item.JoinDate;
         DatabaseManager.Player.InsertOrReplace(this);
     }

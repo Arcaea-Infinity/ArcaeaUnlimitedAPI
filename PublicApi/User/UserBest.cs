@@ -88,8 +88,13 @@ public partial class PublicApi
 
             // get rank result
             var (success, friendRank) = await account.FriendRank(song.SongId, difficulty);
-            if (success && friendRank?.Any() != true) return (null, Error.NotPlayedYet);
-
+            if (!success || friendRank is null || friendRank.Count == 0) return (null, Error.NotPlayedYet);
+            foreach (var record in friendRank)
+            {
+                record.Potential = player.Potential;
+                DatabaseManager.Bests.InsertOrReplace(record);
+            }
+            
             // calculate song rating
             var rank = friendRank![0];
             rank.Rating = CalcSongRating(rank.Score, song.Ratings[rank.Difficulty]);

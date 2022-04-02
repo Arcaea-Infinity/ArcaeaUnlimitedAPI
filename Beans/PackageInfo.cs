@@ -12,9 +12,9 @@ namespace ArcaeaUnlimitedAPI.Beans;
 internal class PackageInfo
 {
     private static Lazy<ConcurrentDictionary<string, PackageInfo>> _list
-        = new(() => new(DatabaseManager.Song.SelectAll<PackageInfo>().ToDictionary(i => i.PackageId)));
+        = new(() => new(DatabaseManager.Song.SelectAll<PackageInfo>().ToDictionary(i => i.PackageID)));
 
-    [PrimaryKey] [Column("id")] public string PackageId { get; set; }
+    [PrimaryKey] [Column("id")] public string PackageID { get; set; }
 
     [Column("name")] public string Name { get; set; }
 

@@ -41,7 +41,7 @@ public class Records
     [JsonProperty("best_clear_type")] [Column("best_clear_type")]
     public int? BestClearType { get; set; }
 
-    [JsonProperty("time_played")] [PrimaryKey] [Column("time_played")]
+    [JsonProperty("time_played")] [Column("time_played")]
     public long TimePlayed { get; set; }
 
     [JsonProperty("near_count")] [Column("near_count")]

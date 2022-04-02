@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using ArcaeaUnlimitedAPI.Beans;
 using ArcaeaUnlimitedAPI.Core;
+using ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
@@ -10,18 +11,18 @@ internal class PollingBestsHelper
     private readonly AccountInfo _account;
     private readonly PriorityQueue<(string songID, int songDif, int songRating), int> _failedlist = new();
 
-    private readonly int _friendUserID;
+    private readonly FriendsItem _friend;
     private readonly PriorityQueue<Records, double> _records = new();
     private readonly ConcurrentQueue<Task<Records?>> _tasks = new();
 
-    private PollingBestsHelper(AccountInfo account, int friendUserID)
+    private PollingBestsHelper(AccountInfo account, FriendsItem friend)
     {
         _account = account;
-        _friendUserID = friendUserID;
+        _friend = friend;
     }
 
-    internal static async Task<UserBest30Response?> GetResult(AccountInfo account, int userID) =>
-        await new PollingBestsHelper(account, userID).PollingBests();
+    internal static async Task<UserBest30Response?> GetResult(AccountInfo account, FriendsItem friend) =>
+        await new PollingBestsHelper(account, friend).PollingBests();
 
     private async Task<UserBest30Response?> PollingBests()
     {
@@ -84,6 +85,7 @@ internal class PollingBestsHelper
 
                      var (success, result) = _account.FriendRank(songID, songDif).Result;
 
+
                      // Check invalid response and add them into failed list
                      if (!success || result is null)
                      {
@@ -91,13 +93,19 @@ internal class PollingBestsHelper
                          return null;
                      }
 
-                     var record = result.FirstOrDefault(i => i.UserID == _friendUserID);
+                     foreach (var i in result)
+                     {
+                         i.Potential = _friend.Rating;
+                         i.Rating = Utils.CalcSongRating(i.Score, songRating);
+                         DatabaseManager.Bests.InsertOrReplace(i);
+                     }
+
+                     var record = result.FirstOrDefault(i => i.UserID == _friend.UserID);
 
                      if (record is null) return null;
 
                      //for json
                      record.UserID = null!;
-                     record.Rating = Utils.CalcSongRating(record.Score, songRating);
 
                      return record;
                  });

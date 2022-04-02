@@ -102,7 +102,7 @@ public partial class PublicApi : ControllerBase
     {
         error = null;
 
-        if (!string.IsNullOrWhiteSpace(songid)) return ArcaeaCharts.GetById(songid);
+        if (!string.IsNullOrWhiteSpace(songid)) return ArcaeaCharts.QueryById(songid);
 
         if (string.IsNullOrWhiteSpace(songname))
         {
@@ -110,9 +110,9 @@ public partial class PublicApi : ControllerBase
             return null;
         }
 
-        var ls = ArcaeaCharts.GetByAlias(songname);
-
-        if (ls.Count < 1)
+        var ls = ArcaeaCharts.Query(songname);
+       
+        if (ls is null || ls.Count < 1)
         {
             error = Error.SongNotFound;
             return null;

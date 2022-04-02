@@ -256,7 +256,7 @@ internal class ArcaeaSongs
     }
 
     internal static IEnumerable<string> GetAlias(ArcaeaSongs song) =>
-        AliasList.Value.Where(i => i.SongId == song.SongId).Select(i => i.Alias);
+        AliasList.Value.Where(i => i.SongID == song.SongId).Select(i => i.Alias);
 
     internal static ArcaeaSongs?[] GetByAlias(string alias)
     {
@@ -267,7 +267,7 @@ internal class ArcaeaSongs
         if (Aliascache.ContainsKey(alias)) return Aliascache[alias];
 
         var data = GetById(alias)
-                   ?? GetById(AliasList.Value.FirstOrDefault(c => Utils.StringCompareHelper.Equals(c.Alias, alias))?.SongId)
+                   ?? GetById(AliasList.Value.FirstOrDefault(c => Utils.StringCompareHelper.Equals(c.Alias, alias))?.SongID)
                    ?? SongList.Value.Values.FirstOrDefault(c => Utils.StringCompareHelper.Equals(c.SongnameEn, alias));
 
         if (data != null) return new[] { data };
@@ -280,8 +280,8 @@ internal class ArcaeaSongs
         var dic = new PriorityQueue<string, byte>();
         foreach (var arcaeaAlias in AliasList.Value)
         {
-            if (Utils.StringCompareHelper.Contains(arcaeaAlias.Alias, alias)) dic.Enqueue(arcaeaAlias.SongId, 1);
-            if (Utils.StringCompareHelper.Contains(alias, arcaeaAlias.Alias)) dic.Enqueue(arcaeaAlias.SongId, 4);
+            if (Utils.StringCompareHelper.Contains(arcaeaAlias.Alias, alias)) dic.Enqueue(arcaeaAlias.SongID, 1);
+            if (Utils.StringCompareHelper.Contains(alias, arcaeaAlias.Alias)) dic.Enqueue(arcaeaAlias.SongID, 4);
         }
 
         foreach (var songdata in SongList.Value.Values)

@@ -11,5 +11,5 @@ namespace ArcaeaUnlimitedAPI.Beans;
 public class ArcaeaAlias
 {
     [PrimaryKey] [Column("alias")] public string Alias { get; set; }
-    [Column("sid")] public string SongId { get; set; }
+    [Column("sid")] public string SongID { get; set; }
 }

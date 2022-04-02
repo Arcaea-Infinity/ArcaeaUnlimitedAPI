@@ -52,7 +52,7 @@ internal static class ArcaeaFetch
         {
             var value = info.DeserializeContent<UserMeValue>();
             accountInfo.UserID = value.UserID;
-            accountInfo.Ucode = value.UserCode;
+            accountInfo.Code = value.UserCode;
             DatabaseManager.Account.Update(accountInfo);
             return (true, value.Friends);
         }
@@ -170,7 +170,7 @@ internal static class ArcaeaFetch
                                       {
                                           Name = name,
                                           Password = password,
-                                          DeviceId = deviceID,
+                                          DeviceID = deviceID,
                                           UserID = value.UserID,
                                           Token = value.AccessToken,
                                           Banned = "false"
@@ -249,7 +249,7 @@ internal static class ArcaeaFetch
         if (node is null) return default;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{node}/{_apientry}/{url}");
-        request.Headers.Add("DeviceId", info.DeviceId);
+        request.Headers.Add("DeviceId", info.DeviceID);
         request.Headers.Add("Accept-Encoding", "identity");
         request.Headers.Authorization = new("Bearer", info.Token);
         request.Headers.Add("X-Random-Challenge", GenerateChallenge("GET", "", url));
@@ -276,7 +276,7 @@ internal static class ArcaeaFetch
         if (node is null) return default;
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"{node}/{_apientry}/{resturl}");
-        request.Headers.Add("DeviceId", info.DeviceId);
+        request.Headers.Add("DeviceId", info.DeviceID);
         request.Headers.Add("Accept-Encoding", "identity");
         request.Headers.Authorization = new("Bearer", info.Token);
         request.Content = new StringContent(data, Encoding.UTF8, new("application/x-www-form-urlencoded"));
@@ -306,7 +306,7 @@ internal static class ArcaeaFetch
         request.Headers.Add("Accept-Encoding", "identity");
         request.Headers.Authorization
             = new("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{info.Name}:{info.Password}")));
-        request.Headers.Add("DeviceId", info.DeviceId);
+        request.Headers.Add("DeviceId", info.DeviceID);
         request.Content = new StringContent(data, Encoding.UTF8, new("application/x-www-form-urlencoded"));
         request.Headers.Add("X-Random-Challenge", GenerateChallenge("POST", data, resturl));
         request.Headers.Add("i", info.UserID.ToString());

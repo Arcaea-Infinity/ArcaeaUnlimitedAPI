@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Text;
 using ArcaeaUnlimitedAPI.Core;
 using ArcaeaUnlimitedAPI.Json.Songlist;
@@ -9,207 +8,40 @@ using SQLite;
 
 namespace ArcaeaUnlimitedAPI.Beans;
 
-[Serializable]
-[Table("charts")]
-[DatabaseManager.CreateTableSqlAttribute(
-                                            "CREATE TABLE `charts`(`song_id` TEXT PRIMARY KEY NOT NULL DEFAULT '', `rating_class` INTEGER NOT NULL DEFAULT 0, `name_en` TEXT NOT NULL DEFAULT '', `name_jp` TEXT DEFAULT '', `artist` TEXT NOT NULL DEFAULT '', `bpm` TEXT NOT NULL DEFAULT '', `bpm_base` DOUBLE NOT NULL DEFAULT 0, `set` TEXT NOT NULL DEFAULT '', `time` INTEGER DEFAULT 0, `side` INTEGER NOT NULL DEFAULT 0, `world_unlock` BOOLEAN NOT NULL DEFAULT 0, `remote_download` BOOLEAN DEFAULT '', `bg` TEXT NOT NULL DEFAULT '', `date` INTEGER NOT NULL DEFAULT 0, `version` TEXT NOT NULL DEFAULT '', `difficulty` INTEGER NOT NULL DEFAULT 0, `rating` INTEGER NOT NULL DEFAULT 0, `note` INTEGER NOT NULL DEFAULT 0, `chart_designer` TEXT DEFAULT '', `jacket_designer` TEXT DEFAULT '', `jacket_override` BOOLEAN NOT NULL DEFAULT 0, `audio_override` BOOLEAN NOT NULL DEFAULT 0);")]
-public class ArcaeaCharts
+public partial class ArcaeaCharts
 {
-    [NonSerialized] internal static readonly List<(string sid, int dif, int rating)> SortByRating;
+    internal (string sid, int dif, int rating)[] SortedCharts => SortByRating.ToArray();
 
-    [NonSerialized] private static readonly ConcurrentDictionary<string, ArcaeaSong> SongList;
-    [NonSerialized] private static readonly ConcurrentDictionary<string, List<string>> AliasList;
-    [NonSerialized] private static readonly ConcurrentDictionary<string, List<string>> Abbreviations = new();
-    [NonSerialized] private static readonly ConcurrentDictionary<string, List<ArcaeaSong>> Aliascache = new();
+    internal static ArcaeaSong? QueryById(string? songid) => GetById(songid);
 
-    static ArcaeaCharts()
+    internal static List<ArcaeaSong>? Query(string alias)
     {
-        SongList = new();
+        if (string.IsNullOrWhiteSpace(alias)) return default;
 
-        foreach (var chart in DatabaseManager.Song.SelectAll<ArcaeaCharts>())
-        {
-            chart.Init();
-            if (SongList.ContainsKey(chart.SongID))
-                SongList[chart.SongID].Add(chart);
-            else
-                SongList.TryAdd(chart.SongID, new(chart.SongID) { chart });
-        }
+        if (AliasCache.ContainsKey(alias)) return AliasCache[alias];
 
-        foreach (var (_, value) in SongList) value.Sort();
-
-        AliasList = new();
-
-        foreach (var alias in DatabaseManager.Song.SelectAll<ArcaeaAlias>())
-            if (AliasList.ContainsKey(alias.SongId))
-                AliasList[alias.SongId].Add(alias.Alias);
-            else
-                AliasList.TryAdd(alias.SongId, new() { alias.Alias });
-
-        SortByRating = new();
-        Sort();
-    }
-
-    public void Init()
-    {
-        Package = PackageInfo.GetById(Set)?.Name;
-
-        if (Abbreviations.ContainsKey(SongID) && !AudioOverride) return;
-
-        var ls = new List<string>() { GetAbbreviation(NameEn) };
-
-        if (!string.IsNullOrEmpty(NameJp)) ls.Add(GetAbbreviation(NameJp));
-
-        Abbreviations.TryAdd(SongID, ls);
-    }
-
-    internal static string GetAbbreviation(string str)
-    {
-        var sb = new StringBuilder();
-        sb.Append(str[0]);
-
-        for (var index = 0; index < str.Length - 1; ++index)
-            if (str[index] == ' ')
-                sb.Append(str[index + 1]);
-
-        return sb.ToString();
-    }
-
-    internal static void Sort()
-    {
-        lock (SortByRating)
-        {
-            SortByRating.Clear();
-
-            foreach (var (sid, item) in SongList)
-                for (var i = 0; i < item.Count; i++)
-                    SortByRating.Add((sid, i, item[i].Rating));
-
-            SortByRating.Sort((tuple, valueTuple) => valueTuple.Item3 - tuple.Item3);
-        }
-    }
-
-    internal static ArcaeaSong? GetById(string? songid) =>
-        songid is not null && SongList.TryGetValue(songid, out var value)
-            ? value
-            : null;
-
-    internal static IEnumerable<string> GetAlias(ArcaeaSong song) =>
-        AliasList.TryGetValue(song.SongID, out var result)
-            ? result
-            : Array.Empty<string>();
-
-    internal static string? GetByAlias(ConcurrentDictionary<string, List<string>> values, string alias)
-    {
-        foreach (var (key, value) in values)
-            // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-            foreach (var item in value)
-                if (Utils.StringCompareHelper.Equals(item, alias))
-                    return key;
-
-        return default;
-    }
-
-    internal static ArcaeaSong? GetByName(ConcurrentDictionary<string, ArcaeaSong> values, string alias)
-    {
-        // ReSharper disable once LoopCanBeConvertedToQuery
-        foreach (var value in values.Values)
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var item in value)
-                if (Utils.StringCompareHelper.Equals(item.NameEn, alias)
-                    || Utils.StringCompareHelper.Equals(item.NameJp, alias))
-                    return value;
-
-        return default;
-    }
-
-    internal static List<ArcaeaSong> GetByAlias(string alias)
-    {
-        var empty = new List<ArcaeaSong>();
-
-        if (string.IsNullOrWhiteSpace(alias)) return empty;
-
-        if (Aliascache.ContainsKey(alias)) return Aliascache[alias];
-
-        var data = GetById(alias) ?? GetByName(SongList, alias) ?? GetById(GetByAlias(AliasList, alias));
+        var data = GetById(alias) ?? GetByName(Songs, alias) ?? GetByAlias(alias);
 
         if (data != null) return new() { data };
 
         var abbrdata = new List<ArcaeaSong>();
 
-        foreach (var (key, value) in Abbreviations)
-            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-            foreach (var item in value)
-                if (Utils.StringCompareHelper.Equals(item, alias))
-                {
-                    var obj = GetById(key)!;
-                    if (!abbrdata.Contains(obj)) abbrdata.Add(GetById(key)!);
-                }
+        Abbreviations.ForAllItems<ArcaeaSong, string, List<string>>((song, value) =>
+                                                                    {
+                                                                        if (Utils.StringCompareHelper
+                                                                                 .Equals(value, alias))
+                                                                            if (!abbrdata.Contains(song))
+                                                                                abbrdata.Add(song);
+                                                                    });
 
         if (abbrdata.Count > 0) return abbrdata;
 
-        var dic = new PriorityQueue<string, byte>();
-
-        foreach (var (key, values) in AliasList)
-        {
-            foreach (var value in values)
-            {
-                if (Utils.StringCompareHelper.Contains(value, alias)) dic.Enqueue(key, 1);
-                if (Utils.StringCompareHelper.Contains(alias, value)) dic.Enqueue(key, 4);
-            }
-        }
-
-        dic.TryPeek(out _, out var firstpriority);
-
-        if (firstpriority != 1)
-        {
-            foreach (var songdata in SongList.Values)
-            {
-                if (Utils.StringCompareHelper.Contains(songdata.SongID, alias)) dic.Enqueue(songdata.SongID, 2);
-                if (Utils.StringCompareHelper.Contains(alias, songdata.SongID)) dic.Enqueue(songdata.SongID, 5);
-
-                dic.TryPeek(out _, out firstpriority);
-
-                if (firstpriority != 2)
-                {
-                    foreach (var chart in songdata)
-                    {
-                        if (Utils.StringCompareHelper.Contains(chart.NameEn, alias)) dic.Enqueue(songdata.SongID, 3);
-                        if (Utils.StringCompareHelper.Contains(alias, chart.NameEn)) dic.Enqueue(songdata.SongID, 6);
-
-                        if (!string.IsNullOrWhiteSpace(chart.NameJp))
-                        {
-                            if (Utils.StringCompareHelper.Contains(chart.NameJp, alias))
-                                dic.Enqueue(songdata.SongID, 3);
-                            if (Utils.StringCompareHelper.Contains(alias, chart.NameJp))
-                                dic.Enqueue(songdata.SongID, 6);
-                        }
-                    }
-                }
-            }
-        }
-
-        if (dic.Count == 0) return empty;
-
-        dic.TryDequeue(out var firstobj, out var lowestpriority);
-
-        var ls = new List<ArcaeaSong> { GetById(firstobj)! };
-
-        while (dic.TryDequeue(out var obj, out var priority) && priority == lowestpriority)
-        {
-            var song = GetById(obj)!;
-            if (!ls.Contains(song)) ls.Add(song);
-        }
-
-        Aliascache.TryAdd(alias, ls);
-        return ls;
+        return GetByPriorityQueue(alias);
     }
 
     internal static void Insert(SongItem item)
     {
-        var ls = new ArcaeaSong(item.Id);
-        var song = GetById(item.Id);
-
-        for (var i = song?.Count ?? 0; i < item.Difficulties.Count; i++)
+        for (var i = GetById(item.Id)?.Count ?? 0; i < item.Difficulties.Count; i++)
         {
             var chart = new ArcaeaCharts
                         {
@@ -236,17 +68,10 @@ public class ArcaeaCharts
                                 : 0)
                         };
 
-            chart.Init();
-            ls.Add(chart);
+            Songs.TryAddOrInsert(item.Id, chart);
 
             DatabaseManager.Song.Value.Insert(chart);
         }
-
-        if (ls.Count > 0)
-            if (song is null)
-                SongList.TryAdd(item.Id, ls);
-            else
-                SongList[item.Id].AddRange(ls);
     }
 
     internal static void UpdateRating(Records record)
@@ -270,6 +95,154 @@ public class ArcaeaCharts
         }
     }
 
+    internal static ArcaeaSong RandomSong() => Utils.RandomHelper.GetRandomItem(Songs.Values.ToArray())!;
+
+    internal static ArcaeaCharts? RandomSong(int? start, int? end) =>
+        Utils.RandomHelper.GetRandomItem(GetByConstRange(start ?? 0, end ?? 24).ToArray());
+}
+
+public partial class ArcaeaCharts
+{
+    [NonSerialized] private static readonly List<(string sid, int dif, int rating)> SortByRating;
+    [NonSerialized] private static readonly ConcurrentDictionary<string, ArcaeaSong> Songs;
+    [NonSerialized] private static readonly ConcurrentDictionary<ArcaeaSong, List<string>> Aliases;
+    [NonSerialized] private static readonly ConcurrentDictionary<ArcaeaSong, List<string>> Abbreviations = new();
+    [NonSerialized] private static readonly ConcurrentDictionary<ArcaeaSong, List<string>> Names = new();
+    [NonSerialized] private static readonly ConcurrentDictionary<string, List<ArcaeaSong>> AliasCache = new();
+
+    static ArcaeaCharts()
+    {
+        Songs = new();
+
+        foreach (var chart in DatabaseManager.Song.SelectAll<ArcaeaCharts>())
+        {
+            chart.Init();
+            Songs.TryAddOrInsert(chart.SongID, chart);
+        }
+
+        foreach (var (_, value) in Songs)
+        {
+            value.Sort();
+
+            var abbrs = new List<string>();
+            var names = new List<string>();
+
+            for (var index = 0; index < value.Count; index++)
+                if (index == 0 || value[index].AudioOverride)
+                {
+                    abbrs.Add(GetAbbreviation(value[index].NameEn));
+                    names.Add(value[index].NameEn);
+
+                    if (!string.IsNullOrWhiteSpace(value[index].NameJp))
+                    {
+                        abbrs.Add(GetAbbreviation(value[index].NameJp));
+                        names.Add(value[index].NameJp);
+                    }
+                }
+
+            Abbreviations.TryAdd(value, abbrs);
+            Names.TryAdd(value, names);
+        }
+
+        Aliases = new();
+
+        foreach (var alias in DatabaseManager.Song.SelectAll<ArcaeaAlias>())
+            Aliases.TryAddOrInsert(Songs[alias.SongID], alias.Alias);
+
+        SortByRating = new();
+        Sort();
+    }
+
+    private void Init() { Package = PackageInfo.GetById(Set)?.Name; }
+
+    private static string GetAbbreviation(string str)
+    {
+        var sb = new StringBuilder();
+        sb.Append(str[0]);
+
+        for (var index = 0; index < str.Length - 1; ++index)
+            if (str[index] == ' ')
+                sb.Append(str[index + 1]);
+
+        return sb.ToString();
+    }
+
+    private static void Sort()
+    {
+        lock (SortByRating)
+        {
+            SortByRating.Clear();
+
+            Songs.ForAllItems<string, ArcaeaCharts, ArcaeaSong>((key, value) =>
+                                                                    SortByRating.Add((key, value.RatingClass,
+                                                                                      value.Rating)));
+
+            SortByRating.Sort((tuple, valueTuple) => valueTuple.Item3 - tuple.Item3);
+        }
+    }
+}
+
+public partial class ArcaeaCharts
+{
+    private static ArcaeaSong? GetById(string? songid) =>
+        songid is not null && Songs.TryGetValue(songid, out var value)
+            ? value
+            : null;
+
+    private static ArcaeaSong? GetByName(ConcurrentDictionary<string, ArcaeaSong> values, string alias)
+    {
+        values.TryTakeValues<string, ArcaeaCharts,
+            ArcaeaSong>((item) => Utils.StringCompareHelper.Equals(item.NameEn, alias) || Utils.StringCompareHelper.Equals(item.NameJp, alias),
+                        out var result);
+
+        return result;
+    }
+
+    private static ArcaeaSong? GetByAlias(string alias)
+    {
+        Aliases.TryTakeKey<ArcaeaSong, string, List<string>>(value => Utils.StringCompareHelper.Equals(value, alias),
+                                                             out var result);
+        return result;
+    }
+
+    private static List<ArcaeaSong>? GetByPriorityQueue(string alias)
+    {
+        var dic = new PriorityQueue<ArcaeaSong, byte>();
+
+        Aliases.ForAllItems<ArcaeaSong, string, List<string>>((song, sid) => Enqueue(dic, alias, sid, song, 1,4));
+
+        dic.TryPeek(out _, out var firstpriority);
+
+        if (firstpriority != 1)
+            foreach (var (sid, song) in Songs)
+                Enqueue(dic, alias, sid, song, 2,5);
+
+        dic.TryPeek(out _, out firstpriority);
+
+        if (firstpriority != 2)
+            Names.ForAllItems<ArcaeaSong, string, List<string>>((song, name) => Enqueue(dic, alias, name, song, 3,6));
+
+        if (dic.Count == 0) return default;
+
+        dic.TryDequeue(out var firstobj, out var lowestpriority);
+
+        var ls = new List<ArcaeaSong> { firstobj! };
+
+        while (dic.TryDequeue(out var obj, out var priority) && priority == lowestpriority)
+            if (!ls.Contains(obj))
+                ls.Add(obj);
+
+        AliasCache.TryAdd(alias, ls);
+        return ls;
+    }
+
+    private static void Enqueue(PriorityQueue<ArcaeaSong, byte> dic, string alias, string key, ArcaeaSong song,
+                                byte upperpriority, byte lowerpriority)
+    {
+        if (Utils.StringCompareHelper.Contains(key, alias)) dic.Enqueue(song, upperpriority);
+        if (Utils.StringCompareHelper.Contains(alias, key)) dic.Enqueue(song, lowerpriority);
+    }
+
     private static double CalcSongConst(int score, double rating)
     {
         return score switch
@@ -282,16 +255,16 @@ public class ArcaeaCharts
                };
     }
 
-    internal static IEnumerable<ArcaeaCharts> GetByConstRange(int lowerlimit, int upperlimit) =>
-        SongList.Values.SelectMany(charts => charts)
-                .Where(t => t.Difficulty >= lowerlimit && t.Difficulty <= upperlimit);
+    private static IEnumerable<ArcaeaCharts> GetByConstRange(int lowerlimit, int upperlimit) =>
+        Songs.Values.SelectMany(charts => charts).Where(t => t.Difficulty >= lowerlimit && t.Difficulty <= upperlimit);
+}
 
-    internal static ArcaeaSong RandomSong() => Utils.RandomHelper.GetRandomItem(SongList.Values.ToArray())!;
-
-    internal static ArcaeaCharts? RandomSong(int? start, int? end) =>
-        Utils.RandomHelper.GetRandomItem(GetByConstRange(start ?? 0, end ?? 24).ToArray());
-
-
+[Serializable]
+[Table("charts")]
+[DatabaseManager.CreateTableSqlAttribute(
+                                            "CREATE TABLE `charts`(`song_id` TEXT PRIMARY KEY NOT NULL DEFAULT '', `rating_class` INTEGER NOT NULL DEFAULT 0, `name_en` TEXT NOT NULL DEFAULT '', `name_jp` TEXT DEFAULT '', `artist` TEXT NOT NULL DEFAULT '', `bpm` TEXT NOT NULL DEFAULT '', `bpm_base` DOUBLE NOT NULL DEFAULT 0, `set` TEXT NOT NULL DEFAULT '', `time` INTEGER DEFAULT 0, `side` INTEGER NOT NULL DEFAULT 0, `world_unlock` BOOLEAN NOT NULL DEFAULT 0, `remote_download` BOOLEAN DEFAULT '', `bg` TEXT NOT NULL DEFAULT '', `date` INTEGER NOT NULL DEFAULT 0, `version` TEXT NOT NULL DEFAULT '', `difficulty` INTEGER NOT NULL DEFAULT 0, `rating` INTEGER NOT NULL DEFAULT 0, `note` INTEGER NOT NULL DEFAULT 0, `chart_designer` TEXT DEFAULT '', `jacket_designer` TEXT DEFAULT '', `jacket_override` BOOLEAN NOT NULL DEFAULT 0, `audio_override` BOOLEAN NOT NULL DEFAULT 0);")]
+public partial class ArcaeaCharts
+{
 #region DataProperties
 
     [JsonIgnore] [PrimaryKey] [Column("song_id")]
@@ -364,50 +337,4 @@ public class ArcaeaCharts
     public bool AudioOverride { get; set; }
 
 #endregion
-}
-
-internal class ArcaeaSong : IEnumerable<ArcaeaCharts>, IEquatable<ArcaeaSong>
-{
-    private readonly List<ArcaeaCharts> _charts;
-
-    internal readonly string SongID;
-
-    internal int Count => _charts.Count;
-
-    public ArcaeaSong(string songID)
-    {
-        _charts = new();
-        SongID = songID;
-    }
-
-    internal object ToJson() => new { song_id = SongID, difficulties = _charts };
-
-    public ArcaeaCharts this[int index] => _charts[index];
-
-    public void Add(ArcaeaCharts chart) => _charts.Add(chart);
-
-    public void AddRange(ArcaeaSong ls) => _charts.AddRange(ls);
-
-    public IEnumerator<ArcaeaCharts> GetEnumerator() => _charts.GetEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    public void Sort() { _charts.Sort((chart, another) => chart.RatingClass - another.RatingClass); }
-
-    public bool Equals(ArcaeaSong? other)
-    {
-        if (ReferenceEquals(null, other)) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return SongID.Equals(other.SongID);
-    }
-
-    public override bool Equals(object? obj)
-    {
-        if (ReferenceEquals(null, obj)) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != GetType()) return false;
-        return Equals((ArcaeaSong)obj);
-    }
-
-    public override int GetHashCode() => SongID.GetHashCode();
 }

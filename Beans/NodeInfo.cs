@@ -5,18 +5,19 @@ namespace ArcaeaUnlimitedAPI.Beans;
 
 internal static class NodeInfo
 {
-    private static int _nodeindex;
+    private static int _index;
 
     private static Node GetNode(out int nodeIndex)
     {
-        _nodeindex %= Config.Nodes.Count;
-        nodeIndex = _nodeindex;
-        return Config.Nodes[_nodeindex++];
+        _index %= Config.Nodes.Count;
+        nodeIndex = _index;
+        return Config.Nodes[_index++];
     }
 
     internal static Node? Alloc()
     {
         var node = GetNode(out var nodeindex);
+
         while (!node.Active)
         {
             node = GetNode(out var curnodeindex);

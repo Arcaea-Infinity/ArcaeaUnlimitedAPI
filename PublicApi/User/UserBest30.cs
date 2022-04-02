@@ -104,10 +104,16 @@ public partial class PublicApi
                 {
                     var (success, friendRank)
                         = await account.FriendRank(friend.RecentScore[0].SongID, friend.RecentScore[0].Difficulty);
-                    if (success && friendRank?.Any() != true) return (null, Error.Shadowbanned);
+                    
+                    if (!success || friendRank is null || friendRank.Count == 0) return (null, Error.Shadowbanned);
+                    foreach (var record in friendRank)
+                    {
+                        record.Potential = player.Potential;
+                        DatabaseManager.Bests.InsertOrReplace(record);
+                    }
                 }
 
-                best30Cache = await PollingBestsHelper.GetResult(account, friend.UserID);
+                best30Cache = await PollingBestsHelper.GetResult(account, friend);
 
                 if (best30Cache == null || best30Cache.Best30List is null || best30Cache.Best30List.Count == 0)
                     return (null, Error.QueryingB30Failed);
