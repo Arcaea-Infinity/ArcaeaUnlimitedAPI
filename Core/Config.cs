@@ -4,15 +4,19 @@ namespace ArcaeaUnlimitedAPI.Core;
 
 internal static class GlobalConfig
 {
-    internal static readonly ConfigItem Config;
+    internal static ConfigItem Config = null!;
 
     internal static volatile bool NeedUpdate = false;
 
-    static GlobalConfig()
+    internal static void Init()
     {
         Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("config.json"))!;
-
         ArcaeaFetch.Init();
+    }
+
+    static GlobalConfig()
+    {
+        Init();
         BackgroundService.Init();
     }
 }

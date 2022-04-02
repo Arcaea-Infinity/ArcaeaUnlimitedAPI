@@ -2,7 +2,6 @@
 using System.IO.Compression;
 using System.Timers;
 using ArcaeaUnlimitedAPI.Beans;
-using ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
 using ArcaeaUnlimitedAPI.Json.Songlist;
 using ArcaeaUnlimitedAPI.PublicApi;
 using Newtonsoft.Json;
@@ -11,6 +10,28 @@ using static ArcaeaUnlimitedAPI.Core.Utils;
 using Timer = System.Timers.Timer;
 
 namespace ArcaeaUnlimitedAPI.Core;
+
+public static class ConfigWatcher
+{
+    private static readonly int TimeoutMillis = 2000;
+    private static readonly FileSystemWatcher Watcher = new(AppContext.BaseDirectory);
+
+    static ConfigWatcher()
+    {
+        Watcher.NotifyFilter = NotifyFilters.LastWrite;
+        Watcher.Filter = "config.json";
+        Watcher.EnableRaisingEvents = true;
+
+        System.Threading.Timer timer = new(OnTimer, null, Timeout.Infinite, Timeout.Infinite);
+        Watcher.Changed += (_, _) => timer.Change(TimeoutMillis, Timeout.Infinite);
+    }
+
+    private static void OnTimer(object? _)
+    {
+        Log.FunctionLog("ConfigWatcher", "config changed.");
+        Init();
+    }
+}
 
 internal static class BackgroundService
 {
@@ -160,12 +181,7 @@ internal static class BackgroundService
 
             var tmpfetch = new TestFetch();
 
-            if (tmpfetch.Init(Config) && tmpfetch.TestLogin().Result)
-            {
-                Config.WriteConfig(true);
-                ArcaeaFetch.Init();
-                NeedUpdate = false;
-            }
+            if (tmpfetch.Init(Config) && tmpfetch.TestLogin().Result) Config.WriteConfig(true);
         }
         catch (Exception ex)
         {

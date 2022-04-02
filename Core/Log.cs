@@ -65,6 +65,22 @@ internal static class Log
             FunctionError(function, content);
         }
     }
+    
+    internal static async void FunctionLog(string function, string content)
+    {
+        try
+        {
+            var time = DateTime.Now;
+
+            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/functionlog_{time:yyMMdd}.log",
+                                          $"\n\n{time}\n{function}: {content}");
+        }
+        catch
+        {
+            await Task.Delay(2000);
+            FunctionLog(function, content);
+        }
+    }
 
     internal static async void ExceptionError(Exception ex)
     {
