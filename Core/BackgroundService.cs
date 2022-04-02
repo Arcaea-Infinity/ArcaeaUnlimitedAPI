@@ -11,14 +11,14 @@ using Timer = System.Timers.Timer;
 
 namespace ArcaeaUnlimitedAPI.Core;
 
-public static class ConfigWatcher
+internal static class ConfigWatcher
 {
-    private static readonly int TimeoutMillis = 2000;
+    private const int TimeoutMillis = 2000;
     private static readonly FileSystemWatcher Watcher = new(AppContext.BaseDirectory);
 
-    static ConfigWatcher()
+    internal static void Init()
     {
-        Watcher.NotifyFilter = NotifyFilters.LastWrite;
+        Watcher.NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite;
         Watcher.Filter = "config.json";
         Watcher.EnableRaisingEvents = true;
 
@@ -29,7 +29,7 @@ public static class ConfigWatcher
     private static void OnTimer(object? _)
     {
         Log.FunctionLog("ConfigWatcher", "config changed.");
-        Init();
+        GlobalConfig.Init();
     }
 }
 

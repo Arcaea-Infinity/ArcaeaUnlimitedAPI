@@ -18,6 +18,7 @@ internal static class GlobalConfig
     {
         Init();
         BackgroundService.Init();
+        ConfigWatcher.Init();
     }
 }
 
