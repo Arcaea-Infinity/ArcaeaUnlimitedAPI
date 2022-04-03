@@ -1,4 +1,5 @@
 ﻿using ArcaeaUnlimitedAPI.Beans;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
@@ -12,4 +13,8 @@ public partial class PublicApi
         if (!UserAgentCheck()) return NotFound(null);
         return Success(new { songs = ArcaeaSongs.SongJsonList.Value.Values.ToArray() });
     }
+    
+    [EnableCors]
+    [HttpGet("/botarcapi/test/song/list")]
+    public object GetSongListExperimental() => Success(new { songs = ArcaeaCharts.SongList });
 }

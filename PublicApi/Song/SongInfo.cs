@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
@@ -17,6 +18,7 @@ public partial class PublicApi
         return Success(song.ToJson());
     }
     
+    [EnableCors]
     [HttpGet("/botarcapi/test/song/info")]
     public object GetSongInfoExperimental(string? songname, string? songid)
     {

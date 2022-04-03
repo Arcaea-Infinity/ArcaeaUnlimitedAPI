@@ -12,6 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
        .AddNewtonsoftJson(options => options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore);
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddCors(options => options.AddDefaultPolicy(i => i.AllowAnyOrigin()));
+
 var app = builder.Build();
+app.UseCors();
 app.MapControllers();
 app.Run();

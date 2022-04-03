@@ -10,7 +10,9 @@ namespace ArcaeaUnlimitedAPI.Beans;
 
 public partial class ArcaeaCharts
 {
-    internal (string sid, int dif, int rating)[] SortedCharts => SortByRating.ToArray();
+    internal static ICollection<ArcaeaSong> SongList => Songs.Values;
+    
+    internal static (string sid, int dif, int rating)[] SortedCharts => SortByRating.ToArray();
 
     internal static ArcaeaSong? QueryById(string? songid) => GetById(songid);
 
