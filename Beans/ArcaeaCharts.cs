@@ -10,8 +10,8 @@ namespace ArcaeaUnlimitedAPI.Beans;
 
 public partial class ArcaeaCharts
 {
-    internal static ICollection<ArcaeaSong> SongList => Songs.Values;
-    
+    internal static readonly ConcurrentDictionary<string, ArcaeaSong> Songs;
+    internal static readonly ConcurrentDictionary<string, object> SongJsons;
     internal static (string sid, int dif, int rating)[] SortedCharts => SortByRating.ToArray();
 
     internal static ArcaeaSong? QueryById(string? songid) => GetById(songid);
@@ -106,7 +106,6 @@ public partial class ArcaeaCharts
 public partial class ArcaeaCharts
 {
     [NonSerialized] private static readonly List<(string sid, int dif, int rating)> SortByRating;
-    [NonSerialized] private static readonly ConcurrentDictionary<string, ArcaeaSong> Songs;
     [NonSerialized] private static readonly ConcurrentDictionary<ArcaeaSong, List<string>> Aliases;
     [NonSerialized] private static readonly ConcurrentDictionary<ArcaeaSong, List<string>> Abbreviations = new();
     [NonSerialized] private static readonly ConcurrentDictionary<ArcaeaSong, List<string>> Names = new();
@@ -115,6 +114,7 @@ public partial class ArcaeaCharts
     static ArcaeaCharts()
     {
         Songs = new();
+        SongJsons = new();
 
         foreach (var chart in DatabaseManager.Song.SelectAll<ArcaeaCharts>())
         {
@@ -122,7 +122,7 @@ public partial class ArcaeaCharts
             Songs.TryAddOrInsert(chart.SongID, chart);
         }
 
-        foreach (var (_, value) in Songs)
+        foreach (var (sid, value) in Songs)
         {
             value.Sort();
 
@@ -144,6 +144,8 @@ public partial class ArcaeaCharts
 
             Abbreviations.TryAdd(value, abbrs);
             Names.TryAdd(value, names);
+
+            SongJsons.TryAdd(sid, value.ToJson(false));
         }
 
         Aliases = new();

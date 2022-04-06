@@ -4,7 +4,13 @@ internal class ArcaeaSong : List<ArcaeaCharts>, IEquatable<ArcaeaSong>
 {
     internal string SongID => this[0].SongID;
 
-    internal object ToJson() => new { song_id = SongID, difficulties = this };
+    public object ToJson(bool usejsonlist = true)
+    {
+        if (usejsonlist && ArcaeaCharts.SongJsons.ContainsKey(SongID)) return ArcaeaCharts.SongJsons[SongID];
+        var obj = new { song_id = SongID, difficulties = this };
+        ArcaeaCharts.SongJsons.TryAdd(SongID, obj);
+        return obj;
+    }
 
     public new void Sort() { Sort((chart, another) => chart.RatingClass - another.RatingClass); }
 
