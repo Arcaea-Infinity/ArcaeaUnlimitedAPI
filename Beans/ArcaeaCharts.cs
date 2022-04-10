@@ -12,6 +12,8 @@ public partial class ArcaeaCharts
 {
     internal static readonly ConcurrentDictionary<string, ArcaeaSong> Songs;
     internal static readonly ConcurrentDictionary<string, object> SongJsons;
+    internal static readonly ConcurrentDictionary<string, List<string>> Aliases;
+    
     internal static (string sid, int dif, int rating)[] SortedCharts => SortByRating.ToArray();
 
     internal static ArcaeaSong? QueryById(string? songid) => GetById(songid);
@@ -106,7 +108,6 @@ public partial class ArcaeaCharts
 public partial class ArcaeaCharts
 {
     [NonSerialized] private static readonly List<(string sid, int dif, int rating)> SortByRating;
-    [NonSerialized] private static readonly ConcurrentDictionary<ArcaeaSong, List<string>> Aliases;
     [NonSerialized] private static readonly ConcurrentDictionary<ArcaeaSong, List<string>> Abbreviations = new();
     [NonSerialized] private static readonly ConcurrentDictionary<ArcaeaSong, List<string>> Names = new();
     [NonSerialized] private static readonly ConcurrentDictionary<string, List<ArcaeaSong>> AliasCache = new();
@@ -115,13 +116,18 @@ public partial class ArcaeaCharts
     {
         Songs = new();
         SongJsons = new();
+        Aliases = new();
+        SortByRating = new();
+
+        foreach (var alias in DatabaseManager.Song.SelectAll<ArcaeaAlias>())
+            Aliases.TryAddOrInsert(alias.SongID, alias.Alias);
 
         foreach (var chart in DatabaseManager.Song.SelectAll<ArcaeaCharts>())
         {
             chart.Init();
             Songs.TryAddOrInsert(chart.SongID, chart);
         }
-
+        
         foreach (var (sid, value) in Songs)
         {
             value.Sort();
@@ -147,13 +153,7 @@ public partial class ArcaeaCharts
 
             SongJsons.TryAdd(sid, value.ToJson(false));
         }
-
-        Aliases = new();
-
-        foreach (var alias in DatabaseManager.Song.SelectAll<ArcaeaAlias>())
-            Aliases.TryAddOrInsert(Songs[alias.SongID], alias.Alias);
-
-        SortByRating = new();
+        
         Sort();
     }
 
@@ -204,16 +204,16 @@ public partial class ArcaeaCharts
 
     private static ArcaeaSong? GetByAlias(string alias)
     {
-        Aliases.TryTakeKey<ArcaeaSong, string, List<string>>(value => Utils.StringCompareHelper.Equals(value, alias),
-                                                             out var result);
-        return result;
+        Aliases.TryTakeKey<string, string, List<string>>(value => Utils.StringCompareHelper.Equals(value, alias),
+                                                         out var result);
+        return GetById(result);
     }
 
     private static List<ArcaeaSong>? GetByPriorityQueue(string alias)
     {
         var dic = new PriorityQueue<ArcaeaSong, byte>();
 
-        Aliases.ForAllItems<ArcaeaSong, string, List<string>>((song, sid) => Enqueue(dic, alias, sid, song, 1,4));
+        Aliases.ForAllItems<string, string, List<string>>((song, sid) => Enqueue(dic, alias, sid, GetById(song)!, 1,4));
 
         dic.TryPeek(out _, out var firstpriority);
 

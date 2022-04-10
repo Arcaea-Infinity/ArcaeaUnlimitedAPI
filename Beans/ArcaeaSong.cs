@@ -7,7 +7,15 @@ internal class ArcaeaSong : List<ArcaeaCharts>, IEquatable<ArcaeaSong>
     public object ToJson(bool usejsonlist = true)
     {
         if (usejsonlist && ArcaeaCharts.SongJsons.ContainsKey(SongID)) return ArcaeaCharts.SongJsons[SongID];
-        var obj = new { song_id = SongID, difficulties = this };
+
+        var obj = new
+                  {
+                      song_id = SongID,
+                      difficulties = this,
+                      alias = ArcaeaCharts.Aliases.ContainsKey(SongID)
+                          ? ArcaeaCharts.Aliases[SongID]
+                          : new()
+                  };
         ArcaeaCharts.SongJsons.TryAdd(SongID, obj);
         return obj;
     }
