@@ -27,17 +27,13 @@ internal static class DifficultyInfo
         }
 
         foreach (var (index,alias) in List)
-        {
             if (alias.Any(t => string.Equals(t, dif, StringComparison.OrdinalIgnoreCase)))
             {
                 value = index;
                 return true;
             }
-        }
 
-        {
-            value = -1;
-            return false;
-        }
+        value = -1;
+        return false;
     }
 }

@@ -157,6 +157,7 @@ internal static class ArcaeaFetch
                     var info = await Register(node, name, password, email, deviceID);
 
                     if (info?.ErrorCode == 124) return;
+                    
                     if (info?.ErrorCode == 5)
                     {
                         NeedUpdate = true;
@@ -239,14 +240,14 @@ internal static class ArcaeaFetch
     private static async Task<ResponseRoot?> Get(string resturl, AccountInfo info,
                                                  Dictionary<string, string>? submitData, byte retryCount = 0)
     {
-        if (NeedUpdate) return default;
+        if (NeedUpdate) return null;
 
         var url = submitData is not null
             ? $"{resturl}?{SubmitDataToString(submitData)}"
             : resturl;
 
         var node = NodeInfo.Alloc();
-        if (node is null) return default;
+        if (node is null) return null;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{node}/{_apientry}/{url}");
         request.Headers.Add("DeviceId", info.DeviceID);
@@ -266,14 +267,14 @@ internal static class ArcaeaFetch
     private static async Task<ResponseRoot?> Post(string resturl, AccountInfo info,
                                                   Dictionary<string, string>? submitData, byte retryCount = 0)
     {
-        if (NeedUpdate) return default;
+        if (NeedUpdate) return null;
         var data = submitData is null
             ? ""
             : SubmitDataToString(submitData);
 
 
         var node = NodeInfo.Alloc();
-        if (node is null) return default;
+        if (node is null) return null;
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"{node}/{_apientry}/{resturl}");
         request.Headers.Add("DeviceId", info.DeviceID);
@@ -294,13 +295,13 @@ internal static class ArcaeaFetch
 
     private static async Task<ResponseRoot?> Login(AccountInfo info, byte retryCount = 0)
     {
-        if (NeedUpdate) return default;
+        if (NeedUpdate) return null;
 
-        var resturl = "auth/login";
-        var data = "grant_type=client_credentials";
+        const string resturl = "auth/login";
+        const string data = "grant_type=client_credentials";
 
         var node = NodeInfo.Alloc();
-        if (node is null) return default;
+        if (node is null) return null;
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"{node}/{_apientry}/{resturl}");
         request.Headers.Add("Accept-Encoding", "identity");
@@ -322,8 +323,8 @@ internal static class ArcaeaFetch
     private static async Task<ResponseRoot?> Register(Node node, string name, string password, string email,
                                                       string deviceID)
     {
-        if (NeedUpdate) return default;
-        var resturl = "user";
+        if (NeedUpdate) return null;
+        const string resturl = "user";
         var data = SubmitDataToString(new()
                                       {
                                           { "name", name },
@@ -349,7 +350,7 @@ internal static class ArcaeaFetch
             if (!success)
             {
                 Log.ApiError(resturl, (int)resp.StatusCode);
-                return (false, default);
+                return (false, null);
             }
 
             var result = JsonConvert.DeserializeObject<ResponseRoot>(await resp.Content.ReadAsStringAsync())!;
@@ -360,7 +361,7 @@ internal static class ArcaeaFetch
         catch (Exception ex)
         {
             Log.HttpError(ex.Message, request.RequestUri);
-            return (false, default);
+            return (false, null);
         }
         finally
         {

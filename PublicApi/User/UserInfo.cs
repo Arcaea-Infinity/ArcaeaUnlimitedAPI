@@ -51,12 +51,16 @@ public partial class PublicApi
         }
     }
 
-    private Response GetResponse(UserInfoResponse response, int recent, bool withsonginfo)
+    private static Response GetResponse(UserInfoResponse response, int recent, bool withsonginfo)
     {
         response.AccountInfo.RecentScore = null!;
 
-        if (recent == 0) response.RecentScore = null;
-        if (recent > 1) response.RecentScore = Records.Query(response.AccountInfo.UserID, recent);
+        response.RecentScore = recent switch
+                               {
+                                   0   => null,
+                                   > 1 => Records.Query(response.AccountInfo.UserID, recent),
+                                   _   => response.RecentScore
+                               };
 
         if (response.RecentScore?.Count > 0)
         {
@@ -69,7 +73,7 @@ public partial class PublicApi
         return Success(response);
     }
 
-    private async Task<(UserInfoResponse? response, Response? error)> QueryUserInfo(PlayerInfo player)
+    private static async Task<(UserInfoResponse? response, Response? error)> QueryUserInfo(PlayerInfo player)
     {
         AccountInfo? account = null;
 

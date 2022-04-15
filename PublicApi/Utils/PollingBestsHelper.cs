@@ -38,7 +38,7 @@ internal class PollingBestsHelper
             if (_tasks.Count >= 5) await PollingRequests();
         }
 
-        if (_tasks.Count > 0) await PollingRequests();
+        if (!_tasks.IsEmpty) await PollingRequests();
 
         await ClearFailedList();
 

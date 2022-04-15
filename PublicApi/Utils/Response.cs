@@ -53,13 +53,13 @@ internal class Response
         /// <summary>
         ///     errorCode = -8
         /// </summary>
-        internal static Response TooManySongs(ArcaeaSongs?[] ls) =>
-            new() { Status = -8, Message = "too many records", Content = new { songs = ls.Select(i => i?.SongId) } };
+        internal static Response TooManySongs(IEnumerable<ArcaeaSongs> ls) =>
+            new() { Status = -8, Message = "too many records", Content = new { songs = ls.Select(i => i.SongId) } };
 
         /// <summary>
         ///     errorCode = -8
         /// </summary>
-        internal static Response  TooManySongs(List<ArcaeaSong> ls) =>
+        internal static Response  TooManySongs(IEnumerable<ArcaeaSong> ls) =>
             new() { Status = -8, Message = "too many records", Content = new { songs = ls.Select(i => i.SongID) } };
         
         /// <summary>

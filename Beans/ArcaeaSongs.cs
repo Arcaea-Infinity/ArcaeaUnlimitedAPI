@@ -260,7 +260,7 @@ internal class ArcaeaSongs
 
     internal static ArcaeaSongs?[] GetByAlias(string alias)
     {
-        var empty = new ArcaeaSongs[] { };
+        var empty = Array.Empty<ArcaeaSongs>();
 
         if (string.IsNullOrWhiteSpace(alias)) return empty;
 

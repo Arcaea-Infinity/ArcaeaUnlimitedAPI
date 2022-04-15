@@ -79,8 +79,7 @@ internal static class Utils
 
         internal static bool Contains(string? raw, string? seed) =>
             seed != null && raw != null
-                         && Reg.Replace(raw, "").IndexOf(Reg.Replace(seed, ""), StringComparison.OrdinalIgnoreCase)
-                         >= 0;
+                         && Reg.Replace(raw, "").Contains(Reg.Replace(seed, ""), StringComparison.OrdinalIgnoreCase);
 
         internal static bool Equals(string? raw, string? seed) =>
             seed != null && raw != null

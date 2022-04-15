@@ -56,7 +56,7 @@ public partial class PublicApi
         }
     }
 
-    private Response GetResponse(UserBestResponse response, bool withrecent, bool withsonginfo)
+    private static Response GetResponse(UserBestResponse response, bool withrecent, bool withsonginfo)
     {
         if (withsonginfo)
             // add song info
@@ -96,7 +96,7 @@ public partial class PublicApi
             }
             
             // calculate song rating
-            var rank = friendRank![0];
+            var rank = friendRank[0];
             rank.Rating = CalcSongRating(rank.Score, song.Ratings[rank.Difficulty]);
 
             rank.UserID = null!;

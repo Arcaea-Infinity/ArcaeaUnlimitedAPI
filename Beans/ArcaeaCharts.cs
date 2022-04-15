@@ -32,10 +32,8 @@ public partial class ArcaeaCharts
 
         Abbreviations.ForAllItems<ArcaeaSong, string, List<string>>((song, value) =>
                                                                     {
-                                                                        if (Utils.StringCompareHelper
-                                                                                 .Equals(value, alias))
-                                                                            if (!abbrdata.Contains(song))
-                                                                                abbrdata.Add(song);
+                                                                        if (Utils.StringCompareHelper.Equals(value, alias) && !abbrdata.Contains(song))
+                                                                            abbrdata.Add(song);
                                                                     });
 
         if (abbrdata.Count > 0) return abbrdata;
@@ -89,6 +87,7 @@ public partial class ArcaeaCharts
         if (item is null) return;
 
         var chart = item[record.Difficulty];
+        
         if (chart.Rating != @const)
         {
             chart.Rating = @const;
@@ -195,8 +194,7 @@ public partial class ArcaeaCharts
 
     private static ArcaeaSong? GetByName(ConcurrentDictionary<string, ArcaeaSong> values, string alias)
     {
-        values.TryTakeValues<string, ArcaeaCharts,
-            ArcaeaSong>((item) => Utils.StringCompareHelper.Equals(item.NameEn, alias) || Utils.StringCompareHelper.Equals(item.NameJp, alias),
+        values.TryTakeValues((ArcaeaCharts item) => Utils.StringCompareHelper.Equals(item.NameEn, alias) || Utils.StringCompareHelper.Equals(item.NameJp, alias),
                         out var result);
 
         return result;

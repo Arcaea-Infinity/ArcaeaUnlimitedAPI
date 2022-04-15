@@ -83,7 +83,7 @@ public partial class PublicApi : ControllerBase
 
         var ls = ArcaeaSongs.GetByAlias(songname);
 
-        if (ls.Length < 1)
+        if (ls is null || ls.Length < 1)
         {
             error = Error.SongNotFound;
             return null;
@@ -91,7 +91,7 @@ public partial class PublicApi : ControllerBase
 
         if (ls.Length > 1)
         {
-            error = Error.TooManySongs(ls);
+            error = Error.TooManySongs(ls!);
             return null;
         }
 

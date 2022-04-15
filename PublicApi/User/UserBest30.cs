@@ -81,7 +81,7 @@ public partial class PublicApi
         return Success(response);
     }
 
-    private async Task<(UserBest30Response? response, Response? error)> QueryUserBest30(PlayerInfo player)
+    private static async Task<(UserBest30Response? response, Response? error)> QueryUserBest30(PlayerInfo player)
     {
         AccountInfo? account = null;
         try
@@ -115,7 +115,7 @@ public partial class PublicApi
 
                 best30Cache = await PollingBestsHelper.GetResult(account, friend);
 
-                if (best30Cache == null || best30Cache.Best30List is null || best30Cache.Best30List.Count == 0)
+                if (best30Cache is null || best30Cache.Best30List is null || best30Cache.Best30List.Count == 0)
                     return (null, Error.QueryingB30Failed);
 
                 best30Cache.Best30Avg = best30Cache.Best30List.Average(i => i.Rating);
