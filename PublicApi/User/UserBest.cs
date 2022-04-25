@@ -30,13 +30,13 @@ public partial class PublicApi
 
         try
         {
-            var task = UserBestConcurrent.GetTask(player.Code);
+            var task = UserBestConcurrent.GetTask((player.Code, song.SongId));
 
             if (task is null)
             {
-                UserBestConcurrent.NewTask(player.Code);
+                UserBestConcurrent.NewTask((player.Code, song.SongId));
                 var (response, errorresp) = await QueryUserBest(player, song, difficultyNum);
-                UserBestConcurrent.SetResult(player.Code, (response, errorresp));
+                UserBestConcurrent.SetResult((player.Code, song.SongId), (response, errorresp));
                 return errorresp ?? GetResponse(response!, withrecent, withsonginfo);
             }
             else
@@ -52,7 +52,7 @@ public partial class PublicApi
         }
         finally
         {
-            UserBestConcurrent.GotResultCallBack(player.Code);
+            UserBestConcurrent.GotResultCallBack((player.Code, song.SongId));
         }
     }
 
@@ -94,7 +94,7 @@ public partial class PublicApi
                 record.Potential = player.Potential;
                 DatabaseManager.Bests.InsertOrReplace(record);
             }
-            
+
             // calculate song rating
             var rank = friendRank[0];
             rank.Rating = CalcSongRating(rank.Score, song.Ratings[rank.Difficulty]);

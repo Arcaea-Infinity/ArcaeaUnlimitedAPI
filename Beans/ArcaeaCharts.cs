@@ -101,7 +101,7 @@ public partial class ArcaeaCharts
     internal static ArcaeaSong RandomSong() => Utils.RandomHelper.GetRandomItem(Songs.Values.ToArray())!;
 
     internal static ArcaeaCharts? RandomSong(int? start, int? end) =>
-        Utils.RandomHelper.GetRandomItem(GetByConstRange(start ?? 0, end ?? 24).ToArray());
+        Utils.RandomHelper.GetRandomItem(GetByDifficulty(start ?? 0, end ?? 24).ToArray());
 }
 
 public partial class ArcaeaCharts
@@ -237,6 +237,9 @@ public partial class ArcaeaCharts
         AliasCache.TryAdd(alias, ls);
         return ls;
     }
+    
+    private static IEnumerable<ArcaeaCharts> GetByDifficulty(int lowerlimit, int upperlimit) =>
+        Songs.Values.SelectMany(charts => charts).Where(t => t.Difficulty >= lowerlimit && t.Difficulty <= upperlimit);
 
     private static void Enqueue(PriorityQueue<ArcaeaSong, byte> dic, string alias, string key, ArcaeaSong song,
                                 byte upperpriority, byte lowerpriority)
@@ -256,9 +259,6 @@ public partial class ArcaeaCharts
                        : 0
                };
     }
-
-    private static IEnumerable<ArcaeaCharts> GetByConstRange(int lowerlimit, int upperlimit) =>
-        Songs.Values.SelectMany(charts => charts).Where(t => t.Difficulty >= lowerlimit && t.Difficulty <= upperlimit);
 }
 
 [Serializable]

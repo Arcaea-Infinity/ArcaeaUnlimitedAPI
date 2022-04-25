@@ -14,7 +14,7 @@ public partial class PublicApi : ControllerBase
     private static readonly ConcurrentApiRequest<string, (UserInfoResponse? infodata, Response? error)>
         UserInfoConcurrent = new();
 
-    private static readonly ConcurrentApiRequest<string, (UserBestResponse? bestdata, Response? error)>
+    private static readonly ConcurrentApiRequest<(string, string), (UserBestResponse? bestdata, Response? error)>
         UserBestConcurrent = new();
 
     private static readonly ConcurrentApiRequest<string, (UserBest30Response? b30data, Response? error)>
@@ -97,7 +97,7 @@ public partial class PublicApi : ControllerBase
 
         return ls[0];
     }
-    
+
     private static ArcaeaSong? QuerySongInfoExperimental(string? songname, string? songid, out Response? error)
     {
         error = null;
@@ -111,7 +111,7 @@ public partial class PublicApi : ControllerBase
         }
 
         var ls = ArcaeaCharts.Query(songname);
-       
+
         if (ls is null || ls.Count < 1)
         {
             error = Error.SongNotFound;
