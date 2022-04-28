@@ -34,6 +34,7 @@ For the deploy tutorial of AUA, please refer to the sub-branch branch.
 + [assets/char](/docs/assets/charassets.md)
 + [assets/song](/docs/assets/songassets.md)
 + [update](/docs/others/update.md)
++ [playdata](/docs/others/playdata.md)
 
 ### Error status
 
