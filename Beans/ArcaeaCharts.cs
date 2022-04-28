@@ -13,7 +13,7 @@ public partial class ArcaeaCharts
     internal static readonly ConcurrentDictionary<string, ArcaeaSong> Songs;
     internal static readonly ConcurrentDictionary<string, object> SongJsons;
     internal static readonly ConcurrentDictionary<string, List<string>> Aliases;
-    
+
     internal static (string sid, int dif, int rating)[] SortedCharts => SortByRating.ToArray();
 
     internal static ArcaeaSong? QueryById(string? songid) => GetById(songid);
@@ -32,7 +32,9 @@ public partial class ArcaeaCharts
 
         Abbreviations.ForAllItems<ArcaeaSong, string, List<string>>((song, value) =>
                                                                     {
-                                                                        if (Utils.StringCompareHelper.Equals(value, alias) && !abbrdata.Contains(song))
+                                                                        if (Utils.StringCompareHelper
+                                                                                 .Equals(value, alias)
+                                                                            && !abbrdata.Contains(song))
                                                                             abbrdata.Add(song);
                                                                     });
 
@@ -87,13 +89,13 @@ public partial class ArcaeaCharts
         if (item is null) return;
 
         var chart = item[record.Difficulty];
-        
+
         if (chart.Rating != @const)
         {
             chart.Rating = @const;
             chart.Note = record.MissCount + record.NearCount + record.PerfectCount;
-
-            DatabaseManager.Song.Update(chart);
+            var str = "UPDATE `charts` SET rating = ?, note = ? WHERE song_id = ? AND rating_class = ?;";
+            DatabaseManager.Song.Value.Execute(str, chart.Rating, chart.Note, chart.SongID, chart.RatingClass);
             Sort();
         }
     }
@@ -126,7 +128,7 @@ public partial class ArcaeaCharts
             chart.Init();
             Songs.TryAddOrInsert(chart.SongID, chart);
         }
-        
+
         foreach (var (sid, value) in Songs)
         {
             value.Sort();
@@ -152,7 +154,7 @@ public partial class ArcaeaCharts
 
             SongJsons.TryAdd(sid, value.ToJson(false));
         }
-        
+
         Sort();
     }
 
@@ -195,7 +197,7 @@ public partial class ArcaeaCharts
     private static ArcaeaSong? GetByName(ConcurrentDictionary<string, ArcaeaSong> values, string alias)
     {
         values.TryTakeValues((ArcaeaCharts item) => Utils.StringCompareHelper.Equals(item.NameEn, alias) || Utils.StringCompareHelper.Equals(item.NameJp, alias),
-                        out var result);
+                             out var result);
 
         return result;
     }
@@ -211,18 +213,19 @@ public partial class ArcaeaCharts
     {
         var dic = new PriorityQueue<ArcaeaSong, byte>();
 
-        Aliases.ForAllItems<string, string, List<string>>((song, sid) => Enqueue(dic, alias, sid, GetById(song)!, 1,4));
+        Aliases.ForAllItems<string, string, List<string>>((song, sid) =>
+                                                              Enqueue(dic, alias, sid, GetById(song)!, 1, 4));
 
         dic.TryPeek(out _, out var firstpriority);
 
         if (firstpriority != 1)
             foreach (var (sid, song) in Songs)
-                Enqueue(dic, alias, sid, song, 2,5);
+                Enqueue(dic, alias, sid, song, 2, 5);
 
         dic.TryPeek(out _, out firstpriority);
 
         if (firstpriority != 2)
-            Names.ForAllItems<ArcaeaSong, string, List<string>>((song, name) => Enqueue(dic, alias, name, song, 3,6));
+            Names.ForAllItems<ArcaeaSong, string, List<string>>((song, name) => Enqueue(dic, alias, name, song, 3, 6));
 
         if (dic.Count == 0) return default;
 
@@ -237,7 +240,7 @@ public partial class ArcaeaCharts
         AliasCache.TryAdd(alias, ls);
         return ls;
     }
-    
+
     private static IEnumerable<ArcaeaCharts> GetByDifficulty(int lowerlimit, int upperlimit) =>
         Songs.Values.SelectMany(charts => charts).Where(t => t.Difficulty >= lowerlimit && t.Difficulty <= upperlimit);
 
