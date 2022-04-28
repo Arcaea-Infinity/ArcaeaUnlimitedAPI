@@ -5,6 +5,10 @@
 | songname   | any song name for fuzzy querying                                           | true when songid is not null, otherwise false   |
 | songid     | sid in Arcaea songlist                                                     | true when songname is not null, otherwise false |
 
+###### Tag
+
+* Enable Cors
+
 #### Example
 
 + `{apiurl}/botarcapi/song/info?songname=infinity`
@@ -15,54 +19,104 @@
 {
   "status": 0,
   "content": {
-    "id": "infinityheaven",
-    "title_localized": {
-      "en": "Infinity Heaven"
-    },
-    "artist": "HyuN",
-    "bpm": "160",
-    "bpm_base": 160.0,
-    "set": "base",
-    "set_friendly": "Arcaea",
-    "world_unlock": false,
-    "remote_dl": false,
-    "side": 0,
-    "time": 154,
-    "date": 1491868800,
-    "version": "1.0",
+    "song_id": "infinityheaven",
     "difficulties": [
       {
-        "ratingClass": 0,
-        "chartDesigner": "Nitro",
-        "jacketDesigner": "Tagtraume",
-        "jacketOverride": false,
-        "realrating": 15,
-        "totalNotes": 336
+        "name_en": "Infinity Heaven",
+        "name_jp": "",
+        "artist": "HyuN",
+        "bpm": "160",
+        "bpm_base": 160.0,
+        "set": "base",
+        "set_friendly": "Arcaea",
+        "time": 154,
+        "side": 0,
+        "world_unlock": false,
+        "remote_download": false,
+        "bg": "",
+        "date": 1491868800,
+        "version": "1.0",
+        "difficulty": 2,
+        "rating": 15,
+        "note": 336,
+        "chart_designer": "Nitro",
+        "jacket_designer": "Tagtraume",
+        "jacket_override": false,
+        "audio_override": false
       },
       {
-        "ratingClass": 1,
-        "chartDesigner": "Nitro",
-        "jacketDesigner": "Tagtraume",
-        "jacketOverride": false,
-        "realrating": 55,
-        "totalNotes": 545
+        "name_en": "Infinity Heaven",
+        "name_jp": "",
+        "artist": "HyuN",
+        "bpm": "160",
+        "bpm_base": 160.0,
+        "set": "base",
+        "set_friendly": "Arcaea",
+        "time": 154,
+        "side": 0,
+        "world_unlock": false,
+        "remote_download": false,
+        "bg": "",
+        "date": 1491868800,
+        "version": "1.0",
+        "difficulty": 10,
+        "rating": 55,
+        "note": 545,
+        "chart_designer": "Nitro",
+        "jacket_designer": "Tagtraume",
+        "jacket_override": false,
+        "audio_override": false
       },
       {
-        "ratingClass": 2,
-        "chartDesigner": "Nitro",
-        "jacketDesigner": "Tagtraume",
-        "jacketOverride": false,
-        "realrating": 75,
-        "totalNotes": 853
+        "name_en": "Infinity Heaven",
+        "name_jp": "",
+        "artist": "HyuN",
+        "bpm": "160",
+        "bpm_base": 160.0,
+        "set": "base",
+        "set_friendly": "Arcaea",
+        "time": 154,
+        "side": 0,
+        "world_unlock": false,
+        "remote_download": false,
+        "bg": "",
+        "date": 1491868800,
+        "version": "1.0",
+        "difficulty": 14,
+        "rating": 75,
+        "note": 853,
+        "chart_designer": "Nitro",
+        "jacket_designer": "Tagtraume",
+        "jacket_override": false,
+        "audio_override": false
       },
       {
-        "ratingClass": 3,
-        "chartDesigner": "Nitr∞",
-        "jacketDesigner": "Tagtraume",
-        "jacketOverride": true,
-        "realrating": 96,
-        "totalNotes": 986
+        "name_en": "Infinity Heaven",
+        "name_jp": "",
+        "artist": "HyuN",
+        "bpm": "160",
+        "bpm_base": 160.0,
+        "set": "base",
+        "set_friendly": "Arcaea",
+        "time": 154,
+        "side": 0,
+        "world_unlock": false,
+        "remote_download": false,
+        "bg": "",
+        "date": 1590537602,
+        "version": "3.0",
+        "difficulty": 18,
+        "rating": 96,
+        "note": 986,
+        "chart_designer": "Nitr∞",
+        "jacket_designer": "Tagtraume",
+        "jacket_override": true,
+        "audio_override": false
       }
+    ],
+    "alias": [
+      "无限天堂",
+      "无尽天堂"
     ]
   }
 }

@@ -1,5 +1,9 @@
 ## update
 
+###### Tag
+
+* Enable Cors
+
 #### Example
 
 + `{apiurl}/botarcapi/update`

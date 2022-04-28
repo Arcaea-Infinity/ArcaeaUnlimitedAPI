@@ -27,6 +27,8 @@ internal class Int32Converter : JsonConverter<int?>
     {
         var readerValue = reader.Value?.ToString();
         if (readerValue == null) return 0;
-        return int.TryParse(readerValue, out var value) ? value : 0;
+        return int.TryParse(readerValue, out var value)
+            ? value
+            : 0;
     }
 }

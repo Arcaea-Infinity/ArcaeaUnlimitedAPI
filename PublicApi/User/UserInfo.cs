@@ -66,8 +66,7 @@ public partial class PublicApi
         {
             foreach (var record in response.RecentScore) record.UserID = null!;
 
-            if (withsonginfo)
-                response.Songinfo = response.RecentScore.Select(i => ArcaeaSongs.GetById(i.SongID)!.ToJson());
+            if (withsonginfo) response.Songinfo = response.RecentScore.Select(i => ArcaeaCharts.QueryByRecord(i)!);
         }
 
         return Success(response);

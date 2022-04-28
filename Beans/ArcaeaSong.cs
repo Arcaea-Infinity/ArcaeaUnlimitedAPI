@@ -4,6 +4,13 @@ internal class ArcaeaSong : List<ArcaeaCharts>, IEquatable<ArcaeaSong>
 {
     internal string SongID => this[0].SongID;
 
+    public bool Equals(ArcaeaSong? other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return SongID.Equals(other.SongID);
+    }
+
     public object ToJson(bool usejsonlist = true)
     {
         if (usejsonlist && ArcaeaCharts.SongJsons.ContainsKey(SongID)) return ArcaeaCharts.SongJsons[SongID];
@@ -21,13 +28,6 @@ internal class ArcaeaSong : List<ArcaeaCharts>, IEquatable<ArcaeaSong>
     }
 
     public new void Sort() { Sort((chart, another) => chart.RatingClass - another.RatingClass); }
-
-    public bool Equals(ArcaeaSong? other)
-    {
-        if (ReferenceEquals(null, other)) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return SongID.Equals(other.SongID);
-    }
 
     public override bool Equals(object? obj)
     {

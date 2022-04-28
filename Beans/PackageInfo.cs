@@ -8,7 +8,7 @@ namespace ArcaeaUnlimitedAPI.Beans;
 
 [Serializable]
 [Table("packages")]
-[DatabaseManager.CreateTableSqlAttribute("CREATE TABLE `packages`(`id` TEXT PRIMARY KEY NOT NULL, `name` TEXT NOT NULL DEFAULT '');")]
+[DatabaseManager.CreateTableSqlAttribute("CREATE TABLE `packages`(`id` TEXT PRIMARY KEY NOT NULL, `name` TEXT NOT NULL DEFAULT '', FOREIGN KEY(`id`) REFERENCES `charts`(`set`));")]
 internal class PackageInfo
 {
     private static Lazy<ConcurrentDictionary<string, PackageInfo>> _list

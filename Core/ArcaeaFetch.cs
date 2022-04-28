@@ -157,7 +157,7 @@ internal static class ArcaeaFetch
                     var info = await Register(node, name, password, email, deviceID);
 
                     if (info?.ErrorCode == 124) return;
-                    
+
                     if (info?.ErrorCode == 5)
                     {
                         NeedUpdate = true;

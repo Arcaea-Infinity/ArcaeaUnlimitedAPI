@@ -8,9 +8,13 @@
 | withrecent   | boolean. if true, will reply with recent_score                                  | true                                            |
 | withsonginfo | boolean. if true, will reply with songinfo                                      | true                                            |
 
+###### Tag
+
+* User-Agent Needed
+
 #### Example
 
-+ `{apiurl}/botarcapi/user/best30?user=ToasterKoishi&overflow=10&withrecent=true&withsonginfo=true`
++ `{apiurl}/botarcapi/user/best30?user=ToasterKoishi&withrecent=true&withsonginfo=true`
 
 ###### Return data (Edited for readability)
 
@@ -47,241 +51,71 @@
         "miss_count": 3,
         "perfect_count": 1440,
         "shiny_perfect_count": 1376
-      },
-      {
-        "score": 9884488,
-        "health": 100,
-        "rating": 12.92244,
-        "song_id": "tempestissimo",
-        "modifier": 0,
-        "difficulty": 3,
-        "clear_type": 1,
-        "best_clear_type": 5,
-        "time_played": 1591566895228,
-        "near_count": 20,
-        "miss_count": 8,
-        "perfect_count": 1512,
-        "shiny_perfect_count": 1372
-      }    
-    ],
-    "best30_overflow": [
-      {
-        "score": 9993863,
-        "health": 100,
-        "rating": 12.469315,
-        "song_id": "ikazuchi",
-        "modifier": 0,
-        "difficulty": 2,
-        "clear_type": 1,
-        "best_clear_type": 2,
-        "time_played": 1584913642898,
-        "near_count": 0,
-        "miss_count": 1,
-        "perfect_count": 1346,
-        "shiny_perfect_count": 1287
       }
     ],
     "best30_songinfo": [
       {
-        "id": "grievouslady",
-        "title_localized": {
-          "en": "Grievous Lady"
-        },
+        "name_en": "Grievous Lady",
+        "name_jp": "",
         "artist": "Team Grimoire vs Laur",
         "bpm": "210",
         "bpm_base": 210.0,
         "set": "yugamu",
         "set_friendly": "Vicious Labyrinth",
-        "world_unlock": false,
-        "remote_dl": true,
-        "side": 1,
         "time": 141,
+        "side": 1,
+        "world_unlock": false,
+        "remote_download": true,
+        "bg": "grievouslady",
         "date": 1509667208,
         "version": "1.5",
-        "difficulties": [
-          {
-            "ratingClass": 0,
-            "chartDesigner": "迷路第一層",
-            "jacketDesigner": "シエラ",
-            "jacketOverride": false,
-            "realrating": 65,
-            "totalNotes": 956
-          },
-          {
-            "ratingClass": 1,
-            "chartDesigner": "迷路第二層",
-            "jacketDesigner": "シエラ",
-            "jacketOverride": false,
-            "realrating": 93,
-            "totalNotes": 1194
-          },
-          {
-            "ratingClass": 2,
-            "chartDesigner": "迷路深層",
-            "jacketDesigner": "シエラ",
-            "jacketOverride": false,
-            "realrating": 113,
-            "totalNotes": 1450
-          }
-        ]
-      },
-      {
-        "id": "tempestissimo",
-        "title_localized": {
-          "en": "Tempestissimo"
-        },
-        "artist": "t+pazolite",
-        "bpm": "231",
-        "bpm_base": 231.0,
-        "set": "vs",
-        "set_friendly": "Black Fate",
-        "world_unlock": false,
-        "remote_dl": true,
-        "side": 1,
-        "time": 137,
-        "date": 1590537605,
-        "version": "3.0",
-        "difficulties": [
-          {
-            "ratingClass": 0,
-            "chartDesigner": "Prelude - Ouverture",
-            "jacketDesigner": "シエラ",
-            "jacketOverride": false,
-            "realrating": 65,
-            "totalNotes": 919
-          },
-          {
-            "ratingClass": 1,
-            "chartDesigner": "Convergence - Intermezzo",
-            "jacketDesigner": "シエラ",
-            "jacketOverride": false,
-            "realrating": 95,
-            "totalNotes": 1034
-          },
-          {
-            "ratingClass": 2,
-            "chartDesigner": "Onslaught - Crescendo",
-            "jacketDesigner": "シエラ",
-            "jacketOverride": false,
-            "realrating": 106,
-            "totalNotes": 1254
-          },
-          {
-            "ratingClass": 3,
-            "chartDesigner": "Finale - The Tempest",
-            "jacketDesigner": "シエラ",
-            "jacketOverride": true,
-            "realrating": 115,
-            "totalNotes": 1540
-          }
-        ]
-      }
-    ],
-    "best30_overflow_songinfo": [
-      {
-        "id": "ikazuchi",
-        "title_localized": {
-          "en": "Ikazuchi",
-          "ja": "怒槌"
-        },
-        "artist": "光吉猛修",
-        "bpm": "200",
-        "bpm_base": 200.0,
-        "set": "chunithm",
-        "set_friendly": "CHUNITHM Collaboration",
-        "world_unlock": false,
-        "remote_dl": true,
-        "side": 1,
-        "time": 150,
-        "date": 1558573201,
-        "version": "2.1",
-        "difficulties": [
-          {
-            "ratingClass": 0,
-            "chartDesigner": "先史の機械神【夜浪】",
-            "jacketDesigner": "",
-            "jacketOverride": false,
-            "realrating": 35,
-            "totalNotes": 656
-          },
-          {
-            "ratingClass": 1,
-            "chartDesigner": "先史の機械神【夜浪】",
-            "jacketDesigner": "",
-            "jacketOverride": false,
-            "realrating": 75,
-            "totalNotes": 976
-          },
-          {
-            "ratingClass": 2,
-            "chartDesigner": "先史の機械神【夜浪】",
-            "jacketDesigner": "",
-            "jacketOverride": false,
-            "realrating": 105,
-            "totalNotes": 1347
-          }
-        ]
+        "difficulty": 22,
+        "rating": 113,
+        "note": 1450,
+        "chart_designer": "迷路深層",
+        "jacket_designer": "シエラ",
+        "jacket_override": false,
+        "audio_override": false
       }
     ],
     "recent_score": {
       "user_id": 4,
-      "score": 9979350,
+      "score": 9982099,
       "health": 100,
-      "rating": 11.59675,
-      "song_id": "melodyoflove",
+      "rating": 11.510494999999999,
+      "song_id": "espebranch",
       "modifier": 0,
       "difficulty": 2,
-      "clear_type": 1,
+      "clear_type": 2,
       "best_clear_type": 3,
-      "time_played": 1647570474485,
-      "near_count": 2,
-      "miss_count": 1,
-      "perfect_count": 928,
-      "shiny_perfect_count": 833
+      "time_played": 1651045525836,
+      "near_count": 4,
+      "miss_count": 0,
+      "perfect_count": 1054,
+      "shiny_perfect_count": 1003
     },
     "recent_songinfo": {
-      "id": "melodyoflove",
-      "title_localized": {
-        "en": "A Wandering Melody of Love",
-        "ja": "迷える音色は恋の唄"
-      },
-      "artist": "からとPαnchii少年 feat.はるの",
-      "bpm": "165",
-      "bpm_base": 165.0,
-      "set": "omatsuri",
-      "set_friendly": "Sunset Radiance",
-      "world_unlock": false,
-      "remote_dl": true,
-      "side": 0,
-      "time": 134,
-      "date": 1566432002,
-      "version": "2.3",
-      "difficulties": [
-        {
-          "ratingClass": 0,
-          "chartDesigner": "恋のToaster",
-          "jacketDesigner": "シエラ",
-          "jacketOverride": false,
-          "realrating": 35,
-          "totalNotes": 422
-        },
-        {
-          "ratingClass": 1,
-          "chartDesigner": "恋のToaster",
-          "jacketDesigner": "シエラ",
-          "jacketOverride": false,
-          "realrating": 75,
-          "totalNotes": 670
-        },
-        {
-          "ratingClass": 2,
-          "chartDesigner": "恋のToaster",
-          "jacketDesigner": "シエラ",
-          "jacketOverride": false,
-          "realrating": 97,
-          "totalNotes": 931
-        }
-      ]
+      "name_en": "LunarOrbit -believe in the Espebranch road-",
+      "name_jp": "白道、多希望羊と信じありく。",
+      "artist": "Apo11o program ft. 大瀬良あい",
+      "bpm": "192",
+      "bpm_base": 192.0,
+      "set": "base",
+      "set_friendly": "Arcaea",
+      "time": 141,
+      "side": 1,
+      "world_unlock": true,
+      "remote_download": false,
+      "bg": "mirai_conflict",
+      "date": 1535673600,
+      "version": "1.7",
+      "difficulty": 18,
+      "rating": 96,
+      "note": 1058,
+      "chart_designer": "月刊Toaster",
+      "jacket_designer": "hideo",
+      "jacket_override": false,
+      "audio_override": false
     }
   }
 }

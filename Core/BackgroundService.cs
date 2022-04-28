@@ -3,7 +3,6 @@ using System.IO.Compression;
 using System.Timers;
 using ArcaeaUnlimitedAPI.Beans;
 using ArcaeaUnlimitedAPI.Json.Songlist;
-using ArcaeaUnlimitedAPI.PublicApi;
 using Newtonsoft.Json;
 using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 using static ArcaeaUnlimitedAPI.Core.Utils;
@@ -65,6 +64,9 @@ internal static class BackgroundService
             {
                 if (!File.Exists(apkpth)) DownloadApk(info.Url);
 
+                // not apk
+                if (new FileInfo(apkpth).Length < 8192) File.Delete(apkpth);
+
                 if (Directory.Exists(dirpth)) Directory.Delete(dirpth, true);
                 Directory.CreateDirectory(dirpth);
                 ZipFile.ExtractToDirectory(apkpth, dirpth);
@@ -101,22 +103,8 @@ internal static class BackgroundService
                                 if (!File.Exists(pth) && File.Exists(rawpth)) File.Move(rawpth, pth);
                             }
 
-                        ArcaeaSongs.Insert(i);
-                        Thread.Sleep(300);
                         ArcaeaCharts.Insert(i);
-
-                        if (i.Difficulties.Count == 4)
-                        {
-                            var song = ArcaeaSongs.GetById(i.Id);
-                            if (song?.BynRating == -1)
-                            {
-                                song.BynRating = 0;
-                                song.BynNote = 0;
-                                song.Ratings[3] = song.BynRating;
-
-                                DatabaseManager.Song.Update(song);
-                            }
-                        }
+                        Thread.Sleep(300);
                     }
 
                 AutoDecrypt(dirpth, info.Version);

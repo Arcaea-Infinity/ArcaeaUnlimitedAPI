@@ -1,4 +1,5 @@
 using ArcaeaUnlimitedAPI.Beans;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
@@ -7,10 +8,10 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 
 public partial class PublicApi
 {
+    [EnableCors]
     [HttpGet("/botarcapi/assets/song")]
     public object GetSongAssets(string? songname, string? songid, string? difficulty, string? file)
     {
-        if (!UserAgentCheck()) return NotFound(null);
         FileInfo fileinfo;
         if (file is null)
         {
@@ -20,15 +21,11 @@ public partial class PublicApi
 
             if (song is null) return NotFound(songerror ?? Error.InvalidSongNameorID);
 
-            var difextend = difficultyNum switch
-                            {
-                                0 when song.JacketOverridePst == "true" => "_0",
-                                1 when song.JacketOverridePrs == "true" => "_1",
-                                3 when song.JacketOverrideByn == "true" => "_3",
-                                _                                       => ""
-                            };
+            var difextend = song[difficultyNum].JacketOverride
+                ? $"_{difficultyNum}"
+                : "";
 
-            fileinfo = new($"{Config.DataPath}/source/songs/{song.SongId}{difextend}.jpg");
+            fileinfo = new($"{Config.DataPath}/source/songs/{song.SongID}{difextend}.jpg");
         }
         else
             fileinfo = new($"{Config.DataPath}/source/songs/{file}.jpg");
@@ -38,11 +35,10 @@ public partial class PublicApi
         return PhysicalFile(fileinfo.FullName, "image/jpeg");
     }
 
+    [EnableCors]
     [HttpGet("/botarcapi/assets/icon")]
     public object GetIconAssets(string? partner, bool awakened = false)
     {
-        if (!UserAgentCheck()) return NotFound(null);
-
         // check for request arguments
         if (!int.TryParse(partner, out _)) return NotFound(Error.InvalidPartner);
 
@@ -53,11 +49,10 @@ public partial class PublicApi
         return PhysicalFile(fileinfo.FullName, "image/png");
     }
 
+    [EnableCors]
     [HttpGet("/botarcapi/assets/char")]
     public object GetCharAssets(string? partner, bool awakened = false)
     {
-        if (!UserAgentCheck()) return NotFound(null);
-
         // check for request arguments
         if (!int.TryParse(partner, out _)) return NotFound(Error.InvalidPartner);
 

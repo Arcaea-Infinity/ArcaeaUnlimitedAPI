@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
-using ArcaeaUnlimitedAPI.Json.Songlist;
 using ArcaeaUnlimitedAPI.PublicApi;
 using Newtonsoft.Json;
 using SQLite;
@@ -39,16 +38,16 @@ public class UserBest30Response
     public List<Records>? Best30Overflow { get; set; }
 
     [JsonProperty("best30_songinfo")] [Ignore]
-    public IEnumerable<SongItem>? Best30Songinfo { get; set; }
+    public IEnumerable<ArcaeaCharts>? Best30Songinfo { get; set; }
 
     [JsonProperty("best30_overflow_songinfo")] [Ignore]
-    public IEnumerable<SongItem>? Best30OverflowSonginfo { get; set; }
+    public IEnumerable<ArcaeaCharts>? Best30OverflowSonginfo { get; set; }
 
     [JsonProperty("recent_score")] [Ignore]
     public Records? RecentScore { get; set; }
 
     [JsonProperty("recent_songinfo")] [Ignore]
-    public SongItem? RecentSonginfo { get; set; }
+    public ArcaeaCharts? RecentSonginfo { get; set; }
 
     internal static UserBest30Response? GetById(int userid)
     {

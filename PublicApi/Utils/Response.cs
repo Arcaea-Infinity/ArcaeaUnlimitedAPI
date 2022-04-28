@@ -51,18 +51,6 @@ internal class Response
         internal static readonly Response SongNotFound = Exception(-7, "song not recorded");
 
         /// <summary>
-        ///     errorCode = -8
-        /// </summary>
-        internal static Response TooManySongs(IEnumerable<ArcaeaSongs> ls) =>
-            new() { Status = -8, Message = "too many records", Content = new { songs = ls.Select(i => i.SongId) } };
-
-        /// <summary>
-        ///     errorCode = -8
-        /// </summary>
-        internal static Response  TooManySongs(IEnumerable<ArcaeaSong> ls) =>
-            new() { Status = -8, Message = "too many records", Content = new { songs = ls.Select(i => i.SongID) } };
-        
-        /// <summary>
         ///     errorCode = -9
         /// </summary>
         internal static readonly Response InvalidDifficulty = Exception(-9, "invalid difficulty");
@@ -149,5 +137,11 @@ internal class Response
         ///     errorCode = -233
         /// </summary>
         internal static readonly Response InternalErrorOccurred = Exception(-233, "internal error occurred");
+
+        /// <summary>
+        ///     errorCode = -8
+        /// </summary>
+        internal static Response TooManySongs(IEnumerable<ArcaeaSong> ls) =>
+            new() { Status = -8, Message = "too many records", Content = new { songs = ls.Select(i => i.SongID) } };
     }
 }

@@ -7,6 +7,14 @@
 | difficulty | accept format are 3 or byn or beyond                               | true                                                      |
 | file       | filename for special songs, such as stager_1 or melodyoflove_night | true when songid or songname is not null, otherwise false |
 
+###### Tag
+
+* Enable Cors
+
+#### Example
+
++ `{apiurl}/botarcapi/assets/song?file=stager_1`
+
 ###### Content-Type
 
 ```

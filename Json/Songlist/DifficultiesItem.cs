@@ -40,10 +40,4 @@ public class DifficultiesItem
     [JsonProperty("rating")] public int Rating { get; set; }
 
     [JsonProperty("ratingPlus")] public bool? RatingPlus { get; set; }
-    
-    /// for old song/info only
-    [JsonProperty("realrating")] public int RealRating { get; set; }
-    
-    /// for old song/info only
-    [JsonProperty("totalNotes")] public int TotalNotes { get; set; }
 }

@@ -61,19 +61,18 @@ public partial class PublicApi
 
         if (withsonginfo)
         {
-            if (response.Best30List is not  null)
-                response.Best30Songinfo = response.Best30List.Select(i => ArcaeaSongs.GetById(i.SongID)!.ToJson());
+            if (response.Best30List is not null)
+                response.Best30Songinfo = response.Best30List.Select(i => ArcaeaCharts.QueryByRecord(i)!);
 
             if (response.Best30Overflow is not null)
-                response.Best30OverflowSonginfo
-                    = response.Best30Overflow.Select(i => ArcaeaSongs.GetById(i.SongID)!.ToJson());
+                response.Best30OverflowSonginfo = response.Best30Overflow.Select(i => ArcaeaCharts.QueryByRecord(i)!);
         }
 
         if (withrecent)
         {
             if (response.AccountInfo.RecentScore is not null)
                 response.RecentScore = response.AccountInfo.RecentScore.FirstOrDefault();
-            if (withsonginfo) response.RecentSonginfo = ArcaeaSongs.GetById(response.RecentScore?.SongID)?.ToJson();
+            if (withsonginfo) response.RecentSonginfo = ArcaeaCharts.QueryByRecord(response.RecentScore);
         }
 
         response.AccountInfo.RecentScore = null;
@@ -104,7 +103,7 @@ public partial class PublicApi
                 {
                     var (success, friendRank)
                         = await account.FriendRank(friend.RecentScore[0].SongID, friend.RecentScore[0].Difficulty);
-                    
+
                     if (!success || friendRank is null || friendRank.Count == 0) return (null, Error.Shadowbanned);
                     foreach (var record in friendRank)
                     {

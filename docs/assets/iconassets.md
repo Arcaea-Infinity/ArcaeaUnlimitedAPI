@@ -5,6 +5,14 @@
 | partner   | partner id                   | false    |
 | awakened  | Boolean, partner is awakened | true     |
 
+###### Tag
+
+* Enable Cors
+
+#### Example
+
++ `{apiurl}/botarcapi/assets/icon?partner=1`
+
 ###### Content-Type
 
 ```

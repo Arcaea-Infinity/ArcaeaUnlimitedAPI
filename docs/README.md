@@ -8,7 +8,7 @@ For the deploy tutorial of AUA, please refer to the sub-branch branch.
 
 ### Note
 
-> Accessing the api requires a specific User-Agent
+> Accessing some api requires a specific User-Agent
 
 ### Nuget Packages Dependencies
 

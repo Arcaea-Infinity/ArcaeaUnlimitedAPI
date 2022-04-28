@@ -7,6 +7,10 @@
 | recent       | number, range 0-7. The number of recently played songs expected | true                                            |
 | withsonginfo | boolean. if true, will reply with songinfo                      | true                                            |
 
+###### Tag
+
+* User-Agent Needed
+
 #### Example
 
 + `{apiurl}/botarcapi/user/info?user=ToasterKoishi&recent=2&withsonginfo=true`
@@ -31,123 +35,82 @@
     },
     "recent_score": [
       {
-        "score": 9979350,
+        "score": 9982099,
         "health": 100,
-        "rating": 11.59675,
-        "song_id": "melodyoflove",
+        "rating": 11.510494999999999,
+        "song_id": "espebranch",
         "modifier": 0,
         "difficulty": 2,
-        "clear_type": 1,
+        "clear_type": 2,
         "best_clear_type": 3,
-        "time_played": 1647570474485,
-        "near_count": 2,
-        "miss_count": 1,
-        "perfect_count": 928,
-        "shiny_perfect_count": 833
+        "time_played": 1651045525836,
+        "near_count": 4,
+        "miss_count": 0,
+        "perfect_count": 1054,
+        "shiny_perfect_count": 1003
       },
       {
-        "score": 9893013,
+        "score": 9877383,
         "health": 100,
-        "rating": 12.465065,
-        "song_id": "aegleseeker",
-        "modifier": 0,
+        "rating": 11.886915,
+        "song_id": "seclusion",
+        "modifier": 2,
         "difficulty": 2,
-        "clear_type": 1,
+        "clear_type": 5,
         "best_clear_type": 5,
-        "time_played": 1646960716486,
-        "near_count": 16,
-        "miss_count": 9,
-        "perfect_count": 1543,
-        "shiny_perfect_count": 1432
+        "time_played": 1650581540921,
+        "near_count": 8,
+        "miss_count": 10,
+        "perfect_count": 1114,
+        "shiny_perfect_count": 1058
       }
     ],
     "songinfo": [
       {
-        "id": "melodyoflove",
-        "title_localized": {
-          "en": "A Wandering Melody of Love",
-          "ja": "迷える音色は恋の唄"
-        },
-        "artist": "からとPαnchii少年 feat.はるの",
-        "bpm": "165",
-        "bpm_base": 165.0,
-        "set": "omatsuri",
-        "set_friendly": "Sunset Radiance",
-        "world_unlock": false,
-        "remote_dl": true,
-        "side": 0,
-        "time": 134,
-        "date": 1566432002,
-        "version": "2.3",
-        "difficulties": [
-          {
-            "ratingClass": 0,
-            "chartDesigner": "恋のToaster",
-            "jacketDesigner": "シエラ",
-            "jacketOverride": false,
-            "realrating": 35,
-            "totalNotes": 422
-          },
-          {
-            "ratingClass": 1,
-            "chartDesigner": "恋のToaster",
-            "jacketDesigner": "シエラ",
-            "jacketOverride": false,
-            "realrating": 75,
-            "totalNotes": 670
-          },
-          {
-            "ratingClass": 2,
-            "chartDesigner": "恋のToaster",
-            "jacketDesigner": "シエラ",
-            "jacketOverride": false,
-            "realrating": 97,
-            "totalNotes": 931
-          }
-        ]
+        "name_en": "LunarOrbit -believe in the Espebranch road-",
+        "name_jp": "白道、多希望羊と信じありく。",
+        "artist": "Apo11o program ft. 大瀬良あい",
+        "bpm": "192",
+        "bpm_base": 192.0,
+        "set": "base",
+        "set_friendly": "Arcaea",
+        "time": 141,
+        "side": 1,
+        "world_unlock": true,
+        "remote_download": false,
+        "bg": "mirai_conflict",
+        "date": 1535673600,
+        "version": "1.7",
+        "difficulty": 18,
+        "rating": 96,
+        "note": 1058,
+        "chart_designer": "月刊Toaster",
+        "jacket_designer": "hideo",
+        "jacket_override": false,
+        "audio_override": false
       },
       {
-        "id": "aegleseeker",
-        "title_localized": {
-          "en": "Aegleseeker"
-        },
-        "artist": "Silentroom vs Frums",
-        "bpm": "234",
-        "bpm_base": 234.0,
+        "name_en": "Seclusion",
+        "name_jp": "",
+        "artist": "Laur feat. Sennzai",
+        "bpm": "175",
+        "bpm_base": 175.0,
         "set": "observer",
         "set_friendly": "Esoteric Order",
-        "world_unlock": false,
-        "remote_dl": true,
-        "side": 0,
-        "time": 147,
-        "date": 1620691204,
-        "version": "3.6",
-        "difficulties": [
-          {
-            "ratingClass": 0,
-            "chartDesigner": "⟨RECORD START⟩ 0:",
-            "jacketDesigner": "シエラ",
-            "jacketOverride": false,
-            "realrating": 55,
-            "totalNotes": 973
-          },
-          {
-            "ratingClass": 1,
-            "chartDesigner": "⟨OBSRV⟩ boundary(?°a,?°A)",
-            "jacketDesigner": "シエラ",
-            "jacketOverride": false,
-            "realrating": 88,
-            "totalNotes": 1235
-          },
-          {
-            "ratingClass": 2,
-            "chartDesigner": "L₆ː The Void",
-            "jacketDesigner": "シエラ",
-            "jacketOverride": false,
-            "realrating": 110,
-            "totalNotes": 1568
-          }
-        ]
+        "time": 138,
+        "side": 1,
+        "world_unlock": true,
+        "remote_download": true,
+        "bg": "observer_conflict",
+        "date": 1626825603,
+        "version": "3.7",
+        "difficulty": 20,
+        "rating": 105,
+        "note": 1132,
+        "chart_designer": "N•Ex•T",
+        "jacket_designer": "海鵜げそ",
+        "jacket_override": false,
+        "audio_override": false
       }
     ]
   }

@@ -65,7 +65,7 @@ internal static class Log
             FunctionError(function, content);
         }
     }
-    
+
     internal static async void FunctionLog(string function, string content)
     {
         try

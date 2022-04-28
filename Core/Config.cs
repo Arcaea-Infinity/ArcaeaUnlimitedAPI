@@ -8,17 +8,17 @@ internal static class GlobalConfig
 
     internal static volatile bool NeedUpdate = false;
 
-    internal static void Init()
-    {
-        Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("config.json"))!;
-        ArcaeaFetch.Init();
-    }
-
     static GlobalConfig()
     {
         Init();
         BackgroundService.Init();
         ConfigWatcher.Init();
+    }
+
+    internal static void Init()
+    {
+        Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("config.json"))!;
+        ArcaeaFetch.Init();
     }
 }
 

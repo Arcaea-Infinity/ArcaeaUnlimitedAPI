@@ -16,6 +16,12 @@ public partial class ArcaeaCharts
 
     internal static (string sid, int dif, int rating)[] SortedCharts => SortByRating.ToArray();
 
+    internal static ArcaeaCharts? QueryByRecord(Records? record)
+    {
+        if (record is null) return null;
+        return GetById(record.SongID)![record.Difficulty];
+    }
+
     internal static ArcaeaSong? QueryById(string? songid) => GetById(songid);
 
     internal static List<ArcaeaSong>? Query(string alias)

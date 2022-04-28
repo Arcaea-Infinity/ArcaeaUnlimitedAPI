@@ -14,7 +14,7 @@ public partial class PublicApi : ControllerBase
     private static readonly ConcurrentApiRequest<string, (UserInfoResponse? infodata, Response? error)>
         UserInfoConcurrent = new();
 
-    private static readonly ConcurrentApiRequest<(string, string), (UserBestResponse? bestdata, Response? error)>
+    private static readonly ConcurrentApiRequest<(string, string, int), (UserBestResponse? bestdata, Response? error)>
         UserBestConcurrent = new();
 
     private static readonly ConcurrentApiRequest<string, (UserBest30Response? b30data, Response? error)>
@@ -68,37 +68,7 @@ public partial class PublicApi : ControllerBase
         return players[0];
     }
 
-
-    private static ArcaeaSongs? QuerySongInfo(string? songname, string? songid, out Response? error)
-    {
-        error = null;
-
-        if (!string.IsNullOrWhiteSpace(songid)) return ArcaeaSongs.GetById(songid);
-
-        if (string.IsNullOrWhiteSpace(songname))
-        {
-            error = Error.InvalidSongNameorID;
-            return null;
-        }
-
-        var ls = ArcaeaSongs.GetByAlias(songname);
-
-        if (ls is null || ls.Length < 1)
-        {
-            error = Error.SongNotFound;
-            return null;
-        }
-
-        if (ls.Length > 1)
-        {
-            error = Error.TooManySongs(ls!);
-            return null;
-        }
-
-        return ls[0];
-    }
-
-    private static ArcaeaSong? QuerySongInfoExperimental(string? songname, string? songid, out Response? error)
+    private static ArcaeaSong? QuerySongInfo(string? songname, string? songid, out Response? error)
     {
         error = null;
 
@@ -155,11 +125,7 @@ public partial class PublicApi : ControllerBase
         if (friend.RecentScore?.Any() == true)
         {
             // Time > 2021/01/01 'cause 616 changed the calc func of ptt in 2020
-            if (friend.RecentScore[0].TimePlayed > 1609430400000)
-            {
-                ArcaeaSongs.UpdateRating(friend.RecentScore[0]);
-                ArcaeaCharts.UpdateRating(friend.RecentScore[0]);
-            }
+            if (friend.RecentScore[0].TimePlayed > 1609430400000) ArcaeaCharts.UpdateRating(friend.RecentScore[0]);
 
             Records.Insert(friend, friend.RecentScore[0]);
         }

@@ -26,7 +26,7 @@ internal static class DifficultyInfo
             return false;
         }
 
-        foreach (var (index,alias) in List)
+        foreach (var (index, alias) in List)
             if (alias.Any(t => string.Equals(t, dif, StringComparison.OrdinalIgnoreCase)))
             {
                 value = index;

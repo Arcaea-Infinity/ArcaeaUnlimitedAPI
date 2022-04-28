@@ -1,5 +1,4 @@
 ﻿using ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
-using ArcaeaUnlimitedAPI.Json.Songlist;
 using Newtonsoft.Json;
 
 namespace ArcaeaUnlimitedAPI.Beans;
@@ -12,9 +11,9 @@ public class UserBestResponse
 
     [JsonProperty("record")] public Records Record { get; set; }
 
-    [JsonProperty("songinfo")] public SongItem[]? Songinfo { get; set; }
+    [JsonProperty("songinfo")] public ArcaeaCharts[]? Songinfo { get; set; }
 
     [JsonProperty("recent_score")] public Records? RecentScore { get; set; }
 
-    [JsonProperty("recent_songinfo")] public SongItem? RecentSonginfo { get; set; }
+    [JsonProperty("recent_songinfo")] public ArcaeaCharts? RecentSonginfo { get; set; }
 }

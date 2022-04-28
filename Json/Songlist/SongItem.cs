@@ -18,13 +18,13 @@ public class SongItem
     [JsonProperty("bpm_base")] public double BpmBase { get; set; }
 
     [JsonProperty("set")] public string Set { get; set; } = "";
-    
+
     [JsonProperty("world_unlock")] public bool WorldUnlock { get; set; }
 
     [JsonProperty("remote_dl")] public bool NeedDownload { get; set; }
 
     [JsonProperty("side")] public int Side { get; set; }
-    
+
     [JsonProperty("bg")] public string Background { get; set; } = "";
 
     [JsonProperty("time")] public int Time { get; set; }
@@ -34,7 +34,4 @@ public class SongItem
     [JsonProperty("version")] public string Version { get; set; } = "";
 
     [JsonProperty("difficulties")] public List<DifficultiesItem> Difficulties { get; set; }
-    
-    /// for old song/info only
-    [JsonProperty("set_friendly")] public string? Package { get; set; }
 }

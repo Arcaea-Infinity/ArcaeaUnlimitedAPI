@@ -1,5 +1,4 @@
 using ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
-using ArcaeaUnlimitedAPI.Json.Songlist;
 using Newtonsoft.Json;
 
 namespace ArcaeaUnlimitedAPI.Beans;
@@ -12,5 +11,5 @@ public class UserInfoResponse
 
     [JsonProperty("recent_score")] public List<Records>? RecentScore { get; set; }
 
-    [JsonProperty("songinfo")] public IEnumerable<SongItem>? Songinfo { get; set; }
+    [JsonProperty("songinfo")] public IEnumerable<ArcaeaCharts>? Songinfo { get; set; }
 }

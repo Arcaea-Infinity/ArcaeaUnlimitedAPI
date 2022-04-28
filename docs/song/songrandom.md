@@ -6,6 +6,10 @@
 | end          | range of end                               | true     |
 | withsonginfo | boolean. if true, will reply with songinfo | true     |
 
+###### Tag
+
+* Enable Cors
+
 #### ConvertFunction
 
 ```c#
@@ -22,28 +26,28 @@ var val = rating * 2 + (ratingPlus ? 1 : 0);
 {
   "status": 0,
   "content": {
-    "id": "gothiveofra",
+    "id": "divinelight",
     "ratingClass": 2,
     "songinfo": {
-      "name_en": "Got hive of Ra",
-      "name_jp": "",
-      "artist": "E.G.G.",
-      "bpm": "268",
-      "bpm_base": 268.0,
-      "set": "groovecoaster",
-      "set_friendly": "Groove Coaster Collaboration",
-      "time": 126,
+      "name_en": "Divine Light of Myriad",
+      "name_jp": "光速神授説 - Divine Light of Myriad -",
+      "artist": "yoho",
+      "bpm": "172",
+      "bpm_base": 172.0,
+      "set": "observer_append_2",
+      "set_friendly": "Esoteric Order",
+      "time": 142,
       "side": 0,
       "world_unlock": false,
       "remote_download": true,
-      "bg": "gc_light",
-      "date": 1600214400,
-      "version": "3.2",
-      "difficulty": 19,
-      "rating": 98,
-      "note": 794,
-      "chart_designer": "Groove Nitro",
-      "jacket_designer": "",
+      "bg": "observer_light",
+      "date": 1626825602,
+      "version": "3.7",
+      "difficulty": 21,
+      "rating": 108,
+      "note": 1021,
+      "chart_designer": "東星※神授",
+      "jacket_designer": "緋原ヨウ",
       "jacket_override": false,
       "audio_override": false
     }

@@ -23,26 +23,30 @@ public partial class PublicApi
         if (song is null) return songerror ?? Error.InvalidSongNameorID;
 
         // check for beyond is existed
-        if (difficultyNum == 3 && song.BynRating == -1) return Error.NoBeyondLevel;
+        if (difficultyNum == 3 && song.Count < 4) return Error.NoBeyondLevel;
+
+        var chart = song[difficultyNum];
 
         var player = QueryPlayerInfo(user, usercode, out var playererror);
         if (player is null) return playererror!;
 
+        var key = (player.Code, chart.SongID, chart.RatingClass);
+
         try
         {
-            var task = UserBestConcurrent.GetTask((player.Code, song.SongId));
+            var task = UserBestConcurrent.GetTask(key);
 
             if (task is null)
             {
-                UserBestConcurrent.NewTask((player.Code, song.SongId));
-                var (response, errorresp) = await QueryUserBest(player, song, difficultyNum);
-                UserBestConcurrent.SetResult((player.Code, song.SongId), (response, errorresp));
-                return errorresp ?? GetResponse(response!, withrecent, withsonginfo);
+                UserBestConcurrent.NewTask(key);
+                var (response, errorresp) = await QueryUserBest(player, chart, difficultyNum);
+                UserBestConcurrent.SetResult(key, (response, errorresp));
+                return errorresp ?? GetResponse(response!, withrecent, withsonginfo, chart);
             }
             else
             {
                 var (response, errorresp) = await task.Task;
-                return errorresp ?? GetResponse(response!, withrecent, withsonginfo);
+                return errorresp ?? GetResponse(response!, withrecent, withsonginfo, chart);
             }
         }
         catch (Exception ex)
@@ -52,21 +56,22 @@ public partial class PublicApi
         }
         finally
         {
-            UserBestConcurrent.GotResultCallBack((player.Code, song.SongId));
+            UserBestConcurrent.GotResultCallBack(key);
         }
     }
 
-    private static Response GetResponse(UserBestResponse response, bool withrecent, bool withsonginfo)
+    private static Response GetResponse(UserBestResponse response, bool withrecent, bool withsonginfo,
+                                        ArcaeaCharts chart)
     {
         if (withsonginfo)
             // add song info
-            response.Songinfo = new[] { ArcaeaSongs.GetById(response.Record.SongID)!.ToJson() };
+            response.Songinfo = new[] { chart };
 
         if (withrecent)
         {
             if (response.AccountInfo.RecentScore is not null)
                 response.RecentScore = response.AccountInfo.RecentScore.FirstOrDefault();
-            if (withsonginfo) response.RecentSonginfo = ArcaeaSongs.GetById(response.RecentScore?.SongID)?.ToJson();
+            if (withsonginfo) response.RecentSonginfo = ArcaeaCharts.QueryByRecord(response.RecentScore);
         }
 
         response.AccountInfo.RecentScore = null!;
@@ -75,7 +80,7 @@ public partial class PublicApi
     }
 
     private static async Task<(UserBestResponse? response, Response? error)> QueryUserBest(
-        PlayerInfo player, ArcaeaSongs song, sbyte difficulty)
+        PlayerInfo player, ArcaeaCharts chart, sbyte difficulty)
     {
         AccountInfo? account = null;
 
@@ -87,7 +92,7 @@ public partial class PublicApi
             if (friend is null) return (null, recorderror!);
 
             // get rank result
-            var (success, friendRank) = await account.FriendRank(song.SongId, difficulty);
+            var (success, friendRank) = await account.FriendRank(chart.SongID, difficulty);
             if (!success || friendRank is null || friendRank.Count == 0) return (null, Error.NotPlayedYet);
             foreach (var record in friendRank)
             {
@@ -97,7 +102,7 @@ public partial class PublicApi
 
             // calculate song rating
             var rank = friendRank[0];
-            rank.Rating = CalcSongRating(rank.Score, song.Ratings[rank.Difficulty]);
+            rank.Rating = CalcSongRating(rank.Score, (double)chart.Rating / 10);
 
             rank.UserID = null!;
 

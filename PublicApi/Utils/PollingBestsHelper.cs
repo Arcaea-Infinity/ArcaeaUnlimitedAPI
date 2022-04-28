@@ -26,7 +26,7 @@ internal class PollingBestsHelper
 
     private async Task<UserBest30Response?> PollingBests()
     {
-        foreach (var item in ArcaeaSongs.SortByRating.ToArray())
+        foreach (var item in ArcaeaCharts.SortedCharts)
         {
             var trypeek = _records.TryPeek(out _, out var minrating);
 
