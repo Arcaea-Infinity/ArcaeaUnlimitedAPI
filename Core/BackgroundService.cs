@@ -44,7 +44,7 @@ internal static class BackgroundService
 
     private static void TestNodes(object? source, ElapsedEventArgs? e)
     {
-        if (TimerCount % 12 == 0) Config.Nodes.ForEach(TestNode);
+        if (TimerCount % 12 == 0) Parallel.ForEach(Config.Nodes, TestNode);
     }
 
     private static void ArcUpdate(object? source, ElapsedEventArgs? e)
@@ -139,16 +139,16 @@ internal static class BackgroundService
         }
     }
 
-    private static async void AutoDecrypt(string dirpth, string version)
+    private static void AutoDecrypt(string dirpth, string version)
     {
         try
         {
-            var lib = await ArcaeaDecrypt.ReadLib($"{dirpth}/lib/arm64-v8a/libcocos2dcpp.so");
+            var lib = ArcaeaDecrypt.ReadLib($"{dirpth}/lib/arm64-v8a/libcocos2dcpp.so").Result;
             var salt = ArcaeaDecrypt.GetSalt(lib);
             var cert = ArcaeaDecrypt.GetCert(lib);
             var entry = ArcaeaDecrypt.GetApiEntry(lib);
 
-            await File.WriteAllBytesAsync($"{Config.DataPath}/cert-{version}.p12", cert);
+            File.WriteAllBytes($"{Config.DataPath}/cert-{version}.p12", cert);
 
             Config.ApiSalt = salt.ToList();
             Config.ApiEntry = entry;

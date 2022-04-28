@@ -21,10 +21,10 @@ internal static class NodeInfo
         while (!node.Active)
         {
             node = GetNode(out var curnodeindex);
-            
+
             if (curnodeindex == nodeindex)
             {
-                Config.Nodes.ForEach(Utils.TestNode);
+                Parallel.ForEach(Config.Nodes, Utils.TestNode);
                 Log.FunctionError("Node", "ranout.");
                 return null;
             }

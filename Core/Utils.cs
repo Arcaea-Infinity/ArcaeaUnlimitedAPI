@@ -38,7 +38,7 @@ internal static class Utils
         }
     }
 
-    internal static async void TestNode(Node node)
+    internal static void TestNode(Node node)
     {
         try
         {
@@ -50,7 +50,7 @@ internal static class Utils
 
             msg.Headers.Host = Config.Host;
 
-            node.Active = (await WebHelper.Client.SendAsync(msg)).StatusCode == HttpStatusCode.MethodNotAllowed;
+            node.Active = WebHelper.Client.SendAsync(msg).Result.StatusCode == HttpStatusCode.MethodNotAllowed;
         }
         catch (Exception ex)
         {
