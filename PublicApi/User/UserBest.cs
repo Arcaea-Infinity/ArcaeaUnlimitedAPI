@@ -102,7 +102,7 @@ public partial class PublicApi
 
             // calculate song rating
             var rank = friendRank[0];
-            rank.Rating = CalcSongRating(rank.Score, (double)chart.Rating / 10);
+            rank.Rating = CalcSongRating(rank.Score, chart.Rating);
 
             rank.UserID = null!;
 
