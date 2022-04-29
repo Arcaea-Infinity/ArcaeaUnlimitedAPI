@@ -1,16 +1,19 @@
 {
-  "api_entry": "years/19",
-  "app_version": "3.12.4c",
-  "host": "arcapi-v2.lowiro.com",
-  "cert_name": "cert-3.12.4c.p12",
-  "cert_password": "HelloWorld",
   "data_path": "/etc/arcaeaunlimitedapi/data",
+  "api_entry": "years/19",
+  "app_version": "3.12.8c",
+  "host": "arcapi-v2.lowiro.com",
+  "cert_name": "cert-3.12.8c.p12",
+  "cert_password": "HelloWorld",
   "open_register": false,
-  "api_salt": [],
+  "challenge_api": "https://example.com/botarcapi/challenge",
+  "challenge_type": "aua",
+  "challenge_token": "",
   "nodes": [
     {
       "url": "arcapi-v2.lowiro.com",
-      "port": 443
+      "port": 443,
+      "active": true
     }
   ],
   "whitelist": [
