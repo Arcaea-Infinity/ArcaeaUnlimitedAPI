@@ -45,11 +45,10 @@ public class ConfigItem
     [JsonProperty("nodes")] public List<Node> Nodes { get; set; }
 
     [JsonProperty("whitelist")] public List<string> Whitelist { get; set; }
-
-    internal void WriteConfig(bool rewrite) =>
-        File.WriteAllText(rewrite
-                              ? "config.json"
-                              : "config_temp.json", JsonConvert.SerializeObject(this));
+    
+    [JsonProperty("challenge_type")] public string ChallengeType { get; set; }
+    [JsonProperty("challenge_api")] public string ChallengeUrl { get; set; }
+    [JsonProperty("challenge_token")] public string ChallengeToken { get; set; }
 }
 
 public class Node

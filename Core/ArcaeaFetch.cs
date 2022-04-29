@@ -216,7 +216,7 @@ internal static class ArcaeaFetch
     private static HttpClient _client = null!;
     private static string _apientry = null!;
     private static readonly int _maxRetryCount = 3;
-    private static ArcaeaHash _arcaeaHash = null!;
+    private static ArcaeaSubHash _arcaeaHash = null!;
 
     internal static void Init()
     {

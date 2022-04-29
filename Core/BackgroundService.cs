@@ -107,8 +107,6 @@ internal static class BackgroundService
                         Thread.Sleep(300);
                     }
 
-                AutoDecrypt(dirpth, info.Version);
-
                 Version = info.Version;
                 File.Delete(apkpth);
             }
@@ -126,35 +124,7 @@ internal static class BackgroundService
             Interlocked.Exchange(ref _running, 0);
         }
     }
-
-    private static void AutoDecrypt(string dirpth, string version)
-    {
-        try
-        {
-            var lib = ArcaeaDecrypt.ReadLib($"{dirpth}/lib/arm64-v8a/libcocos2dcpp.so").Result;
-            var salt = ArcaeaDecrypt.GetSalt(lib);
-            var cert = ArcaeaDecrypt.GetCert(lib);
-            var entry = ArcaeaDecrypt.GetApiEntry(lib);
-
-            File.WriteAllBytes($"{Config.DataPath}/cert-{version}.p12", cert);
-
-            Config.ApiSalt = salt.ToList();
-            Config.ApiEntry = entry;
-            Config.CertFileName = $"cert-{version}.p12";
-            Config.Appversion = version;
-
-            Config.WriteConfig(false);
-
-            var tmpfetch = new TestFetch();
-
-            if (tmpfetch.Init(Config) && tmpfetch.TestLogin().Result) Config.WriteConfig(true);
-        }
-        catch (Exception ex)
-        {
-            Log.ExceptionError(ex);
-        }
-    }
-
+    
     private static void DownloadApk(string url)
     {
         var psi = new ProcessStartInfo { FileName = "aria2c", Arguments = $"--dir={Config.DataPath}/update/ {url}" };
