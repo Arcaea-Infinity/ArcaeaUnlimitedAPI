@@ -28,7 +28,10 @@ public partial class PublicApi
             fileinfo = new($"{Config.DataPath}/source/songs/{song.SongID}{difextend}.jpg");
         }
         else
+        {
+            if (file.Contains("/")) return NotFound(Error.FileUnavailable);
             fileinfo = new($"{Config.DataPath}/source/songs/{file}.jpg");
+        }
 
         if (!fileinfo.Exists) return NotFound(Error.FileUnavailable);
 

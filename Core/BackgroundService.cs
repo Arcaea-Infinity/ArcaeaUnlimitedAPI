@@ -138,16 +138,11 @@ internal static class BackgroundService
 
             File.WriteAllBytes($"{Config.DataPath}/cert-{version}.p12", cert);
 
-            Config.ApiSalt = salt.ToList();
+            Config.ApiSalt = salt;
             Config.ApiEntry = entry;
             Config.CertFileName = $"cert-{version}.p12";
             Config.Appversion = version;
-
-            Config.WriteConfig(false);
-
-            var tmpfetch = new TestFetch();
-
-            if (tmpfetch.Init(Config) && tmpfetch.TestLogin().Result) Config.WriteConfig(true);
+            Config.WriteConfig(true);
         }
         catch (Exception ex)
         {
