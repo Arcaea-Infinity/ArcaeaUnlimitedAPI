@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Timers;
 using ArcaeaUnlimitedAPI.Beans;
 using ArcaeaUnlimitedAPI.Json.Songlist;
+using Downloader;
 using Newtonsoft.Json;
 using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 using static ArcaeaUnlimitedAPI.Core.Utils;
@@ -46,7 +46,7 @@ internal static class BackgroundService
         if (TimerCount % 12 == 0) Parallel.ForEach(Config.Nodes, TestNode);
     }
 
-    private static void ArcUpdate(object? source, ElapsedEventArgs? e)
+    private static async void ArcUpdate(object? source, ElapsedEventArgs? e)
     {
         if (Interlocked.CompareExchange(ref _running, 1, 0) != 0) return;
 
@@ -62,7 +62,7 @@ internal static class BackgroundService
 
             try
             {
-                if (!File.Exists(apkpth)) DownloadApk(info.Url);
+                if (!File.Exists(apkpth)) await DownloadApk(info.Url);
 
                 // not apk
                 if (new FileInfo(apkpth).Length < 8192) File.Delete(apkpth);
@@ -125,12 +125,17 @@ internal static class BackgroundService
         }
     }
     
-    private static void DownloadApk(string url)
+    private static async Task DownloadApk(string url)
     {
-        var psi = new ProcessStartInfo { FileName = "aria2c", Arguments = $"--dir={Config.DataPath}/update/ {url}" };
-        using var p = Process.Start(psi);
-        p?.WaitForExit();
-        p?.Kill();
-        p?.Close();
+        using var downloader = new DownloadService(new()
+                                                   {
+                                                       BufferBlockSize = 8000,
+                                                       ChunkCount = 16,
+                                                       MaxTryAgainOnFailover = 10,
+                                                       OnTheFlyDownload = false,
+                                                       ParallelDownload = true,
+                                                       Timeout = 5000
+                                                   });
+        await downloader.DownloadFileTaskAsync(url, new DirectoryInfo($"{Config.DataPath}/update/"));
     }
 }
