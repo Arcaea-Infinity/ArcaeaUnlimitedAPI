@@ -40,7 +40,7 @@ public class ConfigItem
 
     [JsonProperty("open_register")] public bool? OpenRegister { get; set; }
 
-    [JsonProperty("api_salt")] public byte[] ApiSalt { get; set; }
+    [JsonProperty("api_salt")] public List<byte> ApiSalt { get; set; }
 
     [JsonProperty("nodes")] public List<Node> Nodes { get; set; }
 
