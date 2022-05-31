@@ -1,8 +1,6 @@
-﻿using System.Net;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
 using Newtonsoft.Json;
-using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 
 namespace ArcaeaUnlimitedAPI.Core;
 
@@ -37,31 +35,10 @@ internal static class Utils
             return null;
         }
     }
-
-    internal static void TestNode(Node node)
-    {
-        try
-        {
-            var msg = new HttpRequestMessage
-                      {
-                          Method = HttpMethod.Get,
-                          RequestUri = new(node + $"/{Config.ApiEntry}/we/love/arcarea/forever")
-                      };
-
-            msg.Headers.Host = Config.Host;
-
-            node.Active = WebHelper.Client.SendAsync(msg).Result.StatusCode == HttpStatusCode.MethodNotAllowed;
-        }
-        catch (Exception ex)
-        {
-            Log.ExceptionError(ex);
-            node.Active = false;
-        }
-    }
-
+    
     private static class WebHelper
     {
-        internal static readonly HttpClient Client;
+        private static readonly HttpClient Client;
 
         static WebHelper()
         {

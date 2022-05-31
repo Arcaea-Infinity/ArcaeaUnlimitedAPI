@@ -41,9 +41,9 @@ public class ConfigItem
     [JsonProperty("open_register")] public bool? OpenRegister { get; set; }
 
     [JsonProperty("api_salt")] public List<byte> ApiSalt { get; set; }
-
-    [JsonProperty("nodes")] public List<Node> Nodes { get; set; }
-
+    
+    [JsonProperty("node")] public Node Node { get; set; }
+    
     [JsonProperty("whitelist")] public List<string> Whitelist { get; set; }
 
     internal void WriteConfig(bool rewrite) =>
@@ -56,7 +56,6 @@ public class Node
 {
     [JsonProperty("url")] public string Url { get; set; }
     [JsonProperty("port")] public int? Port { get; set; }
-    [JsonProperty("active")] internal bool Active { get; set; } = true;
 
     public override string ToString() => $"https://{Url}:{Port ?? 443}";
 }

@@ -35,15 +35,9 @@ internal static class BackgroundService
         if (Config.OpenRegister == true) timer.Elapsed += async (_, _) => await ArcaeaFetch.RegisterTask();
 
         timer.Elapsed += ArcUpdate;
-        timer.Elapsed += TestNodes;
         timer.Elapsed += (_, _) => ++TimerCount;
         timer.AutoReset = true;
         timer.Start();
-    }
-
-    private static void TestNodes(object? source, ElapsedEventArgs? e)
-    {
-        if (TimerCount % 12 == 0) Parallel.ForEach(Config.Nodes, TestNode);
     }
 
     private static async void ArcUpdate(object? source, ElapsedEventArgs? e)

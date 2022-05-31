@@ -142,50 +142,48 @@ internal static class ArcaeaFetch
     {
         if (BackgroundService.TimerCount % 144 != 0) return;
 
-        foreach (var node in Config.Nodes)
-            try
+        try
+        {
+            for (var i = 0; i < 3; ++i)
             {
-                for (var i = 0; i < 3; ++i)
+                var name = RandomStringGenerator.GetRandString();
+                var password = RandomStringGenerator.GetRandString();
+                var email = RandomStringGenerator.GetRandString() + "@gmail.com";
+                var deviceID = RandomStringGenerator.GetRandDeviceID();
+
+                await Task.Delay(300);
+
+                var info = await Register(Config.Node, name, password, email, deviceID);
+
+                if (info?.ErrorCode == 124) return;
+
+                if (info?.ErrorCode == 5)
                 {
-                    var name = RandomStringGenerator.GetRandString();
-                    var password = RandomStringGenerator.GetRandString();
-                    var email = RandomStringGenerator.GetRandString() + "@gmail.com";
-                    var deviceID = RandomStringGenerator.GetRandDeviceID();
+                    NeedUpdate = true;
+                    return;
+                }
 
-                    await Task.Delay(300);
+                if (info?.Success == true)
+                {
+                    var value = info.DeserializeContent<RegisterValue>();
+                    var account = new AccountInfo
+                                  {
+                                      Name = name,
+                                      Password = password,
+                                      DeviceID = deviceID,
+                                      UserID = value.UserID,
+                                      Token = value.AccessToken,
+                                      Banned = "false"
+                                  };
 
-                    var info = await Register(node, name, password, email, deviceID);
-
-                    if (info?.ErrorCode == 124) return;
-
-                    if (info?.ErrorCode == 5)
-                    {
-                        NeedUpdate = true;
-                        return;
-                    }
-
-                    if (info?.Success == true)
-                    {
-                        var value = info.DeserializeContent<RegisterValue>();
-                        var account = new AccountInfo
-                                      {
-                                          Name = name,
-                                          Password = password,
-                                          DeviceID = deviceID,
-                                          UserID = value.UserID,
-                                          Token = value.AccessToken,
-                                          Banned = "false"
-                                      };
-
-                        AccountInfo.Insert(account);
-                    }
+                    AccountInfo.Insert(account);
                 }
             }
-            catch (Exception ex)
-            {
-                Log.ExceptionError(ex);
-                continue;
-            }
+        }
+        catch (Exception ex)
+        {
+            Log.ExceptionError(ex);
+        }
     }
 
     private static class RandomStringGenerator
@@ -215,12 +213,14 @@ internal static class ArcaeaFetch
 
     private static HttpClient _client = null!;
     private static string _apientry = null!;
+    private static Node _node = null!;
     private static readonly int _maxRetryCount = 3;
     private static ArcaeaHash _arcaeaHash = null!;
 
     internal static void Init()
     {
         _apientry = Config.ApiEntry;
+        _node = Config.Node;
         _arcaeaHash = new();
         _arcaeaHash.Init();
         var certificate = new X509Certificate2($"{Config.DataPath}/{Config.CertFileName}", Config.CertPassword);
@@ -246,10 +246,7 @@ internal static class ArcaeaFetch
             ? $"{resturl}?{SubmitDataToString(submitData)}"
             : resturl;
 
-        var node = NodeInfo.Alloc();
-        if (node is null) return null;
-
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{node}/{_apientry}/{url}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{_node}/{_apientry}/{url}");
         request.Headers.Add("DeviceId", info.DeviceID);
         request.Headers.Add("Accept-Encoding", "identity");
         request.Headers.Authorization = new("Bearer", info.Token);
@@ -272,11 +269,7 @@ internal static class ArcaeaFetch
             ? ""
             : SubmitDataToString(submitData);
 
-
-        var node = NodeInfo.Alloc();
-        if (node is null) return null;
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{node}/{_apientry}/{resturl}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{_node}/{_apientry}/{resturl}");
         request.Headers.Add("DeviceId", info.DeviceID);
         request.Headers.Add("Accept-Encoding", "identity");
         request.Headers.Authorization = new("Bearer", info.Token);
@@ -300,10 +293,7 @@ internal static class ArcaeaFetch
         const string resturl = "auth/login";
         const string data = "grant_type=client_credentials";
 
-        var node = NodeInfo.Alloc();
-        if (node is null) return null;
-
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{node}/{_apientry}/{resturl}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{_node}/{_apientry}/{resturl}");
         request.Headers.Add("Accept-Encoding", "identity");
         request.Headers.Authorization
             = new("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{info.Name}:{info.Password}")));
