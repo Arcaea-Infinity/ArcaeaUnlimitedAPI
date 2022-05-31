@@ -269,7 +269,7 @@ internal static class ArcaeaFetch
             ? ""
             : SubmitDataToString(submitData);
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{_node}/{_apientry}/{resturl}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{_node}/{_apientry}/{resturl}");
         request.Headers.Add("DeviceId", info.DeviceID);
         request.Headers.Add("Accept-Encoding", "identity");
         request.Headers.Authorization = new("Bearer", info.Token);
@@ -293,7 +293,7 @@ internal static class ArcaeaFetch
         const string resturl = "auth/login";
         const string data = "grant_type=client_credentials";
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{_node}/{_apientry}/{resturl}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{_node}/{_apientry}/{resturl}");
         request.Headers.Add("Accept-Encoding", "identity");
         request.Headers.Authorization
             = new("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{info.Name}:{info.Password}")));
