@@ -124,8 +124,8 @@ public partial class PublicApi : ControllerBase
         // insert new record into database
         if (friend.RecentScore?.Any() == true)
         {
-            // Time > 2021/01/01 'cause 616 changed the calc func of ptt in 2020
-            if (friend.RecentScore[0].TimePlayed > 1609430400000) ArcaeaCharts.UpdateRating(friend.RecentScore[0]);
+            // Time > 2022/07/07 because 616 may change the calculation function of ptt
+            if (friend.RecentScore[0].TimePlayed > 1657152000000) ArcaeaCharts.UpdateRating(friend.RecentScore[0]);
 
             Records.Insert(friend, friend.RecentScore[0]);
         }
