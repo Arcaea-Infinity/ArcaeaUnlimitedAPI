@@ -98,6 +98,7 @@ public partial class ArcaeaCharts
 
         if (chart.Rating != @const)
         {
+            Log.RatingLog(record.SongID, chart.NameEn, record.Difficulty, chart.Rating, @const);
             chart.Rating = @const;
             chart.Note = record.MissCount + record.NearCount + record.PerfectCount;
             var str = "UPDATE `charts` SET rating = ?, note = ? WHERE song_id = ? AND rating_class = ?;";
@@ -157,10 +158,8 @@ public partial class ArcaeaCharts
 
             Abbreviations.TryAdd(value, abbrs);
             Names.TryAdd(value, names);
-
             SongJsons.TryAdd(sid, value.ToJson(false));
         }
-
         Sort();
     }
 

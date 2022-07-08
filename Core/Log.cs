@@ -81,6 +81,21 @@ internal static class Log
             FunctionLog(function, content);
         }
     }
+    
+    internal static async void RatingLog(string songID, string songName, int difficulty,  int originalconst,int @const) 
+    {
+        try
+        {
+            var time = DateTime.Now;
+            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/rating.log",
+                                          $"\n\n{time}\n{songID} ({songName}) [{difficulty}]  {originalconst} -> {@const}");
+        }
+        catch
+        {
+            await Task.Delay(2000);
+            RatingLog(songID, songName, difficulty, originalconst,@const);
+        }
+    }
 
     internal static async void ExceptionError(Exception ex)
     {
