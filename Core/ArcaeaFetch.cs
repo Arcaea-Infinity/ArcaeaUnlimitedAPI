@@ -138,7 +138,7 @@ internal static class ArcaeaFetch
         }
     }
 
-    internal static async Task RegisterTask()
+    internal static void RegisterTask()
     {
         if (BackgroundService.TimerCount % 144 != 0) return;
 
@@ -150,10 +150,9 @@ internal static class ArcaeaFetch
                 var password = RandomStringGenerator.GetRandString();
                 var email = RandomStringGenerator.GetRandString() + "@gmail.com";
                 var deviceID = RandomStringGenerator.GetRandDeviceID();
+               
 
-                await Task.Delay(300);
-
-                var info = await Register(Config.Node, name, password, email, deviceID);
+                var info = Register(Config.Node, name, password, email, deviceID).Result;
 
                 if (info?.ErrorCode == 124) return;
 
