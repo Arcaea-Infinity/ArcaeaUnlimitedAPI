@@ -79,7 +79,7 @@ internal class Response
         /// <summary>
         ///     errorCode = -14
         /// </summary>
-        internal static readonly Response NoBeyondLevel = Exception(-14, "this song has no beyond level");
+        internal static readonly Response NoThisLevel = Exception(-14, "this song has no this level");
 
         /// <summary>
         ///     errorCode = -15

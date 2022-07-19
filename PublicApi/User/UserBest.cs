@@ -22,8 +22,9 @@ public partial class PublicApi
         var song = QuerySongInfo(songname, songid, out var songerror);
         if (song is null) return songerror ?? Error.InvalidSongNameorID;
 
-        // check for beyond is existed
-        if (difficultyNum == 3 && song.Count < 4) return Error.NoBeyondLevel;
+        // check for chart is existed
+        if (difficultyNum == 3 && song.Count < 4) return Error.NoThisLevel;
+        if (song.SongID == "lasteternity" && difficultyNum != 3) return Error.NoThisLevel;
 
         var chart = song[difficultyNum];
 
