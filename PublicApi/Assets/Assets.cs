@@ -21,6 +21,8 @@ public partial class PublicApi
 
             if (song is null) return NotFound(songerror ?? Error.InvalidSongNameorID);
 
+            if (difficultyNum == 3 && song.Count < 4) return Error.NoThisLevel;
+
             var difextend = song[difficultyNum].JacketOverride
                 ? $"_{difficultyNum}"
                 : "";
