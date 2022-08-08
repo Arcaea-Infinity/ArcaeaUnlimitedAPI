@@ -10,7 +10,7 @@ public partial class PublicApi
 {
     [HttpGet("/botarcapi/user/best30")]
     public async Task<object> GetUserBest30(string? user, string? usercode, string? overflow, bool withrecent = false,
-                                            bool withsonginfo = false)
+                                            bool withsonginfo = false, string? version = null)
     {
         if (!UserAgentCheck()) return NotFound(null);
         if (NeedUpdate) return Error.NeedUpdate;
@@ -19,7 +19,26 @@ public partial class PublicApi
         var overflowCount = 0;
         if (overflow is not null && (!int.TryParse(overflow, out overflowCount) || overflowCount is < 0 or > 10))
             return Error.InvalidRecentOrOverflowNumber;
-
+        
+        if (!string.IsNullOrWhiteSpace(usercode) && usercode.Equals("max"))
+        {
+            try
+            {
+                var (_, result) =
+                    PollingBestsHelper.GetTheoryBest30(overflowCount, withrecent, withsonginfo, version);
+                if (result is null)
+                {
+                    return Error.InvalidRange;
+                }
+                return Success(result);
+            }
+            catch (Exception e)
+            {
+                Log.ExceptionError(e);
+                return Error.InternalErrorOccurred;
+            }
+        }
+        
         var player = QueryPlayerInfo(user, usercode, out var playererror);
         if (player is null) return playererror!;
 

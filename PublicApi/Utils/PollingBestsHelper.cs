@@ -48,6 +48,93 @@ internal class PollingBestsHelper
         return new() { Best30List = ls.Take(30).ToList(), Best30Overflow = ls.Skip(30).ToList() };
     }
 
+    private static double GetMaxDateByVersion(string? version)
+    {
+        if (version is null) return double.PositiveInfinity;
+        var allVerSongs = ArcaeaCharts.GetByVersion(version);
+        return allVerSongs is null ? double.NegativeInfinity : allVerSongs.Max(f => f[0].Date);
+    }
+    
+    public static (string, UserBest30Response?) GetTheoryBest30(int overflow = 0, bool withrecent = false, 
+        bool withsonginfo = false, string? queryVersion = null)
+    {
+        double b30Total = .0, r10Total = .0;
+        var fCount = 0;
+        var queryLatestDate = GetMaxDateByVersion(queryVersion);
+        if (double.IsNegativeInfinity(queryLatestDate)) return ("Invalid parameter: version", null);  // check version
+        
+        var showName = double.IsPositiveInfinity(queryLatestDate) ? GlobalConfig.Config.Appversion : queryVersion;
+        
+        var retMaxB30 = new UserBest30Response()
+        {
+            AccountInfo = new FriendsItem()
+            {
+                Character = 5, Code = "000000000", IsCharUncapped = true, IsCharUncappedOverride = true, IsMutual = false,
+                IsSkillSealed = false, JoinDate = 1487980800, Name = $"Max Grades - v{showName}", 
+                UserID = -1
+            },
+            Best30List = new List<Records>()
+        };
+        if (overflow > 0) retMaxB30.Best30Overflow = new List<Records>();
+        if (withsonginfo)
+        {
+            retMaxB30.Best30Songinfo = new List<ArcaeaCharts>();
+            if (overflow > 0) retMaxB30.Best30OverflowSonginfo = new List<ArcaeaCharts>();
+        }
+        
+        foreach (var item in ArcaeaCharts.SortedCharts)
+        {
+            var songsData = ArcaeaCharts.QueryById(item.sid);
+            if (songsData is null) throw new Exception($"\"{item.sid}\" was not found in the database.");
+            var songData = songsData[item.dif];
+            
+            if (songData.Date > queryLatestDate) continue;
+            
+            var addRecord = new Records()
+            {
+                BestClearType = 3, ClearType = 3, Difficulty = item.dif, Health = 100, MissCount = 0, Modifier = 0,
+                NearCount = 0, PerfectCount = songData.Note, Potential = 0, Rating = (double)(item.rating + 20) / 10,
+                Score = 10000000 + songData.Note, TimePlayed = songData.Date,
+                ShinyPerfectCount = songData.Note,
+                SongID = item.sid
+            };
+
+            if (fCount <= 29)
+            {
+                if (fCount <= 9) r10Total += item.rating + 20;
+                b30Total += item.rating + 20;
+                retMaxB30.Best30List.Add(addRecord);
+            } 
+            else if (fCount <= 29 + overflow && retMaxB30.Best30Overflow is not null)
+            {
+                retMaxB30.Best30Overflow.Add(addRecord);
+            }
+            else
+            {
+                break;
+            }
+            fCount++;
+        }
+        
+        if (withsonginfo)
+        {
+            retMaxB30.Best30Songinfo = retMaxB30.Best30List.Select(i => ArcaeaCharts.QueryByRecord(i)!);
+            if (retMaxB30.Best30Overflow is not null) 
+                retMaxB30.Best30OverflowSonginfo = retMaxB30.Best30Overflow.Select(i => ArcaeaCharts.QueryByRecord(i)!);
+        }
+        
+        if (withrecent)
+        {
+            retMaxB30.RecentScore = retMaxB30.Best30List[0];
+            if (withsonginfo) retMaxB30.RecentSonginfo = ArcaeaCharts.QueryByRecord(retMaxB30.RecentScore);
+        }
+        
+        retMaxB30.AccountInfo.Rating = (int)(b30Total + r10Total) / 4;
+        retMaxB30.Best30Avg = b30Total / 300;
+        retMaxB30.Recent10Avg = r10Total / 100;
+        return ("success", retMaxB30);
+    }
+
     private async Task PollingRequests()
     {
         // wait for responses
