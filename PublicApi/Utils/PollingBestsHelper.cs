@@ -76,12 +76,7 @@ internal class PollingBestsHelper
             Best30List = new List<Records>()
         };
         if (overflow > 0) retMaxB30.Best30Overflow = new List<Records>();
-        if (withsonginfo)
-        {
-            retMaxB30.Best30Songinfo = new List<ArcaeaCharts>();
-            if (overflow > 0) retMaxB30.Best30OverflowSonginfo = new List<ArcaeaCharts>();
-        }
-        
+
         foreach (var item in ArcaeaCharts.SortedCharts)
         {
             var songsData = ArcaeaCharts.QueryById(item.sid);
