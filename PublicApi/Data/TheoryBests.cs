@@ -73,6 +73,10 @@ public partial class PublicApi
             ? null!
             : results.Skip(30).ToList();
 
+        response.Best30Avg = response.Best30List.Average(i => i.Rating);
+        response.Recent10Avg = results.Take(10).Average(i => i.Rating);
+        response.AccountInfo.Rating = (int)((response.Best30Avg * 3 + response.Recent10Avg) * 25);
+
         if (withsonginfo)
         {
             if (response.Best30List is not null)
