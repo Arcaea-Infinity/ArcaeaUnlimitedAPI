@@ -23,7 +23,6 @@ public partial class ArcaeaCharts
     }
 
     internal static ArcaeaSong? QueryById(string? songid) => GetById(songid);
-    internal static List<ArcaeaSong>? GetByVersion(string version) => GetByVer(version);
 
     internal static List<ArcaeaSong>? Query(string alias)
     {
@@ -247,25 +246,6 @@ public partial class ArcaeaCharts
         return ls;
     }
     
-    private static List<ArcaeaSong>? GetByVer(string version)
-    {
-        var querySongs = Songs.Select(k =>
-        {
-            if (k.Value[0].Version.Equals(version))
-                return k.Value;
-            else
-                return null;
-        });
-        var retSongs = new List<ArcaeaSong>();
-        foreach (var arcSong in querySongs)
-        {
-            if (arcSong is null) continue;
-            retSongs.Add(arcSong);
-        }
-        if (retSongs.Count == 0) return null;
-        return retSongs;
-    }
-
     private static IEnumerable<ArcaeaCharts> GetByDifficulty(int lowerlimit, int upperlimit) =>
         Songs.Values.SelectMany(charts => charts).Where(t => t.Difficulty >= lowerlimit && t.Difficulty <= upperlimit);
 
