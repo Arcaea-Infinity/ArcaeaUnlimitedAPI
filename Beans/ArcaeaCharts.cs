@@ -245,7 +245,7 @@ public partial class ArcaeaCharts
         AliasCache.TryAdd(alias, ls);
         return ls;
     }
-
+    
     private static IEnumerable<ArcaeaCharts> GetByDifficulty(int lowerlimit, int upperlimit) =>
         Songs.Values.SelectMany(charts => charts).Where(t => t.Difficulty >= lowerlimit && t.Difficulty <= upperlimit);
 

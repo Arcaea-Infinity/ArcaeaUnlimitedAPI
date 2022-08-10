@@ -132,6 +132,11 @@ internal class Response
         /// </summary>
         internal static readonly Response NeedUpdate
             = Exception(-24, "need to update arcaea, please contact maintainer");
+        
+        /// <summary>
+        ///     errorCode = -25
+        /// </summary>
+        internal static readonly Response InvalidVersion = Exception(-25, "invalid version");
 
         /// <summary>
         ///     errorCode = -233

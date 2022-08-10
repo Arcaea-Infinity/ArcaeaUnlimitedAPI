@@ -105,7 +105,7 @@ public partial class PublicApi
                         = await account.FriendRank(friend.RecentScore[0].SongID, friend.RecentScore[0].Difficulty);
 
                     if (!success || friendRank is null || friendRank.Count == 0) return (null, Error.Shadowbanned);
-                    
+
                     foreach (var record in friendRank)
                     {
                         record.Potential = player.Potential;
