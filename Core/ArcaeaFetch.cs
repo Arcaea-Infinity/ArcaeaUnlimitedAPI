@@ -213,7 +213,7 @@ internal static class ArcaeaFetch
     private static HttpClient _client = null!;
     private static string _apientry = null!;
     private static Node _node = null!;
-    private static readonly int _maxRetryCount = 3;
+    private static readonly int MaxRetryCount = 3;
     private static ArcaeaHash _arcaeaHash = null!;
 
     internal static void Init()
@@ -255,7 +255,7 @@ internal static class ArcaeaFetch
         var (success, result) = await LogResult(resturl, request);
         if (success) return result;
 
-        if (retryCount < _maxRetryCount) return await Get(resturl, info, submitData, ++retryCount);
+        if (retryCount < MaxRetryCount) return await Get(resturl, info, submitData, ++retryCount);
         Log.ApiError(resturl);
         return default;
     }
@@ -280,7 +280,7 @@ internal static class ArcaeaFetch
         if (success) return result;
 
 
-        if (retryCount < _maxRetryCount) return await Post(resturl, info, submitData, ++retryCount);
+        if (retryCount < MaxRetryCount) return await Post(resturl, info, submitData, ++retryCount);
         Log.ApiError(resturl);
         return default;
     }
@@ -304,7 +304,7 @@ internal static class ArcaeaFetch
         var (success, result) = await LogResult(resturl, request);
         if (success) return result;
 
-        if (retryCount < _maxRetryCount) return await Login(info, ++retryCount);
+        if (retryCount < MaxRetryCount) return await Login(info, ++retryCount);
         Log.ApiError(resturl);
         return default;
     }

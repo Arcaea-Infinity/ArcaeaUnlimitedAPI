@@ -1,6 +1,6 @@
 ﻿namespace ArcaeaUnlimitedAPI.Beans;
 
-internal class ArcaeaSong : List<ArcaeaCharts>, IEquatable<ArcaeaSong>
+public class ArcaeaSong : List<ArcaeaCharts>, IEquatable<ArcaeaSong>
 {
     internal string SongID => this[0].SongID;
 

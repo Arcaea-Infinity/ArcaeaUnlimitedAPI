@@ -1,35 +1,37 @@
 ﻿using ArcaeaUnlimitedAPI.Beans;
 using ArcaeaUnlimitedAPI.Core;
+using ArcaeaUnlimitedAPI.PublicApi.Params;
 using Microsoft.AspNetCore.Mvc;
 using static ArcaeaUnlimitedAPI.Core.Utils;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
-using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
 public partial class PublicApi
 {
+    [UpdateCheck]
+    [UserAgentAuth]
     [HttpGet("/botarcapi/user/best")]
-    public async Task<object> GetUserBest(string? user, string? usercode, string? songname, string? songid,
-                                          string? difficulty, bool withrecent = false, bool withsonginfo = false)
+    public async Task<object> GetUserBest([FromQuery] PlayerInfoParams playerInfo, 
+                                          [FromQuery] SongInfoParams songInfo,
+                                          [FromQuery] DifficultyParams difficultyInfo,
+                                          bool withrecent = false,
+                                          bool withsonginfo = false)
     {
-        if (!UserAgentCheck()) return NotFound(null);
-        if (NeedUpdate) return Error.NeedUpdate;
-
         // validate request arguments
-        if (!DifficultyInfo.TryParse(difficulty, out var difficultyNum)) return Error.InvalidDifficulty;
 
-        var song = QuerySongInfo(songname, songid, out var songerror);
+        var difficultyNum = difficultyInfo.Validate(out var difficultyerror);
+        if (difficultyerror is not null) return difficultyerror;
+
+        var player = playerInfo.Validate(out var playererror);
+        if (player is null) return playererror ?? Error.UserNotFound;
+
+        var song = songInfo.Validate(out var songerror);
         if (song is null) return songerror ?? Error.InvalidSongNameorID;
 
-        // check for chart is existed
-        if (difficultyNum == 3 && song.Count < 4) return Error.NoThisLevel;
-        if (song.SongID == "lasteternity" && difficultyNum != 3) return Error.NoThisLevel;
-
+        // validate exist chart 
+        if (ChartMissingCheck(song, difficultyNum)) return Error.NoThisLevel;
         var chart = song[difficultyNum];
-
-        var player = QueryPlayerInfo(user, usercode, out var playererror);
-        if (player is null) return playererror!;
 
         var key = (player.Code, chart.SongID, chart.RatingClass);
 

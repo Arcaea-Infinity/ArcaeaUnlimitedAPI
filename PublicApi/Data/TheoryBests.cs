@@ -1,5 +1,6 @@
 ﻿using ArcaeaUnlimitedAPI.Beans;
 using ArcaeaUnlimitedAPI.Core;
+using ArcaeaUnlimitedAPI.PublicApi.Params;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
@@ -10,13 +11,13 @@ public partial class PublicApi
 {
     [EnableCors]
     [HttpGet("/botarcapi/data/theory")]
-    public object GetTheoryBests(string? overflow, bool withrecent = false, bool withsonginfo = false,
-                                 string? version = null)
+    public object GetTheoryBests([FromQuery] OverflowParams overflowInfo, bool withrecent = false,
+                                 bool withsonginfo = false, string? version = null)
     {
         // validate request arguments
-        var overflowCount = 0;
-        if (overflow is not null && (!int.TryParse(overflow, out overflowCount) || overflowCount is < 0 or > 10))
-            return Error.InvalidRecentOrOverflowNumber;
+
+        var overflowCount = overflowInfo.Validate(out var overflowerror);
+        if (overflowerror is not null) return overflowerror;
 
         var count = overflowCount + 30;
 

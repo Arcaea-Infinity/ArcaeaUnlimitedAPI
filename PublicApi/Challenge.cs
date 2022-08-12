@@ -1,7 +1,6 @@
 ﻿using ArcaeaUnlimitedAPI.Core;
 using Microsoft.AspNetCore.Mvc;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
-using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
@@ -13,23 +12,26 @@ public partial class PublicApi
         "purchase/me/stamina/fragment", "world/map/me"
     };
 
+    [UpdateCheck]
+    [UserAgentAuth]
     [HttpGet("/botarcapi/challenge")]
     public object GetChallenge(string path, string? body, ulong time = 0)
     {
-        if (!UserAgentCheck() || PathList.All(i => !path.StartsWith(i))) return NotFound(null);
-        if (NeedUpdate) return Error.NeedUpdate;
+        if (PathList.All(i => !path.StartsWith(i))) return NotFound(null);
         return Success(ArcaeaFetch.GenerateChallenge("", body ?? "", path, time));
     }
 
+    [UpdateCheck]
+    [UserAgentAuth]
     [HttpPost("/botarcapi/challenge")]
     public object PostChallenges([FromBody] ChallengeData[] data)
     {
-        if (!UserAgentCheck()) return NotFound(null);
-        if (NeedUpdate) return Error.NeedUpdate;
         if (data.Select(i => i.path).Any(path => PathList.All(i => !path.StartsWith(i)))) return NotFound(null);
 
         return Success(data.Select(i => ArcaeaFetch.GenerateChallenge("", i.body ?? "", i.path, i.time)));
-    } // ReSharper disable ClassNeverInstantiated.Global
+    } 
+    
+    // ReSharper disable ClassNeverInstantiated.Global
     // ReSharper disable InconsistentNaming
     public record ChallengeData(string path, string? body, ulong time = 0);
 }

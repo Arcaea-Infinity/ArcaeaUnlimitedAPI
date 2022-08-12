@@ -1,4 +1,5 @@
 ﻿using ArcaeaUnlimitedAPI.Beans;
+using ArcaeaUnlimitedAPI.PublicApi.Params;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
@@ -9,10 +10,19 @@ public partial class PublicApi
 {
     [EnableCors]
     [HttpGet("/botarcapi/playdata")]
-    public object GetPlaydata(string? songname, string? songid, int difficulty, int start, int end)
+    public object GetPlaydata([FromQuery] SongInfoParams songInfo, [FromQuery] DifficultyParams difficultyInfo, int start, int end)
     {
-        var song = QuerySongInfo(songname, songid, out var songerror);
+        // validate request arguments
+
+        var difficultyNum = difficultyInfo.Validate(out var difficultyerror);
+        if (difficultyerror is not null) return difficultyerror;
+
+        var song = songInfo.Validate(out var songerror);
         if (song is null) return songerror ?? Error.InvalidSongNameorID;
-        return Success(PlayData.Query(start, end, song.SongID, difficulty));
+
+        // validate exist chart 
+        if (ChartMissingCheck(song, difficultyNum)) return Error.NoThisLevel;
+
+        return Success(PlayData.Query(start, end, song.SongID, difficultyNum));
     }
 }

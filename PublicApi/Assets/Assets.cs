@@ -1,4 +1,4 @@
-using ArcaeaUnlimitedAPI.Beans;
+using ArcaeaUnlimitedAPI.PublicApi.Params;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
@@ -10,19 +10,19 @@ public partial class PublicApi
 {
     [EnableCors]
     [HttpGet("/botarcapi/assets/song")]
-    public object GetSongAssets(string? songname, string? songid, string? difficulty, string? file)
+    public object GetSongAssets([FromQuery] SongInfoParams songInfo,[FromQuery] DifficultyParams difficultyInfo, string? file)
     {
         FileInfo fileinfo;
         if (file is null)
         {
-            if (!DifficultyInfo.TryParse(difficulty, out var difficultyNum)) difficultyNum = 2;
+            var difficultyNum = difficultyInfo.Validate(out _);
+      
+            var song = songInfo.Validate(out var songerror);
+            if (song is null) return songerror ?? Error.InvalidSongNameorID;
 
-            var song = QuerySongInfo(songname, songid, out var songerror);
-
-            if (song is null) return NotFound(songerror ?? Error.InvalidSongNameorID);
-
-            if (difficultyNum == 3 && song.Count < 4) return Error.NoThisLevel;
-
+            // validate exist chart 
+            if (ChartMissingCheck(song, difficultyNum)) return Error.NoThisLevel;
+          
             var difextend = song[difficultyNum].JacketOverride
                 ? $"_{difficultyNum}"
                 : "";

@@ -1,27 +1,27 @@
 ﻿using ArcaeaUnlimitedAPI.Beans;
 using ArcaeaUnlimitedAPI.Core;
+using ArcaeaUnlimitedAPI.PublicApi.Params;
 using Microsoft.AspNetCore.Mvc;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
-using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
 public partial class PublicApi
 {
+    [UpdateCheck]
+    [UserAgentAuth]
     [HttpGet("/botarcapi/user/info")]
-    public async Task<object> GetUserInfo(string? user, string? usercode, string? recent, bool withsonginfo = false)
+    public async Task<object> GetUserInfo([FromQuery] PlayerInfoParams playerInfo,
+                                          [FromQuery] RecentParams recentInfo,
+                                          bool withsonginfo = false)
     {
-        if (!UserAgentCheck()) return NotFound(null);
-        if (NeedUpdate) return Error.NeedUpdate;
-
         // validate request arguments
-        var recentCount = 1;
-        if (recent is not null)
-            if (!int.TryParse(recent, out recentCount) || recentCount is < 0 or > 7)
-                return Error.InvalidRecentOrOverflowNumber;
 
-        var player = QueryPlayerInfo(user, usercode, out var playererror);
-        if (player is null) return playererror!;
+        var player = playerInfo.Validate(out var playererror);
+        if (player is null) return playererror ?? Error.UserNotFound;
+
+        var recentCount = recentInfo.Validate(out var recenterror);
+        if (recenterror is not null) return recenterror;
 
         try
         {
