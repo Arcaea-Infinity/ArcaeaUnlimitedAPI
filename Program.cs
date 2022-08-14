@@ -13,7 +13,6 @@ builder.Services.AddControllers()
        .AddNewtonsoftJson(options => options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddCors(options => options.AddDefaultPolicy(i => i.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
-
 var app = builder.Build();
 app.UseCors();
 app.MapControllers();

@@ -40,7 +40,7 @@ public class ConfigItem
 
     [JsonProperty("open_register")] public bool? OpenRegister { get; set; }
 
-    [JsonProperty("api_salt")] public List<byte> ApiSalt { get; set; }
+    [JsonConverter(typeof(BytesConverter))] [JsonProperty("api_salt")] public byte[] ApiSalt { get; set; }
     
     [JsonProperty("node")] public Node Node { get; set; }
     
@@ -58,4 +58,27 @@ public class Node
     [JsonProperty("port")] public int? Port { get; set; }
 
     public override string ToString() => $"https://{Url}:{Port ?? 443}";
+}
+
+internal class BytesConverter : JsonConverter<byte[]>
+{
+    public override bool CanWrite => true;
+    public override bool CanRead => true;
+
+    public override void WriteJson(JsonWriter writer, byte[]? value, JsonSerializer serializer)
+    {
+        if (value != null) writer.WriteValue(Convert.ToHexString(value));
+    }
+
+    public override byte[] ReadJson(JsonReader reader, Type objectType, byte[]? existingValue,
+                                    bool hasExistingValue, JsonSerializer serializer)
+    {
+        var readerValue = reader.Value?.ToString();
+                
+        return readerValue == null
+            ? hasExistingValue
+                ? existingValue!
+                : Array.Empty<byte>()
+            : Convert.FromHexString(readerValue);
+    }
 }
