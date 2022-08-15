@@ -16,5 +16,3 @@ Core/ArcaeaHash.cs
 Core/ArcaeaDecrypt.cs
 Core/TestFetch.cs
 PublicApi/Assets/Preview.cs
-PublicApi/Utils/SongPoolHelper.cs
-PublicApi/Playpool.cs

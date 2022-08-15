@@ -10,6 +10,7 @@ public partial class PublicApi
 {
     [EnableCors]
     [HttpGet("/botarcapi/playdata")]
+    [HttpGet("/botarcapi/data/playdata")]
     public object GetPlaydata([FromQuery] SongInfoParams songInfo, [FromQuery] DifficultyParams difficultyInfo, int start, int end)
     {
         // validate request arguments

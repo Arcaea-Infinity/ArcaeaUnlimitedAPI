@@ -15,6 +15,7 @@ public partial class PublicApi
     [UpdateCheck]
     [UserAgentAuth]
     [HttpGet("/botarcapi/challenge")]
+    [HttpGet("/botarcapi/data/challenge")]
     public object GetChallenge(string path, string? body, ulong time = 0)
     {
         if (PathList.All(i => !path.StartsWith(i))) return NotFound(null);
@@ -24,6 +25,7 @@ public partial class PublicApi
     [UpdateCheck]
     [UserAgentAuth]
     [HttpPost("/botarcapi/challenge")]
+    [HttpPost("/botarcapi/data/challenge")]
     public object PostChallenges([FromBody] ChallengeData[] data)
     {
         if (data.Select(i => i.path).Any(path => PathList.All(i => !path.StartsWith(i)))) return NotFound(null);
