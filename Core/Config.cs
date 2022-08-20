@@ -4,21 +4,38 @@ namespace ArcaeaUnlimitedAPI.Core;
 
 internal static class GlobalConfig
 {
-    internal static ConfigItem Config = null!;
+    internal static ConfigItem Config;
+    internal static List<string> UserAgents;
+    internal static HashSet<string> Tokens;
 
     internal static volatile bool NeedUpdate = false;
 
     static GlobalConfig()
     {
-        Init();
+        Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("config.json"))!;
+        UserAgents = JsonConvert.DeserializeObject<List<string>>(File.ReadAllText("useragents.json"))!;
+        Tokens = JsonConvert.DeserializeObject<HashSet<string>>(File.ReadAllText("tokens.json"))!;
+
+        ArcaeaFetch.Init();
         BackgroundService.Init();
         ConfigWatcher.Init();
     }
 
-    internal static void Init()
+    internal static void Init(string fileName)
     {
-        Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("config.json"))!;
-        ArcaeaFetch.Init();
+        switch (fileName)
+        {
+            case "config.json":
+                Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("config.json"))!;
+                ArcaeaFetch.Init();
+                break;
+            case "useragents.json":
+                UserAgents = JsonConvert.DeserializeObject<List<string>>(File.ReadAllText("useragents.json"))!;
+                break;
+            case "tokens.json":
+                Tokens = JsonConvert.DeserializeObject<HashSet<string>>(File.ReadAllText("tokens.json"))!;
+                break;
+        }
     }
 }
 
@@ -39,12 +56,12 @@ public class ConfigItem
     [JsonProperty("data_path")] public string DataPath { get; set; }
 
     [JsonProperty("open_register")] public bool? OpenRegister { get; set; }
+    [JsonProperty("quota")] public int Quota { get; set; } = 10;
 
-    [JsonConverter(typeof(BytesConverter))] [JsonProperty("api_salt")] public byte[] ApiSalt { get; set; }
-    
+    [JsonConverter(typeof(BytesConverter))] [JsonProperty("api_salt")]
+    public byte[] ApiSalt { get; set; }
+
     [JsonProperty("node")] public Node Node { get; set; }
-    
-    [JsonProperty("whitelist")] public List<string> Whitelist { get; set; }
 
     internal void WriteConfig(bool rewrite) =>
         File.WriteAllText(rewrite
@@ -70,11 +87,11 @@ internal class BytesConverter : JsonConverter<byte[]>
         if (value != null) writer.WriteValue(Convert.ToHexString(value));
     }
 
-    public override byte[] ReadJson(JsonReader reader, Type objectType, byte[]? existingValue,
-                                    bool hasExistingValue, JsonSerializer serializer)
+    public override byte[] ReadJson(JsonReader reader, Type objectType, byte[]? existingValue, bool hasExistingValue,
+                                    JsonSerializer serializer)
     {
         var readerValue = reader.Value?.ToString();
-                
+
         return readerValue == null
             ? hasExistingValue
                 ? existingValue!

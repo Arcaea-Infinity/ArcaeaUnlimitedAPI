@@ -13,7 +13,7 @@ public partial class PublicApi
     };
 
     [UpdateCheck]
-    [UserAgentAuth]
+    [Auth]
     [HttpGet("/botarcapi/challenge")]
     [HttpGet("/botarcapi/data/challenge")]
     public object GetChallenge(string path, string? body, ulong time = 0)
@@ -23,7 +23,7 @@ public partial class PublicApi
     }
 
     [UpdateCheck]
-    [UserAgentAuth]
+    [Auth]
     [HttpPost("/botarcapi/challenge")]
     [HttpPost("/botarcapi/data/challenge")]
     public object PostChallenges([FromBody] ChallengeData[] data)

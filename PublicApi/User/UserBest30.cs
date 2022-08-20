@@ -9,7 +9,7 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 public partial class PublicApi
 {
     [UpdateCheck]
-    [UserAgentAuth]
+    [Auth]
     [HttpGet("/botarcapi/user/best30")]
     public async Task<object> GetUserBest30([FromQuery] PlayerInfoParams playerInfo,
                                             [FromQuery] OverflowParams overflowInfo,
