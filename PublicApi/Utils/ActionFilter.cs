@@ -12,11 +12,9 @@ internal class Auth : ActionFilterAttribute
 
     private static bool TokenCheck(HttpContext context)
     {
-        if (context.Request.Headers.TryGetValue("Authorization", out var authString))
-        {
-            var str = authString.ToString();
-            if (str.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)) return Tokens.Contains(str[7..]);
-        }
+        if (!context.Request.Headers.TryGetValue("Authorization", out var authString)) return false;
+        var str = authString.ToString();
+        if (str.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)) return Tokens.Contains(str[7..]);
 
         return false;
     }
@@ -24,7 +22,7 @@ internal class Auth : ActionFilterAttribute
     public override void OnActionExecuting(ActionExecutingContext context)
     {
         if (!UserAgentCheck(context.HttpContext) && !TokenCheck(context.HttpContext))
-            if (RateLimiter.IsExceeded(context.HttpContext.Request.Headers["X-Real-IP"].ToString()))
+            if (RateLimiter.IsExceeded(context.HttpContext.Connection.RemoteIpAddress?.ToString()))
                 context.Result = new ObjectResult(null) { StatusCode = 429 };
 
         base.OnActionExecuting(context);
