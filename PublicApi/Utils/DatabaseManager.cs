@@ -6,32 +6,16 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 
 internal static class DatabaseManager
 {
-    internal static readonly Lazy<SQLiteConnection> Song = new(() => new($"{DatabaseDir}/arcsong.db",
-                                                                         SQLiteOpenFlags.ReadWrite
-                                                                         | SQLiteOpenFlags.SharedCache
-                                                                         | SQLiteOpenFlags.FullMutex));
+    internal static readonly Lazy<SQLiteConnection> Song = GetLazyConnection("arcsong"),
+                                                    Account = GetLazyConnection("arcaccount"),
+                                                    Player = GetLazyConnection("arcplayer"),
+                                                    Record = GetLazyConnection("arcrecord"),
+                                                    Bests = GetLazyConnection("arcbests"),
+                                                    Best30 = GetLazyConnection("arcbest30");
 
-    internal static readonly Lazy<SQLiteConnection> Account
-        = new(() => new($"{DatabaseDir}/arcaccount.db",
-                        SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.FullMutex));
-
-    internal static readonly Lazy<SQLiteConnection> Player
-        = new(() => new($"{DatabaseDir}/arcplayer.db",
-                        SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.FullMutex));
-
-    internal static readonly Lazy<SQLiteConnection> Record
-        = new(() => new($"{DatabaseDir}/arcrecord.db",
-                        SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.FullMutex));
-
-    internal static readonly Lazy<SQLiteConnection> Bests
-        = new(() => new($"{DatabaseDir}/arcbests.db",
-                        SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.FullMutex));
-
-    internal static readonly Lazy<SQLiteConnection> Best30
-        = new(() => new($"{DatabaseDir}/arcbest30.db",
-                        SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.FullMutex));
-
-    private static readonly string DatabaseDir = $"{GlobalConfig.Config.DataPath}/database";
+    private static Lazy<SQLiteConnection> GetLazyConnection(string dbName) =>
+        new(() => new($"{GlobalConfig.Config.DataPath}/database/{dbName}.db",
+                      SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.FullMutex));
 
     internal static TableQuery<T> Where<T>(this Lazy<SQLiteConnection> connection, Expression<Func<T, bool>> predExpr)
         where T : new() =>

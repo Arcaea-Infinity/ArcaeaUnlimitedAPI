@@ -32,7 +32,7 @@ internal class ConcurrentApiRequest<T, TU> where T : notnull
         return null;
     }
 
-    internal void GotResultCallBack(T key)
+    internal void CallBack(T key)
     {
         if (_connPendingCounter.ContainsKey(key))
         {

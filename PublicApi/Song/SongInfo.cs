@@ -1,6 +1,7 @@
-﻿using ArcaeaUnlimitedAPI.PublicApi.Params;
+﻿using ArcaeaUnlimitedAPI.Beans;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
@@ -8,12 +9,7 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 public partial class PublicApi
 {
     [EnableCors]
+    [SongInfoConverter]
     [HttpGet("/botarcapi/song/info")]
-    public object GetSongInfo([FromQuery] SongInfoParams songInfo)
-    {
-        var song = songInfo.Validate(out var songerror);
-        if (song is null) return songerror ?? Error.InvalidSongNameorID;
-        
-        return Success(song.ToJson());
-    }
+    public object GetSongInfo([BindNever] ArcaeaSong song) => Success(song.ToJson());
 }

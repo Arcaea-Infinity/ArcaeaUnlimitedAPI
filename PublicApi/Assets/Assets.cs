@@ -1,6 +1,7 @@
-using ArcaeaUnlimitedAPI.PublicApi.Params;
+using ArcaeaUnlimitedAPI.Beans;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
@@ -9,31 +10,21 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 public partial class PublicApi
 {
     [EnableCors]
+    [FileConverter(Order = 0)]
+    [SongInfoConverter(Order = 1)]
+    [DifficultyConverter(Order = 2)]
     [HttpGet("/botarcapi/assets/song")]
-    public object GetSongAssets([FromQuery] SongInfoParams songInfo,[FromQuery] DifficultyParams difficultyInfo, string? file)
+    public object GetSongAssets([BindNever] ArcaeaSong song, [BindNever] sbyte difficulty)
     {
-        FileInfo fileinfo;
-        if (file is null)
-        {
-            var difficultyNum = difficultyInfo.Validate(out _);
-      
-            var song = songInfo.Validate(out var songerror);
-            if (song is null) return songerror ?? Error.InvalidSongNameorID;
+        // validate exist chart 
+        if (ChartMissingCheck(song, difficulty)) return Error.NoThisLevel;
 
-            // validate exist chart 
-            if (ChartMissingCheck(song, difficultyNum)) return Error.NoThisLevel;
-          
-            var difextend = song[difficultyNum].JacketOverride
-                ? $"_{difficultyNum}"
-                : "";
+        var difextend = song[difficulty].JacketOverride
+            ? $"_{difficulty}"
+            : "";
 
-            fileinfo = new($"{Config.DataPath}/source/songs/{song.SongID}{difextend}.jpg");
-        }
-        else
-        {
-            if (file.Contains("/")) return NotFound(Error.FileUnavailable);
-            fileinfo = new($"{Config.DataPath}/source/songs/{file}.jpg");
-        }
+        var fileinfo = new FileInfo($"{Config.DataPath}/source/songs/{song.SongID}{difextend}.jpg");
+
 
         if (!fileinfo.Exists) return NotFound(Error.FileUnavailable);
 

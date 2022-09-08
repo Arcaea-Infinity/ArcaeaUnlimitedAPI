@@ -12,7 +12,12 @@ ServicePointManager.ReusePort = true;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
-       .AddNewtonsoftJson(options => options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore);
+       .AddNewtonsoftJson(options => options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore)
+       .ConfigureApiBehaviorOptions(options =>
+                                    {
+                                        options.SuppressModelStateInvalidFilter = true;
+                                        options.SuppressMapClientErrors = true;
+                                    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddCors(options =>
                              options.AddDefaultPolicy(i => i.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));

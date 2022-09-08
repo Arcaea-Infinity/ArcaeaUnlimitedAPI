@@ -1,8 +1,8 @@
 ﻿using ArcaeaUnlimitedAPI.Beans;
 using ArcaeaUnlimitedAPI.Core;
-using ArcaeaUnlimitedAPI.PublicApi.Params;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
@@ -10,16 +10,12 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 public partial class PublicApi
 {
     [EnableCors]
+    [OverflowConverter]
     [HttpGet("/botarcapi/data/theory")]
-    public object GetTheoryBests([FromQuery] OverflowParams overflowInfo, bool withrecent = false,
-                                 bool withsonginfo = false, string? version = null)
+    public object GetTheoryBests([BindNever] int overflow, bool withrecent = false, bool withsonginfo = false,
+                                 string? version = null)
     {
-        // validate request arguments
-
-        var overflowCount = overflowInfo.Validate(out var overflowerror);
-        if (overflowerror is not null) return overflowerror;
-
-        var count = overflowCount + 30;
+        var count = overflow + 30;
 
         var verNum = double.NaN;
         if (version is not null && (!double.TryParse(version, out verNum) || verNum < 0)) return Error.InvalidVersion;
@@ -70,7 +66,7 @@ public partial class PublicApi
 
         response.Best30List = results.Take(30).ToList();
 
-        response.Best30Overflow = overflowCount == 0
+        response.Best30Overflow = overflow == 0
             ? null!
             : results.Skip(30).ToList();
 

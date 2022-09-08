@@ -1,29 +1,23 @@
 ﻿using ArcaeaUnlimitedAPI.Beans;
-using ArcaeaUnlimitedAPI.PublicApi.Params;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
 public partial class PublicApi
 {
-    [EnableCors]
+    [EnableCors] 
+    [SongInfoConverter]
+    [DifficultyConverter]
     [HttpGet("/botarcapi/playdata")]
     [HttpGet("/botarcapi/data/playdata")]
-    public object GetPlaydata([FromQuery] SongInfoParams songInfo, [FromQuery] DifficultyParams difficultyInfo, int start, int end)
+    public object GetPlaydata([BindNever] ArcaeaSong song, [BindNever] sbyte difficulty, int start, int end)
     {
-        // validate request arguments
-
-        var difficultyNum = difficultyInfo.Validate(out var difficultyerror);
-        if (difficultyerror is not null) return difficultyerror;
-
-        var song = songInfo.Validate(out var songerror);
-        if (song is null) return songerror ?? Error.InvalidSongNameorID;
-
         // validate exist chart 
-        if (ChartMissingCheck(song, difficultyNum)) return Error.NoThisLevel;
+        if (ChartMissingCheck(song, difficulty)) return Error.NoThisLevel;
 
-        return Success(PlayData.Query(start, end, song.SongID, difficultyNum));
+        return Success(PlayData.Query(start, end, song.SongID, difficulty));
     }
 }

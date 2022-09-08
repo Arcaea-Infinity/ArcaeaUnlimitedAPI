@@ -1,7 +1,7 @@
 ﻿using ArcaeaUnlimitedAPI.Beans;
 using ArcaeaUnlimitedAPI.Core;
-using ArcaeaUnlimitedAPI.PublicApi.Params;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
@@ -10,20 +10,12 @@ public partial class PublicApi
 {
     [UpdateCheck]
     [Auth]
+    [PlayerInfoConverter]
+    [OverflowConverter]
     [HttpGet("/botarcapi/user/best30")]
-    public async Task<object> GetUserBest30([FromQuery] PlayerInfoParams playerInfo,
-                                            [FromQuery] OverflowParams overflowInfo,
-                                            bool withrecent = false,
-                                            bool withsonginfo = false)
+    public async Task<object> GetUserBest30([BindNever] PlayerInfo player, [BindNever] int overflow,
+                                            bool withrecent = false, bool withsonginfo = false)
     {
-        // validate request arguments
-
-        var overflowCount = overflowInfo.Validate(out var overflowerror);
-        if (overflowerror is not null) return overflowerror;
-
-        var player = playerInfo.Validate(out var playererror);
-        if (player is null) return playererror ?? Error.UserNotFound;
-
         try
         {
             var task = UserBest30Concurrent.GetTask(player.Code);
@@ -33,12 +25,12 @@ public partial class PublicApi
                 UserBest30Concurrent.NewTask(player.Code);
                 var (response, errorresp) = await QueryUserBest30(player);
                 UserBest30Concurrent.SetResult(player.Code, (response, errorresp));
-                return errorresp ?? GetResponse(response!, overflowCount, withrecent, withsonginfo);
+                return errorresp ?? GetResponse(response!, overflow, withrecent, withsonginfo);
             }
             else
             {
                 var (response, errorresp) = await task.Task;
-                return errorresp ?? GetResponse(response!, overflowCount, withrecent, withsonginfo);
+                return errorresp ?? GetResponse(response!, overflow, withrecent, withsonginfo);
             }
         }
         catch (Exception ex)
@@ -48,7 +40,7 @@ public partial class PublicApi
         }
         finally
         {
-            UserBest30Concurrent.GotResultCallBack(player.Code);
+            UserBest30Concurrent.CallBack(player.Code);
         }
     }
 

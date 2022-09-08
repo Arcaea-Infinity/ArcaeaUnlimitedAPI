@@ -2,13 +2,20 @@
 
 namespace ArcaeaUnlimitedAPI.PublicApi.Params;
 
-public record SongInfoParams(string? SongName, string? SongID) : IParams<ArcaeaSong>
+internal record SongInfoParams(string SongName, string SongID) : IParams<ArcaeaSong>
 {
     public ArcaeaSong? Validate(out Response? error)
     {
         error = null;
 
-        if (!string.IsNullOrWhiteSpace(SongID)) return ArcaeaCharts.QueryById(SongID);
+        if (!string.IsNullOrWhiteSpace(SongID))
+        {
+            var song = ArcaeaCharts.QueryById(SongID);
+            if (song is not null) return song;
+            
+            error = Response.Error.InvalidSongID;
+            return null;
+        }
 
         if (string.IsNullOrWhiteSpace(SongName))
         {

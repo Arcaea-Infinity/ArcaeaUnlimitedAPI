@@ -1,7 +1,7 @@
 ﻿using ArcaeaUnlimitedAPI.Beans;
 using ArcaeaUnlimitedAPI.Core;
-using ArcaeaUnlimitedAPI.PublicApi.Params;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
@@ -10,19 +10,12 @@ public partial class PublicApi
 {
     [UpdateCheck]
     [Auth]
+    [PlayerInfoConverter]
+    [RecentConverter]
     [HttpGet("/botarcapi/user/info")]
-    public async Task<object> GetUserInfo([FromQuery] PlayerInfoParams playerInfo,
-                                          [FromQuery] RecentParams recentInfo,
+    public async Task<object> GetUserInfo([BindNever] PlayerInfo player, [BindNever] int recent,
                                           bool withsonginfo = false)
     {
-        // validate request arguments
-
-        var player = playerInfo.Validate(out var playererror);
-        if (player is null) return playererror ?? Error.UserNotFound;
-
-        var recentCount = recentInfo.Validate(out var recenterror);
-        if (recenterror is not null) return recenterror;
-
         try
         {
             var task = UserInfoConcurrent.GetTask(player.Code);
@@ -32,12 +25,12 @@ public partial class PublicApi
                 UserInfoConcurrent.NewTask(player.Code);
                 var (response, errorresp) = await QueryUserInfo(player);
                 UserInfoConcurrent.SetResult(player.Code, (response, errorresp));
-                return errorresp ?? GetResponse(response!, recentCount, withsonginfo);
+                return errorresp ?? GetResponse(response!, recent, withsonginfo);
             }
             else
             {
                 var (response, errorresp) = await task.Task;
-                return errorresp ?? GetResponse(response!, recentCount, withsonginfo);
+                return errorresp ?? GetResponse(response!, recent, withsonginfo);
             }
         }
         catch (Exception ex)
@@ -47,7 +40,7 @@ public partial class PublicApi
         }
         finally
         {
-            UserInfoConcurrent.GotResultCallBack(player.Code);
+            UserInfoConcurrent.CallBack(player.Code);
         }
     }
 

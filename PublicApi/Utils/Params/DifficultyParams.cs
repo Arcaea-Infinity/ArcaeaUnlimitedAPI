@@ -2,7 +2,7 @@
 
 namespace ArcaeaUnlimitedAPI.PublicApi.Params;
 
-public record DifficultyParams(string? Difficulty) : IParams<sbyte>
+internal record DifficultyParams(string Difficulty) : IParams<sbyte>
 {
     private static readonly ConcurrentDictionary<sbyte, string[]> List;
 
@@ -19,7 +19,7 @@ public record DifficultyParams(string? Difficulty) : IParams<sbyte>
     {
         error = null;
 
-        if (Difficulty is null)
+        if (string.IsNullOrWhiteSpace(Difficulty))
         {
             error = Response.Error.InvalidDifficulty;
             return 2;

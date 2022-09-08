@@ -1,7 +1,7 @@
 ﻿using ArcaeaUnlimitedAPI.Beans;
 using ArcaeaUnlimitedAPI.Core;
-using ArcaeaUnlimitedAPI.PublicApi.Params;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static ArcaeaUnlimitedAPI.Core.Utils;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
@@ -11,27 +11,17 @@ public partial class PublicApi
 {
     [UpdateCheck]
     [Auth]
+    [PlayerInfoConverter]
+    [SongInfoConverter]
+    [DifficultyConverter]
     [HttpGet("/botarcapi/user/best")]
-    public async Task<object> GetUserBest([FromQuery] PlayerInfoParams playerInfo, 
-                                          [FromQuery] SongInfoParams songInfo,
-                                          [FromQuery] DifficultyParams difficultyInfo,
-                                          bool withrecent = false,
+    public async Task<object> GetUserBest([BindNever][FromQuery] PlayerInfo player, [BindNever][FromQuery] ArcaeaSong song,
+                                          [BindNever] sbyte difficulty, bool withrecent = false,
                                           bool withsonginfo = false)
     {
-        // validate request arguments
-
-        var difficultyNum = difficultyInfo.Validate(out var difficultyerror);
-        if (difficultyerror is not null) return difficultyerror;
-
-        var player = playerInfo.Validate(out var playererror);
-        if (player is null) return playererror ?? Error.UserNotFound;
-
-        var song = songInfo.Validate(out var songerror);
-        if (song is null) return songerror ?? Error.InvalidSongNameorID;
-
         // validate exist chart 
-        if (ChartMissingCheck(song, difficultyNum)) return Error.NoThisLevel;
-        var chart = song[difficultyNum];
+        if (ChartMissingCheck(song, difficulty)) return Error.NoThisLevel;
+        var chart = song[difficulty];
 
         var key = (player.Code, chart.SongID, chart.RatingClass);
 
@@ -42,7 +32,7 @@ public partial class PublicApi
             if (task is null)
             {
                 UserBestConcurrent.NewTask(key);
-                var (response, errorresp) = await QueryUserBest(player, chart, difficultyNum);
+                var (response, errorresp) = await QueryUserBest(player, chart, difficulty);
                 UserBestConcurrent.SetResult(key, (response, errorresp));
                 return errorresp ?? GetResponse(response!, withrecent, withsonginfo, chart);
             }
@@ -59,7 +49,7 @@ public partial class PublicApi
         }
         finally
         {
-            UserBestConcurrent.GotResultCallBack(key);
+            UserBestConcurrent.CallBack(key);
         }
     }
 
