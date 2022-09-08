@@ -7,11 +7,10 @@ using static ArcaeaUnlimitedAPI.PublicApi.Response;
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
 public partial class PublicApi
-{
-    [UpdateCheck]
-    [Auth]
-    [PlayerInfoConverter]
-    [RecentConverter]
+{ 
+    [AuthorizationCheck(Order = 0)]
+    [PlayerInfoConverter(Order = 1)]
+    [RecentConverter(Order = 2)]
     [HttpGet("/botarcapi/user/info")]
     public async Task<object> GetUserInfo([BindNever] PlayerInfo player, [BindNever] int recent,
                                           bool withsonginfo = false)

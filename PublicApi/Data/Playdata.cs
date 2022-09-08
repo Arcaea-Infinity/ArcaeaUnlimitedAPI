@@ -9,15 +9,10 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 public partial class PublicApi
 {
     [EnableCors] 
-    [SongInfoConverter]
-    [DifficultyConverter]
+    [SongInfoConverter(Order = 0)]
+    [DifficultyConverter(Order = 1)]
+    [ChartConverter(Order = 2)]
     [HttpGet("/botarcapi/playdata")]
     [HttpGet("/botarcapi/data/playdata")]
-    public object GetPlaydata([BindNever] ArcaeaSong song, [BindNever] sbyte difficulty, int start, int end)
-    {
-        // validate exist chart 
-        if (ChartMissingCheck(song, difficulty)) return Error.NoThisLevel;
-
-        return Success(PlayData.Query(start, end, song.SongID, difficulty));
-    }
+    public object GetPlaydata([BindNever] ArcaeaCharts chart, int start, int end) => Success(PlayData.Query(start, end, chart.SongID, chart.RatingClass));
 }

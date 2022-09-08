@@ -9,20 +9,17 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 
 public partial class PublicApi
 {
-    [UpdateCheck]
-    [Auth]
-    [PlayerInfoConverter]
-    [SongInfoConverter]
-    [DifficultyConverter]
+    [AuthorizationCheck(Order = 0)]
+    [PlayerInfoConverter(Order = 1)]
+    [SongInfoConverter(Order = 2)]
+    [DifficultyConverter(Order = 3)]
+    [ChartConverter(Order = 4)]
     [HttpGet("/botarcapi/user/best")]
-    public async Task<object> GetUserBest([BindNever][FromQuery] PlayerInfo player, [BindNever][FromQuery] ArcaeaSong song,
-                                          [BindNever] sbyte difficulty, bool withrecent = false,
+    public async Task<object> GetUserBest([BindNever] [FromQuery] PlayerInfo player,
+                                          [BindNever] [FromQuery] ArcaeaCharts chart,
+                                          bool withrecent = false,
                                           bool withsonginfo = false)
     {
-        // validate exist chart 
-        if (ChartMissingCheck(song, difficulty)) return Error.NoThisLevel;
-        var chart = song[difficulty];
-
         var key = (player.Code, chart.SongID, chart.RatingClass);
 
         try
@@ -32,7 +29,7 @@ public partial class PublicApi
             if (task is null)
             {
                 UserBestConcurrent.NewTask(key);
-                var (response, errorresp) = await QueryUserBest(player, chart, difficulty);
+                var (response, errorresp) = await QueryUserBest(player, chart);
                 UserBestConcurrent.SetResult(key, (response, errorresp));
                 return errorresp ?? GetResponse(response!, withrecent, withsonginfo, chart);
             }
@@ -73,7 +70,7 @@ public partial class PublicApi
     }
 
     private static async Task<(UserBestResponse? response, Response? error)> QueryUserBest(
-        PlayerInfo player, ArcaeaCharts chart, sbyte difficulty)
+        PlayerInfo player, ArcaeaCharts chart)
     {
         AccountInfo? account = null;
 
@@ -85,7 +82,7 @@ public partial class PublicApi
             if (friend is null) return (null, recorderror!);
 
             // get rank result
-            var (success, friendRank) = await account.FriendRank(chart.SongID, difficulty);
+            var (success, friendRank) = await account.FriendRank(chart.SongID, chart.RatingClass);
             if (!success || friendRank is null || friendRank.Count == 0) return (null, Error.NotPlayedYet);
             foreach (var record in friendRank)
             {

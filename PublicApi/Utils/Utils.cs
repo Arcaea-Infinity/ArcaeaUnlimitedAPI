@@ -17,9 +17,6 @@ public partial class PublicApi : ControllerBase
 
     private static readonly ConcurrentApiRequest<string, (UserBest30Response? b30data, Response? error)>
         UserBest30Concurrent = new();
-
-    private static bool ChartMissingCheck(ArcaeaSong song, sbyte difficulty) =>
-        (difficulty == 3 && song.Count < 4) || (song.SongID == "lasteternity" && difficulty != 3);
     
     private static FriendsItem? RecordPlayers(AccountInfo account, PlayerInfo player, out Response? error)
     {

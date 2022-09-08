@@ -5,7 +5,7 @@ using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
-internal class Auth : ActionFilterAttribute
+internal class AuthorizationCheck : ActionFilterAttribute
 {
     private static bool UserAgentCheck(HttpContext context) =>
         UserAgents.Any(pattern => Regex.IsMatch(context.Request.Headers.UserAgent.ToString(), pattern));
@@ -21,19 +21,11 @@ internal class Auth : ActionFilterAttribute
 
     public override void OnActionExecuting(ActionExecutingContext context)
     {
+        if (NeedUpdate) context.Result = new ObjectResult(Response.Error.NeedUpdate);
+        
         if (!UserAgentCheck(context.HttpContext) && !TokenCheck(context.HttpContext))
             if (RateLimiter.IsExceeded(context.HttpContext.Connection.RemoteIpAddress?.ToString()))
                 context.Result = new ObjectResult(null) { StatusCode = 429 };
-
-        base.OnActionExecuting(context);
-    }
-}
-
-internal class UpdateCheck : ActionFilterAttribute
-{
-    public override void OnActionExecuting(ActionExecutingContext context)
-    {
-        if (NeedUpdate) context.Result = new ObjectResult(Response.Error.NeedUpdate);
 
         base.OnActionExecuting(context);
     }

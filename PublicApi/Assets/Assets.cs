@@ -13,17 +13,15 @@ public partial class PublicApi
     [FileConverter(Order = 0)]
     [SongInfoConverter(Order = 1)]
     [DifficultyConverter(Order = 2)]
+    [ChartConverter(Order = 3)]
     [HttpGet("/botarcapi/assets/song")]
-    public object GetSongAssets([BindNever] ArcaeaSong song, [BindNever] sbyte difficulty)
+    public object GetSongAssets([BindNever] ArcaeaCharts chart)
     {
-        // validate exist chart 
-        if (ChartMissingCheck(song, difficulty)) return Error.NoThisLevel;
-
-        var difextend = song[difficulty].JacketOverride
-            ? $"_{difficulty}"
+        var difextend = chart.JacketOverride
+            ? $"_{chart.RatingClass}"
             : "";
 
-        var fileinfo = new FileInfo($"{Config.DataPath}/source/songs/{song.SongID}{difextend}.jpg");
+        var fileinfo = new FileInfo($"{Config.DataPath}/source/songs/{chart.SongID}{difextend}.jpg");
 
 
         if (!fileinfo.Exists) return NotFound(Error.FileUnavailable);

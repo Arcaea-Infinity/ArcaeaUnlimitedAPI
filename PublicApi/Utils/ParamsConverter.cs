@@ -1,4 +1,5 @@
-﻿using ArcaeaUnlimitedAPI.Core;
+﻿using ArcaeaUnlimitedAPI.Beans;
+using ArcaeaUnlimitedAPI.Core;
 using ArcaeaUnlimitedAPI.PublicApi.Params;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -96,6 +97,28 @@ internal class DifficultyConverterAttribute : ActionFilterAttribute
             context.Result = new ObjectResult(error);
             return;
         }
+
+        base.OnActionExecuting(context);
+    }
+}
+
+internal class ChartConverterAttribute : ActionFilterAttribute
+{
+    private static bool ChartMissingCheck(ArcaeaSong song, sbyte difficulty) =>
+        (difficulty == 3 && song.Count < 4) || (song.SongID == "lasteternity" && difficulty != 3);
+
+    public override void OnActionExecuting(ActionExecutingContext context)
+    {
+        var song = (context.ActionArguments["song"] as ArcaeaSong)!;
+        var difficulty = (sbyte)context.ActionArguments["difficulty"]!;
+
+        if (ChartMissingCheck(song, difficulty))
+        {
+            context.Result = new ObjectResult(Response.Error.NoThisLevel);
+            return;
+        }
+
+        context.ActionArguments["chart"] = song[difficulty];
 
         base.OnActionExecuting(context);
     }

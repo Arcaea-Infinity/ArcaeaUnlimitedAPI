@@ -12,8 +12,7 @@ public partial class PublicApi
         "purchase/me/stamina/fragment", "world/map/me"
     };
 
-    [UpdateCheck]
-    [Auth]
+    [AuthorizationCheck]
     [HttpGet("/botarcapi/challenge")]
     [HttpGet("/botarcapi/data/challenge")]
     public object GetChallenge([FromQuery] ChallengeData? data)
@@ -22,8 +21,7 @@ public partial class PublicApi
         return Success(ArcaeaFetch.GenerateChallenge("", data.body, data.path, data.time));
     }
 
-    [UpdateCheck]
-    [Auth]
+    [AuthorizationCheck]
     [HttpPost("/botarcapi/challenge")]
     [HttpPost("/botarcapi/data/challenge")]
     public object PostChallenges([FromBody] ChallengeData[] data)
