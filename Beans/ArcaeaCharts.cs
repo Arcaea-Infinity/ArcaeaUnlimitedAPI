@@ -58,7 +58,7 @@ public partial class ArcaeaCharts
                             RatingClass = i,
                             SongID = item.Id,
                             NameEn = item.Difficulties[i].TitleLocalized?.En ?? item.TitleLocalized.En,
-                            NameJp = item.Difficulties[i].TitleLocalized?.Ja ?? item.TitleLocalized.Ja ?? "",
+                            NameJp = item.Difficulties[i].TitleLocalized?.Ja ?? item.TitleLocalized.Ja ?? string.Empty,
                             Bpm = item.Difficulties[i].Bpm ?? item.Bpm,
                             BpmBase = item.Difficulties[i].BpmBase ?? item.BpmBase,
                             Set = item.Difficulties[i].Set ?? item.Set,
@@ -278,28 +278,28 @@ public partial class ArcaeaCharts
 #region DataProperties
 
     [JsonIgnore] [PrimaryKey] [Column("song_id")]
-    public string SongID { get; set; } = "";
+    public string SongID { get; set; } = string.Empty;
 
     [JsonIgnore] [PrimaryKey] [Column("rating_class")]
     public int RatingClass { get; set; }
 
     [JsonProperty("name_en")] [Column("name_en")]
-    public string NameEn { get; set; } = "";
+    public string NameEn { get; set; } = string.Empty;
 
     [JsonProperty("name_jp")] [Column("name_jp")]
-    public string NameJp { get; set; } = "";
+    public string NameJp { get; set; } = string.Empty;
 
     [JsonProperty("artist")] [Column("artist")]
-    public string Artist { get; set; } = "";
+    public string Artist { get; set; } = string.Empty;
 
     [JsonProperty("bpm")] [Column("bpm")]
-    public string Bpm { get; set; } = "";
+    public string Bpm { get; set; } = string.Empty;
 
     [JsonProperty("bpm_base")] [Column("bpm_base")]
     public double BpmBase { get; set; }
 
     [JsonProperty("set")] [Column("set")]
-    public string Set { get; set; } = "";
+    public string Set { get; set; } = string.Empty;
 
     [JsonProperty("set_friendly")] [Ignore]
     public string? Package { get; set; }
@@ -317,13 +317,13 @@ public partial class ArcaeaCharts
     public bool RemoteDownload { get; set; }
 
     [JsonProperty("bg")] [Column("bg")]
-    public string Background { get; set; } = "";
+    public string Background { get; set; } = string.Empty;
 
     [JsonProperty("date")] [Column("date")]
     public long Date { get; set; }
 
     [JsonProperty("version")] [Column("version")]
-    public string Version { get; set; } = "";
+    public string Version { get; set; } = string.Empty;
 
     [JsonProperty("difficulty")] [Column("difficulty")]
     public int Difficulty { get; set; }
@@ -335,10 +335,10 @@ public partial class ArcaeaCharts
     public int Note { get; set; }
 
     [JsonProperty("chart_designer")] [Column("chart_designer")]
-    public string ChartDesigner { get; set; } = "";
+    public string ChartDesigner { get; set; } = string.Empty;
 
     [JsonProperty("jacket_designer")] [Column("jacket_designer")]
-    public string JacketDesigner { get; set; } = "";
+    public string JacketDesigner { get; set; } = string.Empty;
 
     [JsonProperty("jacket_override")] [Column("jacket_override")]
     public bool JacketOverride { get; set; }

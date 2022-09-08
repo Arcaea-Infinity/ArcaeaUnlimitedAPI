@@ -65,7 +65,7 @@ internal static class ArcaeaFetch
 
         if (info.Code == "UnauthorizedError" || info.ErrorCode != null)
         {
-            accountInfo.Token = "";
+            accountInfo.Token = string.Empty;
             DatabaseManager.Account.Update(accountInfo);
             if (!tryagain || !await accountInfo.GetToken()) return (false, null);
             return await accountInfo.UserMe(false);
@@ -249,7 +249,7 @@ internal static class ArcaeaFetch
         request.Headers.Add("DeviceId", info.DeviceID);
         request.Headers.Add("Accept-Encoding", "identity");
         request.Headers.Authorization = new("Bearer", info.Token);
-        request.Headers.Add("X-Random-Challenge", GenerateChallenge("GET", "", url));
+        request.Headers.Add("X-Random-Challenge", GenerateChallenge("GET", string.Empty, url));
         request.Headers.Add("i", info.UserID.ToString());
 
         var (success, result) = await LogResult(resturl, request);
@@ -265,7 +265,7 @@ internal static class ArcaeaFetch
     {
         if (NeedUpdate) return null;
         var data = submitData is null
-            ? ""
+            ? string.Empty
             : SubmitDataToString(submitData);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"{_node}/{_apientry}/{resturl}");

@@ -56,11 +56,11 @@ internal static class Utils
 
         internal static bool Contains(string? raw, string? seed) =>
             seed != null && raw != null
-                         && Reg.Replace(raw, "").Contains(Reg.Replace(seed, ""), StringComparison.OrdinalIgnoreCase);
+                         && Reg.Replace(raw, string.Empty).Contains(Reg.Replace(seed, string.Empty), StringComparison.OrdinalIgnoreCase);
 
         internal static bool Equals(string? raw, string? seed) =>
             seed != null && raw != null
-                         && string.Equals(Reg.Replace(raw, ""), Reg.Replace(seed, ""),
+                         && string.Equals(Reg.Replace(raw, string.Empty), Reg.Replace(seed, string.Empty),
                                           StringComparison.OrdinalIgnoreCase);
     }
 

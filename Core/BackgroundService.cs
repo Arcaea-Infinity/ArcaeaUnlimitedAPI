@@ -81,7 +81,7 @@ internal static class BackgroundService
                     foreach (var i in list.Songs)
                     {
                         var destdir = $"{Config.DataPath}/source/songs";
-                        var rawdir = $"{dirpth}/assets/songs/{(i.NeedDownload ? "dl_" : "")}{i.Id}";
+                        var rawdir = $"{dirpth}/assets/songs/{(i.NeedDownload ? "dl_" : string.Empty)}{i.Id}";
 
                         for (var j = 0; j < i.Difficulties.Count; ++j)
                             if (j == 2)

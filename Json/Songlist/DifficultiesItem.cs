@@ -7,9 +7,9 @@ public class DifficultiesItem
 {
     [JsonProperty("ratingClass")] public int RatingClass { get; set; }
 
-    [JsonProperty("chartDesigner")] public string ChartDesigner { get; set; } = "";
+    [JsonProperty("chartDesigner")] public string ChartDesigner { get; set; } = string.Empty;
 
-    [JsonProperty("jacketDesigner")] public string JacketDesigner { get; set; } = "";
+    [JsonProperty("jacketDesigner")] public string JacketDesigner { get; set; } = string.Empty;
 
     [JsonProperty("jacketOverride")] public bool JacketOverride { get; set; }
 

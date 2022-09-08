@@ -5,7 +5,7 @@ internal static class ConfigWatcher
     private const int TimeoutMillis = 2000;
     private static readonly FileSystemWatcher Watcher = new(AppContext.BaseDirectory);
 
-    private static string _fileName = "";
+    private static string _fileName = string.Empty;
 
     internal static void Init()
     {

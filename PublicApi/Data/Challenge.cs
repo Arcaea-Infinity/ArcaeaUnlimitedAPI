@@ -17,8 +17,8 @@ public partial class PublicApi
     [HttpGet("/botarcapi/data/challenge")]
     public object GetChallenge([FromQuery] ChallengeData? data)
     {
-        if (data is null || PathList.All(i => !data.path.StartsWith(i))) return NotFound(null);
-        return Success(ArcaeaFetch.GenerateChallenge("", data.body, data.path, data.time));
+        if (data is null || PathList.All(i => !data.Path.StartsWith(i))) return NotFound(null);
+        return Success(ArcaeaFetch.GenerateChallenge(string.Empty, data.Body, data.Path, data.Time));
     }
 
     [AuthorizationCheck]
@@ -26,12 +26,10 @@ public partial class PublicApi
     [HttpPost("/botarcapi/data/challenge")]
     public object PostChallenges([FromBody] ChallengeData[] data)
     {
-        if (data.Select(i => i.path).Any(path => PathList.All(i => !path.StartsWith(i)))) return NotFound(null);
+        if (data.Select(i => i.Path).Any(path => PathList.All(i => !path.StartsWith(i)))) return NotFound(null);
 
-        return Success(data.Select(i => ArcaeaFetch.GenerateChallenge("", i.body, i.path, i.time)));
+        return Success(data.Select(i => ArcaeaFetch.GenerateChallenge(string.Empty, i.Body, i.Path, i.Time)));
     }
 
-    // ReSharper disable ClassNeverInstantiated.Global
-    // ReSharper disable InconsistentNaming
-    public record ChallengeData(string path = "", string body = "", ulong time = 0);
+    public record ChallengeData(string Path = "", string Body = "", ulong Time = 0);
 }
