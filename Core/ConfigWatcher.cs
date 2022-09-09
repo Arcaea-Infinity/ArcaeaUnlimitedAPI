@@ -4,8 +4,7 @@ internal static class ConfigWatcher
 {
     private const int TimeoutMillis = 2000;
     private static readonly FileSystemWatcher Watcher = new(AppContext.BaseDirectory);
-
-    private static string _fileName = string.Empty;
+    private static readonly List<string> TmpFiles = new();
 
     internal static void Init()
     {
@@ -16,14 +15,22 @@ internal static class ConfigWatcher
         Timer timer = new(OnTimer, null, Timeout.Infinite, Timeout.Infinite);
         Watcher.Changed += (_, e) =>
                            {
-                               _fileName = e.Name!;
+                               TmpFiles.Add(e.Name!);
                                timer.Change(TimeoutMillis, Timeout.Infinite);
                            };
     }
 
     private static void OnTimer(object? _)
     {
-        Log.FunctionLog("ConfigWatcher", "config changed.");
-        GlobalConfig.Init(_fileName);
+        lock (TmpFiles)
+        {
+            foreach (var file in TmpFiles)
+            {
+                Log.FunctionLog("ConfigWatcher", $"{file} changed.");
+                GlobalConfig.Init(file);
+            }
+
+            TmpFiles.Clear();
+        }
     }
 }

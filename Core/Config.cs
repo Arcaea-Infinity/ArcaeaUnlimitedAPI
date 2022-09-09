@@ -12,7 +12,7 @@ internal static class GlobalConfig
 
     static GlobalConfig()
     {
-        Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("config.json"))!;
+        Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("apiconfig.json"))!;
         UserAgents = JsonConvert.DeserializeObject<List<string>>(File.ReadAllText("useragents.json"))!;
         Tokens = JsonConvert.DeserializeObject<HashSet<string>>(File.ReadAllText("tokens.json"))!;
 
@@ -25,8 +25,8 @@ internal static class GlobalConfig
     {
         switch (fileName)
         {
-            case "config.json":
-                Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("config.json"))!;
+            case "apiconfig.json":
+                Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("apiconfig.json"))!;
                 ArcaeaFetch.Init();
                 break;
             case "useragents.json":
