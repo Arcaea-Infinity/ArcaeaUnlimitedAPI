@@ -82,7 +82,7 @@ public partial class PublicApi
             if (friend is null) return (null, recorderror!);
 
             // get rank result
-            var (success, friendRank) = await account.FriendRank(chart.SongID, chart.RatingClass);
+            var (success, friendRank) = await account.FriendRank(chart);
             if (!success || friendRank is null || friendRank.Count == 0) return (null, Error.NotPlayedYet);
             foreach (var record in friendRank)
             {

@@ -65,15 +65,17 @@ internal static class BackgroundService
                 Directory.CreateDirectory(dirpth);
                 ZipFile.ExtractToDirectory(apkpth, dirpth);
 
-                if (!File.Exists($"{Config.DataPath}/source/songs/melodyoflove_night.jpg"))
+                var molnight = $"{Config.DataPath}/source/songs/melodyoflove_night.jpg";
+                if (!File.Exists(molnight))
                     File.Move($"{dirpth}/assets/songs/dl_melodyoflove/base_night.jpg",
-                              $"{Config.DataPath}/source/songs/melodyoflove_night.jpg");
+                              molnight);
 
-                foreach (var file in new DirectoryInfo($"{dirpth}/assets/char/").GetFiles()
-                                                                                .Where(file =>
-                                                                                           !File
-                                                                                               .Exists($"{Config.DataPath}/source/char/{file.Name}")))
-                    file.MoveTo($"{Config.DataPath}/source/char/{file.Name}");
+                foreach (var file in new DirectoryInfo($"{dirpth}/assets/char/").GetFiles())
+                {
+                    var name = $"{Config.DataPath}/source/char/{file.Name}";
+                    if (!File.Exists(name))
+                        file.MoveTo(name);
+                }
 
                 var list = JsonConvert.DeserializeObject<Songlist>(File.ReadAllText($"{dirpth}/assets/songs/songlist"));
 
@@ -125,15 +127,14 @@ internal static class BackgroundService
     {
         try
         {
-            var lib = ArcaeaDecrypt.ReadLib($"{dirpth}/lib/arm64-v8a/libcocos2dcpp.so").Result;
-            var salt = ArcaeaDecrypt.GetSalt(lib);
-            var cert = ArcaeaDecrypt.GetCert(lib);
-            var entry = ArcaeaDecrypt.GetApiEntry(lib);
+            var decrypt = new ArcaeaDecrypt();
 
-            File.WriteAllBytes($"{Config.DataPath}/cert-{version}.p12", cert);
+            decrypt.ReadLib($"{dirpth}/lib/arm64-v8a/libcocos2dcpp.so");
 
-            Config.ApiSalt = salt;
-            Config.ApiEntry = entry;
+            File.WriteAllBytes($"{Config.DataPath}/cert-{version}.p12", decrypt.GetCert());
+
+            Config.ApiSalt = decrypt.GetSalt();
+            Config.ApiEntry = decrypt.GetApiEntry();
             Config.CertFileName = $"cert-{version}.p12";
             Config.Appversion = version;
             Config.WriteConfig(true);

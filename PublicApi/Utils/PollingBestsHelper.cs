@@ -9,7 +9,7 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 internal class PollingBestsHelper
 {
     private readonly AccountInfo _account;
-    private readonly PriorityQueue<(string songID, int songDif, int songRating), int> _failedlist = new();
+    private readonly PriorityQueue<ArcaeaCharts, int> _failedlist = new();
 
     private readonly FriendsItem _friend;
     private readonly PriorityQueue<Records, double> _records = new();
@@ -31,7 +31,7 @@ internal class PollingBestsHelper
             var trypeek = _records.TryPeek(out _, out var minrating);
 
             // query charts until rating less than floor -2
-            if (trypeek && _records.Count == 40 && item.rating < (minrating - 2) * 10) break;
+            if (trypeek && _records.Count == 40 && item.Rating < (minrating - 2) * 10) break;
 
             _tasks.Enqueue(GetNewTask(item));
 
@@ -78,25 +78,23 @@ internal class PollingBestsHelper
         }
     }
 
-    private Task<Records?> GetNewTask((string songID, int songDif, int songRating) tuple) =>
+    private Task<Records?> GetNewTask(ArcaeaCharts chart) =>
         Task.Run(() =>
                  {
-                     var (songID, songDif, songRating) = tuple;
-
-                     var (success, result) = _account.FriendRank(songID, songDif).Result;
+                     var (success, result) = _account.FriendRank(chart).Result;
 
 
                      // Check invalid response and add them into failed list
                      if (!success || result is null)
                      {
-                         _failedlist.Enqueue(tuple, songRating);
+                         _failedlist.Enqueue(chart, chart.Rating);
                          return null;
                      }
 
                      foreach (var i in result)
                      {
                          i.Potential = _friend.Rating;
-                         i.Rating = Utils.CalcSongRating(i.Score, songRating);
+                         i.Rating = Utils.CalcSongRating(i.Score, chart.Rating);
                          DatabaseManager.Bests.InsertOrReplace(i);
                      }
 

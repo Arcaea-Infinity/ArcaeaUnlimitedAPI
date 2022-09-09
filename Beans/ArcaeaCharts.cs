@@ -14,7 +14,7 @@ public partial class ArcaeaCharts
     internal static readonly ConcurrentDictionary<string, object> SongJsons;
     internal static readonly ConcurrentDictionary<string, List<string>> Aliases;
 
-    internal static (string sid, int dif, int rating)[] SortedCharts => SortByRating.ToArray();
+    internal static ArcaeaCharts[] SortedCharts => SortByRating.ToArray();
 
     internal static ArcaeaCharts? QueryByRecord(Records? record)
     {
@@ -115,7 +115,7 @@ public partial class ArcaeaCharts
 
 public partial class ArcaeaCharts
 {
-    [NonSerialized] private static readonly List<(string sid, int dif, int rating)> SortByRating;
+    [NonSerialized] private static readonly List<ArcaeaCharts> SortByRating;
     [NonSerialized] private static readonly ConcurrentDictionary<ArcaeaSong, List<string>> Abbreviations = new();
     [NonSerialized] private static readonly ConcurrentDictionary<ArcaeaSong, List<string>> Names = new();
     [NonSerialized] private static readonly ConcurrentDictionary<string, List<ArcaeaSong>> AliasCache = new();
@@ -148,7 +148,6 @@ public partial class ArcaeaCharts
                 {
                     abbrs.Add(GetAbbreviation(value[index].NameEn));
                     names.Add(value[index].NameEn);
-
                     if (!string.IsNullOrWhiteSpace(value[index].NameJp))
                     {
                         abbrs.Add(GetAbbreviation(value[index].NameJp));
@@ -183,11 +182,9 @@ public partial class ArcaeaCharts
         {
             SortByRating.Clear();
 
-            Songs.ForAllItems<string, ArcaeaCharts, ArcaeaSong>((key, value) =>
-                                                                    SortByRating.Add((key, value.RatingClass,
-                                                                                      value.Rating)));
+            Songs.ForAllItems<string, ArcaeaCharts, ArcaeaSong>((_, value) => SortByRating.Add(value));
 
-            SortByRating.Sort((tuple, valueTuple) => valueTuple.Item3 - tuple.Item3);
+            SortByRating.Sort((tuple, valueTuple) => valueTuple.Rating - tuple.Rating);
         }
     }
 }

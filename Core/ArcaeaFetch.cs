@@ -105,16 +105,15 @@ internal static class ArcaeaFetch
         return (info.Success, value.Friends);
     }
 
-    internal static async Task<(bool, List<Records>?)> FriendRank(this AccountInfo accountInfo, string songID,
-                                                                  int difficulty)
+    internal static async Task<(bool, List<Records>?)> FriendRank(this AccountInfo accountInfo, ArcaeaCharts chart)
     {
         try
         {
             var info = await Get("score/song/friend", accountInfo,
                                  new()
                                  {
-                                     { "song_id", songID },
-                                     { "difficulty", difficulty.ToString() },
+                                     { "song_id", chart.SongID },
+                                     { "difficulty", chart.RatingClass.ToString() },
                                      { "start", "0" },
                                      { "limit", "11" }
                                  });

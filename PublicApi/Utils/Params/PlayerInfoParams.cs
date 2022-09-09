@@ -10,15 +10,14 @@ internal record PlayerInfoParams(string User, string UserCode) : IParams<PlayerI
 
         if (!string.IsNullOrWhiteSpace(UserCode))
         {
-            if (!int.TryParse(UserCode, out var ucode) || ucode is < 0 or > 999999999)
+            if (UserCode.Length > 9 || !int.TryParse(UserCode, out var ucode) || ucode < 0)
             {
                 error = Response.Error.InvalidUsercode;
                 return null;
             }
 
             // use this user code directly
-            return PlayerInfo.GetByCode(UserCode).FirstOrDefault()
-                   ?? new PlayerInfo { Code = UserCode.PadLeft(9, '0') };
+            return PlayerInfo.GetByCode(UserCode).FirstOrDefault() ?? new PlayerInfo { Code = ucode.ToString("D9") };
         }
 
         if (string.IsNullOrWhiteSpace(User))
@@ -37,7 +36,7 @@ internal record PlayerInfoParams(string User, string UserCode) : IParams<PlayerI
                 return null;
             }
 
-            return new() { Code = User.PadLeft(9, '0') };
+            return new() { Code = ucode.ToString("D9") };
         }
 
         if (players.Count > 1)

@@ -94,8 +94,7 @@ public partial class PublicApi
                 // check shadow ban
                 {
                     var (success, friendRank)
-                        = await account.FriendRank(friend.RecentScore[0].SongID, friend.RecentScore[0].Difficulty);
-
+                        = await account.FriendRank(ArcaeaCharts.QueryByRecord(friend.RecentScore[0])!);
                     if (!success || friendRank is null || friendRank.Count == 0) return (null, Error.Shadowbanned);
 
                     foreach (var record in friendRank)

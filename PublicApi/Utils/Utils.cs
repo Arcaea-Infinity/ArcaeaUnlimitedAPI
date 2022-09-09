@@ -17,7 +17,7 @@ public partial class PublicApi : ControllerBase
 
     private static readonly ConcurrentApiRequest<string, (UserBest30Response? b30data, Response? error)>
         UserBest30Concurrent = new();
-    
+
     private static FriendsItem? RecordPlayers(AccountInfo account, PlayerInfo player, out Response? error)
     {
         error = null;

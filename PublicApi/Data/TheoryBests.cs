@@ -36,28 +36,27 @@ public partial class PublicApi
 
         var results = new List<Records>();
 
-        foreach (var (sid, dif, rating) in ArcaeaCharts.SortedCharts)
+        foreach (var chart in ArcaeaCharts.SortedCharts)
         {
             if (results.Count >= count) break;
 
-            var chart = ArcaeaCharts.QueryById(sid)![dif];
             if (double.IsNaN(verNum) || double.Parse(chart.Version) < verNum)
             {
                 var result = new Records()
                              {
                                  BestClearType = 3,
                                  ClearType = 3,
-                                 Difficulty = dif,
+                                 Difficulty = chart.RatingClass,
                                  Health = 100,
                                  MissCount = 0,
                                  Modifier = 0,
                                  NearCount = 0,
                                  PerfectCount = chart.Note,
-                                 Rating = Utils.CalcSongRating(10000000, rating),
+                                 Rating = Utils.CalcSongRating(10000000, chart.Rating),
                                  Score = 10000000 + chart.Note,
                                  ShinyPerfectCount = chart.Note,
                                  TimePlayed = chart.Date,
-                                 SongID = sid
+                                 SongID = chart.SongID
                              };
 
                 results.Add(result);
