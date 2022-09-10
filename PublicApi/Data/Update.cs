@@ -14,8 +14,6 @@ public partial class PublicApi
     {
         var obj = await Utils.GetLatestVersion();
 
-        return obj is not null
-            ? Success(obj)
-            : Error.UpdateServiceUnavailable;
+        return obj is not null ? Success(obj) : Error.UpdateServiceUnavailable;
     }
 }

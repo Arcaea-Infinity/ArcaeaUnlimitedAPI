@@ -16,7 +16,8 @@ public class UserBest30Response
     [JsonIgnore] [PrimaryKey] [Column("uid")]
     public int UserID { get; set; }
 
-    [JsonIgnore] [Column("last_played")] public long LastPlayed { get; set; }
+    [JsonIgnore] [Column("last_played")]
+    public long LastPlayed { get; set; }
 
     [JsonProperty("best30_avg")] [Column("best30_avg")]
     public double Best30Avg { get; set; }
@@ -27,12 +28,14 @@ public class UserBest30Response
     [JsonProperty("account_info")] [Ignore]
     public FriendsItem AccountInfo { get; set; }
 
-    [JsonIgnore] [Column("best30_list")] public string Best30ListStr { get; set; }
+    [JsonIgnore] [Column("best30_list")]
+    public string Best30ListStr { get; set; }
 
     [JsonIgnore] [Column("best30_overflow")]
     public string Best30OverflowStr { get; set; }
 
-    [JsonProperty("best30_list")] [Ignore] public List<Records>? Best30List { get; set; }
+    [JsonProperty("best30_list")] [Ignore]
+    public List<Records>? Best30List { get; set; }
 
     [JsonProperty("best30_overflow")] [Ignore]
     public List<Records>? Best30Overflow { get; set; }
@@ -67,10 +70,10 @@ public class UserBest30Response
 
     internal static class SerializeHelper
     {
-        internal static string Serialize<T>(T obj) where T : class, new() =>
-            Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(obj)));
+        internal static string Serialize<T>(T obj) where T : class, new()
+            => Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(obj)));
 
-        internal static T Deserialize<T>(string str) where T : class, new() =>
-            JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(Convert.FromBase64String(str))) ?? new T();
+        internal static T Deserialize<T>(string str) where T : class, new()
+            => JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(Convert.FromBase64String(str))) ?? new T();
     }
 }

@@ -26,8 +26,9 @@ internal record DifficultyParams(string Difficulty) : IParams<sbyte>
         }
 
         foreach (var (index, alias) in List)
-            if (alias.Any(t => string.Equals(t, Difficulty, StringComparison.OrdinalIgnoreCase)))
-                return index;
+        {
+            if (alias.Any(t => string.Equals(t, Difficulty, StringComparison.OrdinalIgnoreCase))) return index;
+        }
 
         error = Response.Error.InvalidDifficulty;
         return -1;

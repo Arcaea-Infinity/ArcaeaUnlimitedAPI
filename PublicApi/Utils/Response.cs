@@ -5,9 +5,14 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 
 public class Response
 {
-    [JsonProperty("status")] public int Status { get; set; }
-    [JsonProperty("message")] public string? Message { get; set; }
-    [JsonProperty("content")] public object? Content { get; set; }
+    [JsonProperty("status")]
+    public int Status { get; set; }
+
+    [JsonProperty("message")]
+    public string? Message { get; set; }
+
+    [JsonProperty("content")]
+    public object? Content { get; set; }
 
     internal static Response Success(object data) => new() { Status = 0, Content = data };
 
@@ -49,12 +54,12 @@ public class Response
         ///     errorCode = -7
         /// </summary>
         internal static readonly Response SongNotFound = Exception(-7, "song not recorded");
-
+        
         /// <summary>
         ///     errorCode = -8
         /// </summary>
-        internal static Response TooManySongs(IEnumerable<ArcaeaSong> ls) =>
-            new () { Status = -8, Message = "too many records", Content = new { songs = ls.Select(i => i.SongID) } };
+        internal static Response TooManySongs(IEnumerable<ArcaeaSong> ls)
+            => new() { Status = -8, Message = "too many records", Content = new { songs = ls.Select(i => i.SongID) } };
         
         /// <summary>
         ///     errorCode = -9
@@ -64,8 +69,7 @@ public class Response
         /// <summary>
         ///     errorCode = -10
         /// </summary>
-        internal static readonly Response InvalidRecentOrOverflowNumber
-            = Exception(-10, "invalid recent/overflow number");
+        internal static readonly Response InvalidRecentOrOverflowNumber = Exception(-10, "invalid recent/overflow number");
 
         /// <summary>
         ///     errorCode = -11
@@ -130,15 +134,13 @@ public class Response
         /// <summary>
         ///     errorCode = -23
         /// </summary>
-        internal static readonly Response BelowTheThreshold
-            = Exception(-23, "potential is below the threshold of querying best30 (7.0)");
+        internal static readonly Response BelowTheThreshold = Exception(-23, "potential is below the threshold of querying best30 (7.0)");
 
         /// <summary>
         ///     errorCode = -24
         /// </summary>
-        internal static readonly Response NeedUpdate
-            = Exception(-24, "need to update arcaea, please contact maintainer");
-        
+        internal static readonly Response NeedUpdate = Exception(-24, "need to update arcaea, please contact maintainer");
+
         /// <summary>
         ///     errorCode = -25
         /// </summary>

@@ -10,20 +10,18 @@ internal class ConcurrentApiRequest<T, TU> where T : notnull
 
     internal void NewTask(T key)
     {
-        {
-            if (_connPending.ContainsKey(key) && _connPendingCounter.ContainsKey(key)) return;
+        if (_connPending.ContainsKey(key) && _connPendingCounter.ContainsKey(key)) return;
 
-            var task = new TaskCompletionSource<TU>();
+        var task = new TaskCompletionSource<TU>();
 
-            // Put async task
-            _connPending.TryAdd(key, task);
-            _connPendingCounter.TryAdd(key, 1);
-        }
+        // Put async task
+        _connPending.TryAdd(key, task);
+        _connPendingCounter.TryAdd(key, 1);
     }
 
     internal TaskCompletionSource<TU>? GetTask(T key)
     {
-        if (_connPending.TryGetValue(key, out var task))
+        if (_connPending.TryGetValue(key, out TaskCompletionSource<TU>? task))
         {
             ++_connPendingCounter[key];
             return task;
@@ -48,6 +46,6 @@ internal class ConcurrentApiRequest<T, TU> where T : notnull
 
     internal void SetResult(T key, TU result)
     {
-        if (_connPending.TryGetValue(key, out var task)) task.SetResult(result);
+        if (_connPending.TryGetValue(key, out TaskCompletionSource<TU>? task)) task.SetResult(result);
     }
 }

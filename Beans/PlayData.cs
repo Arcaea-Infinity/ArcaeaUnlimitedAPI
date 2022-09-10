@@ -15,6 +15,10 @@ public class PlayData
     [JsonProperty("count")] [Column("count")]
     public int? Count { get; set; }
 
-    internal static IEnumerable<object> Query(int potentialstart, int potentialend, string songid, int difficulty) =>
-        DatabaseManager.Bests.Value.Query<PlayData>(RangeQuerystr, potentialstart, potentialend, songid, difficulty);
+    internal static IEnumerable<object> Query(
+        int potentialstart,
+        int potentialend,
+        string songid,
+        int difficulty)
+        => DatabaseManager.Bests.Value.Query<PlayData>(RangeQuerystr, potentialstart, potentialend, songid, difficulty);
 }

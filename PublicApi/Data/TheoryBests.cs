@@ -12,15 +12,18 @@ public partial class PublicApi
     [EnableCors]
     [OverflowConverter]
     [HttpGet("/botarcapi/data/theory")]
-    public object GetTheoryBests([BindNever] int overflow, bool withrecent = false, bool withsonginfo = false,
-                                 string? version = null)
+    public object GetTheoryBests(
+        [BindNever] int overflow,
+        bool withrecent = false,
+        bool withsonginfo = false,
+        string? version = null)
     {
         var count = overflow + 30;
 
         var verNum = double.NaN;
         if (version is not null && (!double.TryParse(version, out verNum) || verNum < 0)) return Error.InvalidVersion;
 
-        var response = new UserBest30Response()
+        var response = new UserBest30Response
                        {
                            AccountInfo = new()
                                          {
@@ -42,7 +45,7 @@ public partial class PublicApi
 
             if (double.IsNaN(verNum) || double.Parse(chart.Version) < verNum)
             {
-                var result = new Records()
+                var result = new Records
                              {
                                  BestClearType = 3,
                                  ClearType = 3,
@@ -65,9 +68,7 @@ public partial class PublicApi
 
         response.Best30List = results.Take(30).ToList();
 
-        response.Best30Overflow = overflow == 0
-            ? null!
-            : results.Skip(30).ToList();
+        response.Best30Overflow = overflow == 0 ? null! : results.Skip(30).ToList();
 
         response.Best30Avg = response.Best30List.Average(i => i.Rating);
         response.Recent10Avg = results.Take(10).Average(i => i.Rating);
@@ -75,8 +76,7 @@ public partial class PublicApi
 
         if (withsonginfo)
         {
-            if (response.Best30List is not null)
-                response.Best30Songinfo = response.Best30List.Select(i => ArcaeaCharts.QueryByRecord(i)!);
+            if (response.Best30List is not null) response.Best30Songinfo = response.Best30List.Select(i => ArcaeaCharts.QueryByRecord(i)!);
 
             if (response.Best30Overflow is not null)
                 response.Best30OverflowSonginfo = response.Best30Overflow.Select(i => ArcaeaCharts.QueryByRecord(i)!);

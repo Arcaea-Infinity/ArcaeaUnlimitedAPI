@@ -13,25 +13,20 @@ internal static class DatabaseManager
                                                     Bests = GetLazyConnection("arcbests"),
                                                     Best30 = GetLazyConnection("arcbest30");
 
-    private static Lazy<SQLiteConnection> GetLazyConnection(string dbName) =>
-        new(() => new($"{GlobalConfig.Config.DataPath}/database/{dbName}.db",
-                      SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.FullMutex));
+    private static Lazy<SQLiteConnection> GetLazyConnection(string dbName)
+        => new(() => new($"{GlobalConfig.Config.DataPath}/database/{dbName}.db",
+                         SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.SharedCache | SQLiteOpenFlags.FullMutex));
 
-    internal static TableQuery<T> Where<T>(this Lazy<SQLiteConnection> connection, Expression<Func<T, bool>> predExpr)
-        where T : new() =>
-        connection.Value.Table<T>().Where(predExpr);
+    internal static TableQuery<T> Where<T>(this Lazy<SQLiteConnection> connection, Expression<Func<T, bool>> predExpr) where T : new()
+        => connection.Value.Table<T>().Where(predExpr);
 
-    internal static IEnumerable<T> SelectAll<T>(this Lazy<SQLiteConnection> connection) where T : new() =>
-        connection.Value.Table<T>();
+    internal static IEnumerable<T> SelectAll<T>(this Lazy<SQLiteConnection> connection) where T : new() => connection.Value.Table<T>();
 
-    internal static void Insert<T>(this Lazy<SQLiteConnection> connection, T obj) where T : new() =>
-        connection.Value.Insert(obj);
+    internal static void Insert<T>(this Lazy<SQLiteConnection> connection, T obj) where T : new() => connection.Value.Insert(obj);
 
-    internal static void InsertOrReplace<T>(this Lazy<SQLiteConnection> connection, T obj) where T : new() =>
-        connection.Value.InsertOrReplace(obj);
+    internal static void InsertOrReplace<T>(this Lazy<SQLiteConnection> connection, T obj) where T : new() => connection.Value.InsertOrReplace(obj);
 
-    internal static void Update<T>(this Lazy<SQLiteConnection> connection, T obj) where T : new() =>
-        connection.Value.Update(obj);
+    internal static void Update<T>(this Lazy<SQLiteConnection> connection, T obj) where T : new() => connection.Value.Update(obj);
 
     // ReSharper disable once UnusedParameter.Local
     [AttributeUsage(AttributeTargets.Class)]

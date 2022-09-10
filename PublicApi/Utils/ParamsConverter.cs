@@ -8,8 +8,7 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 
 internal static class ConverterUtils
 {
-    internal static string GetValue(this ActionExecutingContext context, string key) =>
-        context.HttpContext.Request.Query[key].ToString();
+    internal static string GetValue(this ActionExecutingContext context, string key) => context.HttpContext.Request.Query[key].ToString();
 }
 
 internal class SongInfoConverterAttribute : ActionFilterAttribute
@@ -22,7 +21,7 @@ internal class SongInfoConverterAttribute : ActionFilterAttribute
 
         if (error != null)
         {
-            context.Result = new ObjectResult(error);
+            context.Result = new JsonResult(error);
             return;
         }
 
@@ -40,7 +39,7 @@ internal class PlayerInfoConverterAttribute : ActionFilterAttribute
 
         if (error != null)
         {
-            context.Result = new ObjectResult(error);
+            context.Result = new JsonResult(error);
             return;
         }
 
@@ -58,7 +57,7 @@ internal class OverflowConverterAttribute : ActionFilterAttribute
 
         if (error != null)
         {
-            context.Result = new ObjectResult(error);
+            context.Result = new JsonResult(error);
             return;
         }
 
@@ -76,7 +75,7 @@ internal class RecentConverterAttribute : ActionFilterAttribute
 
         if (error != null)
         {
-            context.Result = new ObjectResult(error);
+            context.Result = new JsonResult(error);
             return;
         }
 
@@ -94,7 +93,7 @@ internal class DifficultyConverterAttribute : ActionFilterAttribute
 
         if (error != null)
         {
-            context.Result = new ObjectResult(error);
+            context.Result = new JsonResult(error);
             return;
         }
 
@@ -104,8 +103,8 @@ internal class DifficultyConverterAttribute : ActionFilterAttribute
 
 internal class ChartConverterAttribute : ActionFilterAttribute
 {
-    private static bool ChartMissingCheck(ArcaeaSong song, sbyte difficulty) =>
-        (difficulty == 3 && song.Count < 4) || (song.SongID == "lasteternity" && difficulty != 3);
+    private static bool ChartMissingCheck(ArcaeaSong song, sbyte difficulty)
+        => (difficulty == 3 && song.Count < 4) || (song.SongID == "lasteternity" && difficulty != 3);
 
     public override void OnActionExecuting(ActionExecutingContext context)
     {
@@ -114,7 +113,7 @@ internal class ChartConverterAttribute : ActionFilterAttribute
 
         if (ChartMissingCheck(song, difficulty))
         {
-            context.Result = new ObjectResult(Response.Error.NoThisLevel);
+            context.Result = new JsonResult(Response.Error.NoThisLevel);
             return;
         }
 
@@ -136,7 +135,7 @@ internal class FileConverterAttribute : ActionFilterAttribute
 
         if (!fileinfo.Exists)
         {
-            context.Result = new ObjectResult(Response.Error.FileUnavailable) { StatusCode = 404 };
+            context.Result = new JsonResult(Response.Error.FileUnavailable) { StatusCode = 404 };
             return;
         }
 

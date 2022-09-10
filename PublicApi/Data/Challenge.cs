@@ -8,8 +8,7 @@ public partial class PublicApi
 {
     private static readonly string[] PathList =
     {
-        "auth/login", "user", "user/me", "friend/me/delete", "friend/me/add", "score/song/friend",
-        "purchase/me/stamina/fragment", "world/map/me"
+        "auth/login", "user", "user/me", "friend/me/delete", "friend/me/add", "score/song/friend", "purchase/me/stamina/fragment", "world/map/me"
     };
 
     [AuthorizationCheck]

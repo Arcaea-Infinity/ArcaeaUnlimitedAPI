@@ -12,7 +12,7 @@ internal record SongInfoParams(string SongName, string SongID) : IParams<ArcaeaS
         {
             var song = ArcaeaCharts.QueryById(SongID);
             if (song is not null) return song;
-            
+
             error = Response.Error.InvalidSongID;
             return null;
         }
@@ -23,7 +23,7 @@ internal record SongInfoParams(string SongName, string SongID) : IParams<ArcaeaS
             return null;
         }
 
-        var ls = ArcaeaCharts.Query(SongName);
+        List<ArcaeaSong>? ls = ArcaeaCharts.Query(SongName);
 
         if (ls is null || ls.Count < 1)
         {

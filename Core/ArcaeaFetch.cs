@@ -10,8 +10,12 @@ namespace ArcaeaUnlimitedAPI.Core;
 
 internal static class ArcaeaFetch
 {
-    internal static string GenerateChallenge(string method, string body, string path, ulong time = 0) =>
-        _arcaeaHash.GenerateChallenge(method, body, path, time);
+    internal static string GenerateChallenge(
+        string method,
+        string body,
+        string path,
+        ulong time = 0)
+        => _arcaeaHash.GenerateChallenge(method, body, path, time);
 
     internal static async Task<bool> GetToken(this AccountInfo accountInfo)
     {
@@ -85,8 +89,8 @@ internal static class ArcaeaFetch
         return success;
     }
 
-    private static async Task DeleteFriend(this AccountInfo accountInfo, string friendID) =>
-        await Post("friend/me/delete", accountInfo, new() { { "friend_id", friendID } });
+    private static async Task DeleteFriend(this AccountInfo accountInfo, string friendID)
+        => await Post("friend/me/delete", accountInfo, new() { { "friend_id", friendID } });
 
     internal static async Task<(bool, List<FriendsItem>?)> AddFriend(this AccountInfo accountInfo, string usercode)
     {
@@ -112,10 +116,7 @@ internal static class ArcaeaFetch
             var info = await Get("score/song/friend", accountInfo,
                                  new()
                                  {
-                                     { "song_id", chart.SongID },
-                                     { "difficulty", chart.RatingClass.ToString() },
-                                     { "start", "0" },
-                                     { "limit", "11" }
+                                     { "song_id", chart.SongID }, { "difficulty", chart.RatingClass.ToString() }, { "start", "0" }, { "limit", "11" }
                                  });
 
             if (info is null) return (false, null);
@@ -149,7 +150,7 @@ internal static class ArcaeaFetch
                 var password = RandomStringGenerator.GetRandString();
                 var email = RandomStringGenerator.GetRandString() + "@gmail.com";
                 var deviceID = RandomStringGenerator.GetRandDeviceID();
-               
+
 
                 var info = Register(Config.Node, name, password, email, deviceID).Result;
 
@@ -224,25 +225,29 @@ internal static class ArcaeaFetch
         var certificate = new X509Certificate2($"{Config.DataPath}/{Config.CertFileName}", Config.CertPassword);
         var handler = new HttpClientHandler();
         handler.ClientCertificates.Add(certificate);
-        handler.ServerCertificateCustomValidationCallback = (_, _, _, _) => true;
+        handler.ServerCertificateCustomValidationCallback = (
+                                                                _,
+                                                                _,
+                                                                _,
+                                                                _) => true;
         _client = new(handler);
         _client.Timeout = TimeSpan.FromSeconds(30);
         _client.DefaultRequestHeaders.Add("Host", Config.Host);
         _client.DefaultRequestHeaders.Add("AppVersion", Config.Appversion);
         _client.DefaultRequestHeaders.Add("Platform", "android");
         _client.DefaultRequestHeaders.Add("Connection", "Keep-Alive");
-        _client.DefaultRequestHeaders.Add("User-Agent",
-                                          "Dalvik/2.1.0 (Linux; U; Android 9; G8142 Build/47.2.A.10.107)");
+        _client.DefaultRequestHeaders.Add("User-Agent", "Dalvik/2.1.0 (Linux; U; Android 9; G8142 Build/47.2.A.10.107)");
     }
 
-    private static async Task<ResponseRoot?> Get(string resturl, AccountInfo info,
-                                                 Dictionary<string, string>? submitData, byte retryCount = 0)
+    private static async Task<ResponseRoot?> Get(
+        string resturl,
+        AccountInfo info,
+        Dictionary<string, string>? submitData,
+        byte retryCount = 0)
     {
         if (NeedUpdate) return null;
 
-        var url = submitData is not null
-            ? $"{resturl}?{SubmitDataToString(submitData)}"
-            : resturl;
+        var url = submitData is not null ? $"{resturl}?{SubmitDataToString(submitData)}" : resturl;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{_node}/{_apientry}/{url}");
         request.Headers.Add("DeviceId", info.DeviceID);
@@ -259,13 +264,14 @@ internal static class ArcaeaFetch
         return default;
     }
 
-    private static async Task<ResponseRoot?> Post(string resturl, AccountInfo info,
-                                                  Dictionary<string, string>? submitData, byte retryCount = 0)
+    private static async Task<ResponseRoot?> Post(
+        string resturl,
+        AccountInfo info,
+        Dictionary<string, string>? submitData,
+        byte retryCount = 0)
     {
         if (NeedUpdate) return null;
-        var data = submitData is null
-            ? string.Empty
-            : SubmitDataToString(submitData);
+        var data = submitData is null ? string.Empty : SubmitDataToString(submitData);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"{_node}/{_apientry}/{resturl}");
         request.Headers.Add("DeviceId", info.DeviceID);
@@ -293,8 +299,7 @@ internal static class ArcaeaFetch
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"{_node}/{_apientry}/{resturl}");
         request.Headers.Add("Accept-Encoding", "identity");
-        request.Headers.Authorization
-            = new("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{info.Name}:{info.Password}")));
+        request.Headers.Authorization = new("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{info.Name}:{info.Password}")));
         request.Headers.Add("DeviceId", info.DeviceID);
         request.Content = new StringContent(data, Encoding.UTF8, new("application/x-www-form-urlencoded"));
         request.Headers.Add("X-Random-Challenge", GenerateChallenge("POST", data, resturl));
@@ -308,18 +313,16 @@ internal static class ArcaeaFetch
         return default;
     }
 
-    private static async Task<ResponseRoot?> Register(Node node, string name, string password, string email,
-                                                      string deviceID)
+    private static async Task<ResponseRoot?> Register(
+        Node node,
+        string name,
+        string password,
+        string email,
+        string deviceID)
     {
         if (NeedUpdate) return null;
         const string resturl = "user";
-        var data = SubmitDataToString(new()
-                                      {
-                                          { "name", name },
-                                          { "password", password },
-                                          { "email", email },
-                                          { "device_id", deviceID }
-                                      });
+        var data = SubmitDataToString(new() { { "name", name }, { "password", password }, { "email", email }, { "device_id", deviceID } });
         var request = new HttpRequestMessage(HttpMethod.Post, $"{node}/{_apientry}/{resturl}");
         request.Content = new StringContent(data, Encoding.UTF8, new("application/x-www-form-urlencoded"));
         request.Headers.Add("X-Random-Challenge", GenerateChallenge("POST", data, resturl));
@@ -327,7 +330,6 @@ internal static class ArcaeaFetch
         var (_, result) = await LogResult(resturl, request);
         return result;
     }
-
 
     private static async Task<(bool, ResponseRoot?)> LogResult(string resturl, HttpRequestMessage request)
     {
@@ -357,8 +359,8 @@ internal static class ArcaeaFetch
         }
     }
 
-    private static string SubmitDataToString(Dictionary<string, string> submitData) =>
-        new FormUrlEncodedContent(submitData).ReadAsStringAsync().Result;
+    private static string SubmitDataToString(Dictionary<string, string> submitData)
+        => new FormUrlEncodedContent(submitData).ReadAsStringAsync().Result;
 
 #endregion
 }

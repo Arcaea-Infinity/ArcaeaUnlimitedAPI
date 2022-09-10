@@ -26,7 +26,7 @@ internal record PlayerInfoParams(string User, string UserCode) : IParams<PlayerI
             return null;
         }
 
-        var players = PlayerInfo.GetByAny(User);
+        List<PlayerInfo> players = PlayerInfo.GetByAny(User);
 
         if (players.Count == 0)
         {

@@ -66,15 +66,12 @@ internal static class BackgroundService
                 ZipFile.ExtractToDirectory(apkpth, dirpth);
 
                 var molnight = $"{Config.DataPath}/source/songs/melodyoflove_night.jpg";
-                if (!File.Exists(molnight))
-                    File.Move($"{dirpth}/assets/songs/dl_melodyoflove/base_night.jpg",
-                              molnight);
+                if (!File.Exists(molnight)) File.Move($"{dirpth}/assets/songs/dl_melodyoflove/base_night.jpg", molnight);
 
                 foreach (var file in new DirectoryInfo($"{dirpth}/assets/char/").GetFiles())
                 {
                     var name = $"{Config.DataPath}/source/char/{file.Name}";
-                    if (!File.Exists(name))
-                        file.MoveTo(name);
+                    if (!File.Exists(name)) file.MoveTo(name);
                 }
 
                 var list = JsonConvert.DeserializeObject<Songlist>(File.ReadAllText($"{dirpth}/assets/songs/songlist"));
@@ -86,6 +83,7 @@ internal static class BackgroundService
                         var rawdir = $"{dirpth}/assets/songs/{(i.NeedDownload ? "dl_" : string.Empty)}{i.Id}";
 
                         for (var j = 0; j < i.Difficulties.Count; ++j)
+                        {
                             if (j == 2)
                             {
                                 var pth = $"{destdir}/{i.Id}.jpg";
@@ -98,6 +96,7 @@ internal static class BackgroundService
                                 var rawpth = $"{rawdir}/{j}.jpg";
                                 if (!File.Exists(pth) && File.Exists(rawpth)) File.Move(rawpth, pth);
                             }
+                        }
 
                         ArcaeaCharts.Insert(i);
                         Thread.Sleep(300);

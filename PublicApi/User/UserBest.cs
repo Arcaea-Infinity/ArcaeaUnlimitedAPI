@@ -15,16 +15,17 @@ public partial class PublicApi
     [DifficultyConverter(Order = 3)]
     [ChartConverter(Order = 4)]
     [HttpGet("/botarcapi/user/best")]
-    public async Task<object> GetUserBest([BindNever] [FromQuery] PlayerInfo player,
-                                          [BindNever] [FromQuery] ArcaeaCharts chart,
-                                          bool withrecent = false,
-                                          bool withsonginfo = false)
+    public async Task<object> GetUserBest(
+        [BindNever] [FromQuery] PlayerInfo player,
+        [BindNever] [FromQuery] ArcaeaCharts chart,
+        bool withrecent = false,
+        bool withsonginfo = false)
     {
         var key = (player.Code, chart.SongID, chart.RatingClass);
 
         try
         {
-            var task = UserBestConcurrent.GetTask(key);
+            TaskCompletionSource<(UserBestResponse? bestdata, Response? error)>? task = UserBestConcurrent.GetTask(key);
 
             if (task is null)
             {
@@ -50,8 +51,11 @@ public partial class PublicApi
         }
     }
 
-    private static Response GetResponse(UserBestResponse response, bool withrecent, bool withsonginfo,
-                                        ArcaeaCharts chart)
+    private static Response GetResponse(
+        UserBestResponse response,
+        bool withrecent,
+        bool withsonginfo,
+        ArcaeaCharts chart)
     {
         if (withsonginfo)
             // add song info
@@ -59,8 +63,7 @@ public partial class PublicApi
 
         if (withrecent)
         {
-            if (response.AccountInfo.RecentScore is not null)
-                response.RecentScore = response.AccountInfo.RecentScore.FirstOrDefault();
+            if (response.AccountInfo.RecentScore is not null) response.RecentScore = response.AccountInfo.RecentScore.FirstOrDefault();
             if (withsonginfo) response.RecentSonginfo = ArcaeaCharts.QueryByRecord(response.RecentScore);
         }
 
@@ -69,8 +72,7 @@ public partial class PublicApi
         return Success(response);
     }
 
-    private static async Task<(UserBestResponse? response, Response? error)> QueryUserBest(
-        PlayerInfo player, ArcaeaCharts chart)
+    private static async Task<(UserBestResponse? response, Response? error)> QueryUserBest(PlayerInfo player, ArcaeaCharts chart)
     {
         AccountInfo? account = null;
 

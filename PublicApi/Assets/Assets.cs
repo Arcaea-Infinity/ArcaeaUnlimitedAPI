@@ -17,9 +17,7 @@ public partial class PublicApi
     [HttpGet("/botarcapi/assets/song")]
     public object GetSongAssets([BindNever] ArcaeaCharts chart)
     {
-        var difextend = chart.JacketOverride
-            ? $"_{chart.RatingClass}"
-            : string.Empty;
+        var difextend = chart.JacketOverride ? $"_{chart.RatingClass}" : string.Empty;
 
         var fileinfo = new FileInfo($"{Config.DataPath}/source/songs/{chart.SongID}{difextend}.jpg");
 
@@ -35,8 +33,7 @@ public partial class PublicApi
         // check for request arguments
         if (!int.TryParse(partner, out _)) return NotFound(Error.InvalidPartner);
 
-        var fileinfo
-            = new FileInfo($"{Config.DataPath}/source/char/{partner}{(awakened ? "u" : string.Empty)}_icon.png");
+        var fileinfo = new FileInfo($"{Config.DataPath}/source/char/{partner}{(awakened ? "u" : string.Empty)}_icon.png");
 
         if (!fileinfo.Exists) return NotFound(Error.FileUnavailable);
 

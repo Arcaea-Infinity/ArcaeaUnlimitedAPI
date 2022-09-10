@@ -9,14 +9,11 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 [ApiController]
 public partial class PublicApi : ControllerBase
 {
-    private static readonly ConcurrentApiRequest<string, (UserInfoResponse? infodata, Response? error)>
-        UserInfoConcurrent = new();
+    private static readonly ConcurrentApiRequest<string, (UserInfoResponse? infodata, Response? error)> UserInfoConcurrent = new();
 
-    private static readonly ConcurrentApiRequest<(string, string, int), (UserBestResponse? bestdata, Response? error)>
-        UserBestConcurrent = new();
+    private static readonly ConcurrentApiRequest<(string, string, int), (UserBestResponse? bestdata, Response? error)> UserBestConcurrent = new();
 
-    private static readonly ConcurrentApiRequest<string, (UserBest30Response? b30data, Response? error)>
-        UserBest30Concurrent = new();
+    private static readonly ConcurrentApiRequest<string, (UserBest30Response? b30data, Response? error)> UserBest30Concurrent = new();
 
     private static FriendsItem? RecordPlayers(AccountInfo account, PlayerInfo player, out Response? error)
     {

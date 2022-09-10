@@ -17,17 +17,13 @@ public class ArcaeaSong : List<ArcaeaCharts>, IEquatable<ArcaeaSong>
 
         var obj = new
                   {
-                      song_id = SongID,
-                      difficulties = this,
-                      alias = ArcaeaCharts.Aliases.ContainsKey(SongID)
-                          ? ArcaeaCharts.Aliases[SongID]
-                          : new()
+                      song_id = SongID, difficulties = this, alias = ArcaeaCharts.Aliases.ContainsKey(SongID) ? ArcaeaCharts.Aliases[SongID] : new()
                   };
         ArcaeaCharts.SongJsons.TryAdd(SongID, obj);
         return obj;
     }
 
-    public new void Sort() { Sort((chart, another) => chart.RatingClass - another.RatingClass); }
+    public new void Sort() => Sort((chart, another) => chart.RatingClass - another.RatingClass);
 
     public override bool Equals(object? obj)
     {

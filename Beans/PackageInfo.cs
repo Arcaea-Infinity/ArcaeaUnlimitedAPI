@@ -14,12 +14,11 @@ internal class PackageInfo
     private static Lazy<ConcurrentDictionary<string, PackageInfo>> _list
         = new(() => new(DatabaseManager.Song.SelectAll<PackageInfo>().ToDictionary(i => i.PackageID)));
 
-    [PrimaryKey] [Column("id")] public string PackageID { get; set; }
+    [PrimaryKey] [Column("id")]
+    public string PackageID { get; set; }
 
-    [Column("name")] public string Name { get; set; }
+    [Column("name")]
+    public string Name { get; set; }
 
-    internal static PackageInfo? GetById(string id) =>
-        _list.Value.TryGetValue(id, out var value)
-            ? value
-            : null;
+    internal static PackageInfo? GetById(string id) => _list.Value.TryGetValue(id, out var value) ? value : null;
 }

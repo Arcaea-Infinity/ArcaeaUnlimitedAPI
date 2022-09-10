@@ -12,12 +12,15 @@ public partial class PublicApi
     [PlayerInfoConverter(Order = 1)]
     [OverflowConverter(Order = 2)]
     [HttpGet("/botarcapi/user/best30")]
-    public async Task<object> GetUserBest30([BindNever] PlayerInfo player, [BindNever] int overflow,
-                                            bool withrecent = false, bool withsonginfo = false)
+    public async Task<object> GetUserBest30(
+        [BindNever] PlayerInfo player,
+        [BindNever] int overflow,
+        bool withrecent = false,
+        bool withsonginfo = false)
     {
         try
         {
-            var task = UserBest30Concurrent.GetTask(player.Code);
+            TaskCompletionSource<(UserBest30Response? b30data, Response? error)>? task = UserBest30Concurrent.GetTask(player.Code);
 
             if (task is null)
             {
@@ -43,18 +46,20 @@ public partial class PublicApi
         }
     }
 
-    private static Response GetResponse(UserBest30Response response, int overflowCount, bool withrecent,
-                                        bool withsonginfo)
+    private static Response GetResponse(
+        UserBest30Response response,
+        int overflowCount,
+        bool withrecent,
+        bool withsonginfo)
     {
         if (response.Best30Overflow is not null)
             response.Best30Overflow = overflowCount == 0
-                ? null!
-                : response.Best30Overflow.Take(Math.Min(overflowCount, response.Best30Overflow.Count)).ToList();
+                                          ? null!
+                                          : response.Best30Overflow.Take(Math.Min(overflowCount, response.Best30Overflow.Count)).ToList();
 
         if (withsonginfo)
         {
-            if (response.Best30List is not null)
-                response.Best30Songinfo = response.Best30List.Select(i => ArcaeaCharts.QueryByRecord(i)!);
+            if (response.Best30List is not null) response.Best30Songinfo = response.Best30List.Select(i => ArcaeaCharts.QueryByRecord(i)!);
 
             if (response.Best30Overflow is not null)
                 response.Best30OverflowSonginfo = response.Best30Overflow.Select(i => ArcaeaCharts.QueryByRecord(i)!);
@@ -62,8 +67,7 @@ public partial class PublicApi
 
         if (withrecent)
         {
-            if (response.AccountInfo.RecentScore is not null)
-                response.RecentScore = response.AccountInfo.RecentScore.FirstOrDefault();
+            if (response.AccountInfo.RecentScore is not null) response.RecentScore = response.AccountInfo.RecentScore.FirstOrDefault();
             if (withsonginfo) response.RecentSonginfo = ArcaeaCharts.QueryByRecord(response.RecentScore);
         }
 
@@ -93,8 +97,7 @@ public partial class PublicApi
             {
                 // check shadow ban
                 {
-                    var (success, friendRank)
-                        = await account.FriendRank(ArcaeaCharts.QueryByRecord(friend.RecentScore[0])!);
+                    var (success, friendRank) = await account.FriendRank(ArcaeaCharts.QueryByRecord(friend.RecentScore[0])!);
                     if (!success || friendRank is null || friendRank.Count == 0) return (null, Error.Shadowbanned);
 
                     foreach (var record in friendRank)
@@ -110,9 +113,7 @@ public partial class PublicApi
                     return (null, Error.QueryingB30Failed);
 
                 best30Cache.Best30Avg = best30Cache.Best30List.Average(i => i.Rating);
-                best30Cache.Recent10Avg = friend.Rating < 0
-                    ? 0
-                    : Math.Max(0, (double)friend.Rating / 100 * 4 - best30Cache.Best30Avg * 3);
+                best30Cache.Recent10Avg = friend.Rating < 0 ? 0 : Math.Max(0, (double)friend.Rating / 100 * 4 - best30Cache.Best30Avg * 3);
 
                 best30Cache.UserID = friend.UserID;
                 best30Cache.LastPlayed = friend.RecentScore[0].TimePlayed;

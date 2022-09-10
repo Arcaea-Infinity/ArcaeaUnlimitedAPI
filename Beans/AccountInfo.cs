@@ -14,18 +14,32 @@ internal class AccountInfo
     private static readonly Lazy<ConcurrentQueue<AccountInfo>> Queue
         = new(new ConcurrentQueue<AccountInfo>(DatabaseManager.Account.Where<AccountInfo>(i => i.Banned != "true")));
 
-    [PrimaryKey] [Column("name")] public string Name { get; set; }
-    [Column("passwd")] public string Password { get; set; }
-    [Column("device")] public string DeviceID { get; set; }
-    [Column("uid")] public int UserID { get; set; }
-    [Column("ucode")] public string Code { get; set; }
-    [Column("token")] public string Token { get; set; }
-    [Column("banned")] public string Banned { get; set; }
+    [PrimaryKey] [Column("name")]
+    public string Name { get; set; }
+
+    [Column("passwd")]
+    public string Password { get; set; }
+
+    [Column("device")]
+    public string DeviceID { get; set; }
+
+    [Column("uid")]
+    public int UserID { get; set; }
+
+    [Column("ucode")]
+    public string Code { get; set; }
+
+    [Column("token")]
+    public string Token { get; set; }
+
+    [Column("banned")]
+    public string Banned { get; set; }
 
     internal static async Task<AccountInfo?> Alloc()
     {
         AccountInfo? account = null;
         while (true)
+        {
             try
             {
                 if (!Queue.Value.TryDequeue(out account))
@@ -58,6 +72,7 @@ internal class AccountInfo
                 Recycle(account);
                 continue;
             }
+        }
     }
 
     internal static void Recycle(AccountInfo? info)
