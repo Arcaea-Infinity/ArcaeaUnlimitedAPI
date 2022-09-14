@@ -30,7 +30,7 @@ internal class AuthorizationCheck : ActionFilterAttribute
         if (!UserAgentCheck(context.HttpContext) && !TokenCheck(context.HttpContext))
             if (RateLimiter.IsExceeded(context.HttpContext.Connection.RemoteIpAddress?.ToString()))
             {
-                context.Result = new ObjectResult(null) { StatusCode = 429 };
+                context.Result = new ObjectResult(Response.Error.QuotaExceeded) { StatusCode = 429 };
                 return;
             }
 

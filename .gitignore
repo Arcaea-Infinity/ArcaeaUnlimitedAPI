@@ -14,5 +14,4 @@
 
 Core/ArcaeaHash.cs
 Core/ArcaeaDecrypt.cs
-Core/TestFetch.cs
 PublicApi/Assets/Preview.cs

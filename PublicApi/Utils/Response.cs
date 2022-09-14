@@ -145,6 +145,11 @@ public class Response
         ///     errorCode = -25
         /// </summary>
         internal static readonly Response InvalidVersion = Exception(-25, "invalid version");
+        
+        /// <summary>
+        ///     errorCode = -26
+        /// </summary>
+        internal static readonly Response QuotaExceeded = Exception(-26, "daily query quota exceeded");
 
         /// <summary>
         ///     errorCode = -233
