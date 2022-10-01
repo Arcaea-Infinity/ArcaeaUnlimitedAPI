@@ -6,7 +6,7 @@
   "cert_name": "cert-4.0.256c.p12",
   "cert_password": "HelloWorld",
   "open_register": false,
-  "challenge_api": "https://example.com/botarcapi/challenge",
+  "challenge_api": "https://server.awbugl.top/botarcapi/data/challenge",
   "challenge_type": "aua",
   "challenge_token": "",
   "quota": 0,
