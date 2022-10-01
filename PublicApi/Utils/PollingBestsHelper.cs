@@ -9,7 +9,7 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 internal class PollingBestsHelper
 {
     private readonly AccountInfo _account;
-    private readonly PriorityQueue<(string songID, int songDif, int songRating), int> _failedlist = new();
+    private readonly PriorityQueue<ArcaeaCharts, int> _failedlist = new();
 
     private readonly FriendsItem _friend;
     private readonly PriorityQueue<Records, double> _records = new();
@@ -21,8 +21,8 @@ internal class PollingBestsHelper
         _friend = friend;
     }
 
-    internal static async Task<UserBest30Response?> GetResult(AccountInfo account, FriendsItem friend) =>
-        await new PollingBestsHelper(account, friend).PollingBests();
+    internal static async Task<UserBest30Response?> GetResult(AccountInfo account, FriendsItem friend)
+        => await new PollingBestsHelper(account, friend).PollingBests();
 
     private async Task<UserBest30Response?> PollingBests()
     {
@@ -31,7 +31,7 @@ internal class PollingBestsHelper
             var trypeek = _records.TryPeek(out _, out var minrating);
 
             // query charts until rating less than floor -2
-            if (trypeek && _records.Count == 40 && item.rating < (minrating - 2) * 10) break;
+            if (trypeek && _records.Count == 40 && item.Rating < (minrating - 2) * 10) break;
 
             _tasks.Enqueue(GetNewTask(item));
 
@@ -44,14 +44,14 @@ internal class PollingBestsHelper
 
         if (_failedlist.Count != 0) return null;
 
-        var ls = _records.UnorderedItems.Select(i => i.Element).OrderByDescending(i => i.Rating).ToArray();
+        Records[] ls = _records.UnorderedItems.Select(i => i.Element).OrderByDescending(i => i.Rating).ToArray();
         return new() { Best30List = ls.Take(30).ToList(), Best30Overflow = ls.Skip(30).ToList() };
     }
 
     private async Task PollingRequests()
     {
         // wait for responses
-        var results = await Task.WhenAll(_tasks);
+        Records?[] results = await Task.WhenAll(_tasks);
         _tasks.Clear();
 
         InsertRecords(results);
@@ -78,37 +78,34 @@ internal class PollingBestsHelper
         }
     }
 
-    private Task<Records?> GetNewTask((string songID, int songDif, int songRating) tuple) =>
-        Task.Run(() =>
-                 {
-                     var (songID, songDif, songRating) = tuple;
+    private Task<Records?> GetNewTask(ArcaeaCharts chart)
+        => Task.Run(() =>
+                    {
+                        var (success, result) = _account.FriendRank(chart).Result;
 
-                     var (success, result) = _account.FriendRank(songID, songDif).Result;
+                        // Check invalid response and add them into failed list
+                        if (!success || result is null)
+                        {
+                            _failedlist.Enqueue(chart, chart.Rating);
+                            return null;
+                        }
 
+                        foreach (var i in result)
+                        {
+                            i.Potential = _friend.Rating;
+                            i.Rating = Utils.CalcSongRating(i.Score, chart.Rating);
+                            DatabaseManager.Bests.InsertOrReplace(i);
+                        }
 
-                     // Check invalid response and add them into failed list
-                     if (!success || result is null)
-                     {
-                         _failedlist.Enqueue(tuple, songRating);
-                         return null;
-                     }
+                        var record = result.FirstOrDefault(i => i.UserID == _friend.UserID);
 
-                     foreach (var i in result)
-                     {
-                         i.Potential = _friend.Rating;
-                         i.Rating = Utils.CalcSongRating(i.Score, songRating);
-                         DatabaseManager.Bests.InsertOrReplace(i);
-                     }
+                        if (record is null) return null;
 
-                     var record = result.FirstOrDefault(i => i.UserID == _friend.UserID);
+                        //for json
+                        record.UserID = null!;
 
-                     if (record is null) return null;
-
-                     //for json
-                     record.UserID = null!;
-
-                     return record;
-                 });
+                        return record;
+                    });
 
     private void InsertRecords(Records?[] results)
     {

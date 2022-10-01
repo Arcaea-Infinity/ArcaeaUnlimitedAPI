@@ -1,43 +1,34 @@
 ﻿using ArcaeaUnlimitedAPI.Beans;
 using ArcaeaUnlimitedAPI.Core;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
-using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
 public partial class PublicApi
 {
+    [AuthorizationCheck(Order = 0)]
+    [PlayerInfoConverter(Order = 1)]
+    [RecentConverter(Order = 2)]
     [HttpGet("/botarcapi/user/info")]
-    public async Task<object> GetUserInfo(string? user, string? usercode, string? recent, bool withsonginfo = false)
+    public async Task<object> GetUserInfo([BindNever] PlayerInfo player, [BindNever] int recent, bool withsonginfo = false)
     {
-        if (!UserAgentCheck()) return NotFound(null);
-        if (NeedUpdate) return Error.NeedUpdate;
-
-        // validate request arguments
-        var recentCount = 1;
-        if (recent is not null)
-            if (!int.TryParse(recent, out recentCount) || recentCount is < 0 or > 7)
-                return Error.InvalidRecentOrOverflowNumber;
-
-        var player = QueryPlayerInfo(user, usercode, out var playererror);
-        if (player is null) return playererror!;
-
         try
         {
-            var task = UserInfoConcurrent.GetTask(player.Code);
+            TaskCompletionSource<(UserInfoResponse? infodata, Response? error)>? task = UserInfoConcurrent.GetTask(player.Code);
 
             if (task is null)
             {
                 UserInfoConcurrent.NewTask(player.Code);
                 var (response, errorresp) = await QueryUserInfo(player);
                 UserInfoConcurrent.SetResult(player.Code, (response, errorresp));
-                return errorresp ?? GetResponse(response!, recentCount, withsonginfo);
+                return errorresp ?? GetResponse(response!, recent, withsonginfo);
             }
             else
             {
                 var (response, errorresp) = await task.Task;
-                return errorresp ?? GetResponse(response!, recentCount, withsonginfo);
+                return errorresp ?? GetResponse(response!, recent, withsonginfo);
             }
         }
         catch (Exception ex)
@@ -47,7 +38,7 @@ public partial class PublicApi
         }
         finally
         {
-            UserInfoConcurrent.GotResultCallBack(player.Code);
+            UserInfoConcurrent.CallBack(player.Code);
         }
     }
 

@@ -7,5 +7,6 @@ namespace ArcaeaUnlimitedAPI.Json.Songlist;
 [Serializable]
 public class Songlist
 {
-    [JsonProperty("songs")] public List<SongItem> Songs { get; set; }
+    [JsonProperty("songs")]
+    public List<SongItem> Songs { get; set; }
 }

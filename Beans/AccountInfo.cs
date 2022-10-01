@@ -7,6 +7,9 @@ namespace ArcaeaUnlimitedAPI.Beans;
 
 #pragma warning disable CS8618
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+
 [Table("accounts")]
 [DatabaseManager.CreateTableSqlAttribute("CREATE TABLE `accounts` (`name` TEXT NOT NULL,`passwd` TEXT NOT NULL,`device` TEXT NOT NULL DEFAULT '',`uid` INTEGER DEFAULT 0,`ucode`  TEXT DEFAULT '', `token`  TEXT DEFAULT '',`banned` TEXT NOT NULL DEFAULT 'false' CHECK(`banned` IN('true', 'false')),PRIMARY KEY (`name` ASC));")]
 internal class AccountInfo
@@ -14,18 +17,32 @@ internal class AccountInfo
     private static readonly Lazy<ConcurrentQueue<AccountInfo>> Queue
         = new(new ConcurrentQueue<AccountInfo>(DatabaseManager.Account.Where<AccountInfo>(i => i.Banned != "true")));
 
-    [PrimaryKey] [Column("name")] public string Name { get; set; }
-    [Column("passwd")] public string Password { get; set; }
-    [Column("device")] public string DeviceID { get; set; }
-    [Column("uid")] public int UserID { get; set; }
-    [Column("ucode")] public string Code { get; set; }
-    [Column("token")] public string Token { get; set; }
-    [Column("banned")] public string Banned { get; set; }
+    [PrimaryKey] [Column("name")]
+    public string Name { get; set; }
+
+    [Column("passwd")]
+    public string Password { get; set; }
+
+    [Column("device")]
+    public string DeviceID { get; set; }
+
+    [Column("uid")]
+    public int UserID { get; set; }
+
+    [Column("ucode")]
+    public string Code { get; set; }
+
+    [Column("token")]
+    public string Token { get; set; }
+
+    [Column("banned")]
+    public string Banned { get; set; }
 
     internal static async Task<AccountInfo?> Alloc()
     {
         AccountInfo? account = null;
         while (true)
+        {
             try
             {
                 if (!Queue.Value.TryDequeue(out account))
@@ -58,6 +75,7 @@ internal class AccountInfo
                 Recycle(account);
                 continue;
             }
+        }
     }
 
     internal static void Recycle(AccountInfo? info)

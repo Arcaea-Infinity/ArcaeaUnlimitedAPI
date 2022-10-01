@@ -9,12 +9,11 @@ public partial class PublicApi
 {
     [EnableCors]
     [HttpGet("/botarcapi/update")]
+    [HttpGet("/botarcapi/data/update")]
     public async Task<object> GetUpdate()
     {
         var obj = await Utils.GetLatestVersion();
 
-        return obj is not null
-            ? Success(obj)
-            : Error.UpdateServiceUnavailable;
+        return obj is not null ? Success(obj) : Error.UpdateServiceUnavailable;
     }
 }

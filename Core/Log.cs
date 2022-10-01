@@ -9,8 +9,7 @@ internal static class Log
         try
         {
             var time = DateTime.Now;
-            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/apierr_{time:yyMMdd}.log",
-                                          $"\n\n{time}\n{resturl}: query failed");
+            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/apierr_{time:yyMMdd}.log", $"\n\n{time}\n{resturl}: query failed");
         }
         catch
         {
@@ -56,8 +55,7 @@ internal static class Log
         {
             var time = DateTime.Now;
 
-            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/functionerr_{time:yyMMdd}.log",
-                                          $"\n\n{time}\n{function}: {content}");
+            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/functionerr_{time:yyMMdd}.log", $"\n\n{time}\n{function}: {content}");
         }
         catch
         {
@@ -72,8 +70,7 @@ internal static class Log
         {
             var time = DateTime.Now;
 
-            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/functionlog_{time:yyMMdd}.log",
-                                          $"\n\n{time}\n{function}: {content}");
+            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/functionlog_{time:yyMMdd}.log", $"\n\n{time}\n{function}: {content}");
         }
         catch
         {
@@ -82,13 +79,32 @@ internal static class Log
         }
     }
 
+    internal static async void RatingLog(
+        string songID,
+        string songName,
+        int difficulty,
+        int originalconst,
+        int @const)
+    {
+        try
+        {
+            var time = DateTime.Now;
+            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/rating.log",
+                                          $"\n\n{time}\n{songID} ({songName}) [{difficulty}]  {originalconst} -> {@const}");
+        }
+        catch
+        {
+            await Task.Delay(2000);
+            RatingLog(songID, songName, difficulty, originalconst, @const);
+        }
+    }
+
     internal static async void ExceptionError(Exception ex)
     {
         try
         {
             var time = DateTime.Now;
-            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/exception_{time:yyMMdd}.log",
-                                          $"\n\n{time}\n{ex}");
+            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/exception_{time:yyMMdd}.log", $"\n\n{time}\n{ex}");
         }
         catch
         {
@@ -102,8 +118,7 @@ internal static class Log
         try
         {
             var time = DateTime.Now;
-            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/http_{time:yyMMdd}.log",
-                                          $"\n\n{time}\n{uri}\n{message}");
+            await File.AppendAllTextAsync($"{GlobalConfig.Config.DataPath}/log/http_{time:yyMMdd}.log", $"\n\n{time}\n{uri}\n{message}");
         }
         catch
         {

@@ -32,21 +32,15 @@ internal static class BackgroundService
     {
         Timer timer = new(600000);
 
-        if (Config.OpenRegister == true) timer.Elapsed += async (_, _) => await ArcaeaFetch.RegisterTask();
+        if (Config.OpenRegister == true) timer.Elapsed += (_, _) => ArcaeaFetch.RegisterTask();
 
         timer.Elapsed += ArcUpdate;
-        timer.Elapsed += TestNodes;
         timer.Elapsed += (_, _) => ++TimerCount;
         timer.AutoReset = true;
         timer.Start();
     }
 
-    private static void TestNodes(object? source, ElapsedEventArgs? e)
-    {
-        if (TimerCount % 12 == 0) Parallel.ForEach(Config.Nodes, TestNode);
-    }
-
-    private static async void ArcUpdate(object? source, ElapsedEventArgs? e)
+    private static void ArcUpdate(object? source, ElapsedEventArgs? e)
     {
         if (Interlocked.CompareExchange(ref _running, 1, 0) != 0) return;
 
@@ -62,24 +56,23 @@ internal static class BackgroundService
 
             try
             {
-                if (!File.Exists(apkpth)) await DownloadApk(info.Url);
+                if (!File.Exists(apkpth)) DownloadApk(info.Url);
 
                 // not apk
-                if (new FileInfo(apkpth).Length < 8192) File.Delete(apkpth);
+                if (new FileInfo(apkpth).Length < 81920) File.Delete(apkpth);
 
                 if (Directory.Exists(dirpth)) Directory.Delete(dirpth, true);
                 Directory.CreateDirectory(dirpth);
                 ZipFile.ExtractToDirectory(apkpth, dirpth);
 
-                if (!File.Exists($"{Config.DataPath}/source/songs/melodyoflove_night.jpg"))
-                    File.Move($"{dirpth}/assets/songs/dl_melodyoflove/base_night.jpg",
-                              $"{Config.DataPath}/source/songs/melodyoflove_night.jpg");
+                var molnight = $"{Config.DataPath}/source/songs/melodyoflove_night.jpg";
+                if (!File.Exists(molnight)) File.Move($"{dirpth}/assets/songs/dl_melodyoflove/base_night.jpg", molnight);
 
-                foreach (var file in new DirectoryInfo($"{dirpth}/assets/char/").GetFiles()
-                                                                                .Where(file =>
-                                                                                           !File
-                                                                                               .Exists($"{Config.DataPath}/source/char/{file.Name}")))
-                    file.MoveTo($"{Config.DataPath}/source/char/{file.Name}");
+                foreach (var file in new DirectoryInfo($"{dirpth}/assets/char/").GetFiles())
+                {
+                    var name = $"{Config.DataPath}/source/char/{file.Name}";
+                    if (!File.Exists(name)) file.MoveTo(name);
+                }
 
                 var list = JsonConvert.DeserializeObject<Songlist>(File.ReadAllText($"{dirpth}/assets/songs/songlist"));
 
@@ -87,9 +80,10 @@ internal static class BackgroundService
                     foreach (var i in list.Songs)
                     {
                         var destdir = $"{Config.DataPath}/source/songs";
-                        var rawdir = $"{dirpth}/assets/songs/{(i.NeedDownload ? "dl_" : "")}{i.Id}";
+                        var rawdir = $"{dirpth}/assets/songs/{(i.NeedDownload ? "dl_" : string.Empty)}{i.Id}";
 
                         for (var j = 0; j < i.Difficulties.Count; ++j)
+                        {
                             if (j == 2)
                             {
                                 var pth = $"{destdir}/{i.Id}.jpg";
@@ -102,6 +96,7 @@ internal static class BackgroundService
                                 var rawpth = $"{rawdir}/{j}.jpg";
                                 if (!File.Exists(pth) && File.Exists(rawpth)) File.Move(rawpth, pth);
                             }
+                        }
 
                         ArcaeaCharts.Insert(i);
                         Thread.Sleep(300);
@@ -124,8 +119,8 @@ internal static class BackgroundService
             Interlocked.Exchange(ref _running, 0);
         }
     }
-    
-    private static async Task DownloadApk(string url)
+
+    private static void DownloadApk(string url)
     {
         using var downloader = new DownloadService(new()
                                                    {
@@ -136,6 +131,7 @@ internal static class BackgroundService
                                                        ParallelDownload = true,
                                                        Timeout = 5000
                                                    });
-        await downloader.DownloadFileTaskAsync(url, new DirectoryInfo($"{Config.DataPath}/update/"));
+
+        downloader.DownloadFileTaskAsync(url, new DirectoryInfo($"{Config.DataPath}/update/")).Wait();
     }
 }

@@ -7,7 +7,9 @@ namespace ArcaeaUnlimitedAPI.Json.Songlist;
 [Serializable]
 public class TitleLocalized
 {
-    [JsonProperty("en")] public string En { get; set; } = "";
+    [JsonProperty("en")]
+    public string En { get; set; } = string.Empty;
 
-    [JsonProperty("ja")] public string? Ja { get; set; }
+    [JsonProperty("ja")]
+    public string? Ja { get; set; }
 }

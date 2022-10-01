@@ -15,7 +15,8 @@ public class Records
     [JsonProperty("user_id")] [PrimaryKey] [Column("uid")]
     public int? UserID { get; set; }
 
-    [JsonIgnore] [Column("potential")] public int? Potential { get; set; }
+    [JsonIgnore] [Column("potential")]
+    public int? Potential { get; set; }
 
     [JsonProperty("score")] [Column("score")]
     public int Score { get; set; }
@@ -56,10 +57,8 @@ public class Records
     [JsonProperty("shiny_perfect_count")] [Column("shiny_perfect_count")]
     public int ShinyPerfectCount { get; set; }
 
-    internal static List<Records> Query(int userID, int count) =>
-        DatabaseManager.Record.Where<Records>(i => i.UserID == userID).OrderByDescending(i => i.TimePlayed).Take(count)
-                       .ToList();
-
+    internal static List<Records> Query(int userID, int count)
+        => DatabaseManager.Record.Where<Records>(i => i.UserID == userID).OrderByDescending(i => i.TimePlayed).Take(count).ToList();
 
     public static void Insert(FriendsItem friend, Records record)
     {

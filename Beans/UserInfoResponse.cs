@@ -7,9 +7,12 @@ namespace ArcaeaUnlimitedAPI.Beans;
 
 public class UserInfoResponse
 {
-    [JsonProperty("account_info")] public FriendsItem AccountInfo { get; set; }
+    [JsonProperty("account_info")]
+    public FriendsItem AccountInfo { get; set; }
 
-    [JsonProperty("recent_score")] public List<Records>? RecentScore { get; set; }
+    [JsonProperty("recent_score")]
+    public List<Records>? RecentScore { get; set; }
 
-    [JsonProperty("songinfo")] public IEnumerable<ArcaeaCharts>? Songinfo { get; set; }
+    [JsonProperty("songinfo")]
+    public IEnumerable<ArcaeaCharts>? Songinfo { get; set; }
 }

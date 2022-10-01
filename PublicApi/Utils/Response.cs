@@ -3,11 +3,16 @@ using Newtonsoft.Json;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
-internal class Response
+public class Response
 {
-    [JsonProperty("status")] public int Status { get; set; }
-    [JsonProperty("message")] public string? Message { get; set; }
-    [JsonProperty("content")] public object? Content { get; set; }
+    [JsonProperty("status")]
+    public int Status { get; set; }
+
+    [JsonProperty("message")]
+    public string? Message { get; set; }
+
+    [JsonProperty("content")]
+    public object? Content { get; set; }
 
     internal static Response Success(object data) => new() { Status = 0, Content = data };
 
@@ -49,7 +54,13 @@ internal class Response
         ///     errorCode = -7
         /// </summary>
         internal static readonly Response SongNotFound = Exception(-7, "song not recorded");
-
+        
+        /// <summary>
+        ///     errorCode = -8
+        /// </summary>
+        internal static Response TooManySongs(IEnumerable<ArcaeaSong> ls)
+            => new() { Status = -8, Message = "too many records", Content = new { songs = ls.Select(i => i.SongID) } };
+        
         /// <summary>
         ///     errorCode = -9
         /// </summary>
@@ -58,8 +69,7 @@ internal class Response
         /// <summary>
         ///     errorCode = -10
         /// </summary>
-        internal static readonly Response InvalidRecentOrOverflowNumber
-            = Exception(-10, "invalid recent/overflow number");
+        internal static readonly Response InvalidRecentOrOverflowNumber = Exception(-10, "invalid recent/overflow number");
 
         /// <summary>
         ///     errorCode = -11
@@ -79,7 +89,7 @@ internal class Response
         /// <summary>
         ///     errorCode = -14
         /// </summary>
-        internal static readonly Response NoBeyondLevel = Exception(-14, "this song has no beyond level");
+        internal static readonly Response NoThisLevel = Exception(-14, "this song has no this level");
 
         /// <summary>
         ///     errorCode = -15
@@ -124,24 +134,26 @@ internal class Response
         /// <summary>
         ///     errorCode = -23
         /// </summary>
-        internal static readonly Response BelowTheThreshold
-            = Exception(-23, "potential is below the threshold of querying best30 (7.0)");
+        internal static readonly Response BelowTheThreshold = Exception(-23, "potential is below the threshold of querying best30 (7.0)");
 
         /// <summary>
         ///     errorCode = -24
         /// </summary>
-        internal static readonly Response NeedUpdate
-            = Exception(-24, "need to update arcaea, please contact maintainer");
+        internal static readonly Response NeedUpdate = Exception(-24, "need to update arcaea, please contact maintainer");
+
+        /// <summary>
+        ///     errorCode = -25
+        /// </summary>
+        internal static readonly Response InvalidVersion = Exception(-25, "invalid version");
+        
+        /// <summary>
+        ///     errorCode = -26
+        /// </summary>
+        internal static readonly Response QuotaExceeded = Exception(-26, "daily query quota exceeded");
 
         /// <summary>
         ///     errorCode = -233
         /// </summary>
         internal static readonly Response InternalErrorOccurred = Exception(-233, "internal error occurred");
-
-        /// <summary>
-        ///     errorCode = -8
-        /// </summary>
-        internal static Response TooManySongs(IEnumerable<ArcaeaSong> ls) =>
-            new() { Status = -8, Message = "too many records", Content = new { songs = ls.Select(i => i.SongID) } };
     }
 }

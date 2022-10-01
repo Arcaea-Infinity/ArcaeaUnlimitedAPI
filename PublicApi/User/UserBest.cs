@@ -1,45 +1,36 @@
 ﻿using ArcaeaUnlimitedAPI.Beans;
 using ArcaeaUnlimitedAPI.Core;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static ArcaeaUnlimitedAPI.Core.Utils;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
-using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
 public partial class PublicApi
 {
+    [AuthorizationCheck(Order = 0)]
+    [PlayerInfoConverter(Order = 1)]
+    [SongInfoConverter(Order = 2)]
+    [DifficultyConverter(Order = 3)]
+    [ChartConverter(Order = 4)]
     [HttpGet("/botarcapi/user/best")]
-    public async Task<object> GetUserBest(string? user, string? usercode, string? songname, string? songid,
-                                          string? difficulty, bool withrecent = false, bool withsonginfo = false)
+    public async Task<object> GetUserBest(
+        [BindNever] [FromQuery] PlayerInfo player,
+        [BindNever] [FromQuery] ArcaeaCharts chart,
+        bool withrecent = false,
+        bool withsonginfo = false)
     {
-        if (!UserAgentCheck()) return NotFound(null);
-        if (NeedUpdate) return Error.NeedUpdate;
-
-        // validate request arguments
-        if (!DifficultyInfo.TryParse(difficulty, out var difficultyNum)) return Error.InvalidDifficulty;
-
-        var song = QuerySongInfo(songname, songid, out var songerror);
-        if (song is null) return songerror ?? Error.InvalidSongNameorID;
-
-        // check for beyond is existed
-        if (difficultyNum == 3 && song.Count < 4) return Error.NoBeyondLevel;
-
-        var chart = song[difficultyNum];
-
-        var player = QueryPlayerInfo(user, usercode, out var playererror);
-        if (player is null) return playererror!;
-
         var key = (player.Code, chart.SongID, chart.RatingClass);
 
         try
         {
-            var task = UserBestConcurrent.GetTask(key);
+            TaskCompletionSource<(UserBestResponse? bestdata, Response? error)>? task = UserBestConcurrent.GetTask(key);
 
             if (task is null)
             {
                 UserBestConcurrent.NewTask(key);
-                var (response, errorresp) = await QueryUserBest(player, chart, difficultyNum);
+                var (response, errorresp) = await QueryUserBest(player, chart);
                 UserBestConcurrent.SetResult(key, (response, errorresp));
                 return errorresp ?? GetResponse(response!, withrecent, withsonginfo, chart);
             }
@@ -56,12 +47,15 @@ public partial class PublicApi
         }
         finally
         {
-            UserBestConcurrent.GotResultCallBack(key);
+            UserBestConcurrent.CallBack(key);
         }
     }
 
-    private static Response GetResponse(UserBestResponse response, bool withrecent, bool withsonginfo,
-                                        ArcaeaCharts chart)
+    private static Response GetResponse(
+        UserBestResponse response,
+        bool withrecent,
+        bool withsonginfo,
+        ArcaeaCharts chart)
     {
         if (withsonginfo)
             // add song info
@@ -69,8 +63,7 @@ public partial class PublicApi
 
         if (withrecent)
         {
-            if (response.AccountInfo.RecentScore is not null)
-                response.RecentScore = response.AccountInfo.RecentScore.FirstOrDefault();
+            if (response.AccountInfo.RecentScore is not null) response.RecentScore = response.AccountInfo.RecentScore.FirstOrDefault();
             if (withsonginfo) response.RecentSonginfo = ArcaeaCharts.QueryByRecord(response.RecentScore);
         }
 
@@ -79,8 +72,7 @@ public partial class PublicApi
         return Success(response);
     }
 
-    private static async Task<(UserBestResponse? response, Response? error)> QueryUserBest(
-        PlayerInfo player, ArcaeaCharts chart, sbyte difficulty)
+    private static async Task<(UserBestResponse? response, Response? error)> QueryUserBest(PlayerInfo player, ArcaeaCharts chart)
     {
         AccountInfo? account = null;
 
@@ -92,7 +84,7 @@ public partial class PublicApi
             if (friend is null) return (null, recorderror!);
 
             // get rank result
-            var (success, friendRank) = await account.FriendRank(chart.SongID, difficulty);
+            var (success, friendRank) = await account.FriendRank(chart);
             if (!success || friendRank is null || friendRank.Count == 0) return (null, Error.NotPlayedYet);
             foreach (var record in friendRank)
             {

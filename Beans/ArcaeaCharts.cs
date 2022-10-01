@@ -14,7 +14,7 @@ public partial class ArcaeaCharts
     internal static readonly ConcurrentDictionary<string, object> SongJsons;
     internal static readonly ConcurrentDictionary<string, List<string>> Aliases;
 
-    internal static (string sid, int dif, int rating)[] SortedCharts => SortByRating.ToArray();
+    internal static ArcaeaCharts[] SortedCharts => SortByRating.ToArray();
 
     internal static ArcaeaCharts? QueryByRecord(Records? record)
     {
@@ -38,9 +38,8 @@ public partial class ArcaeaCharts
 
         Abbreviations.ForAllItems<ArcaeaSong, string, List<string>>((song, value) =>
                                                                     {
-                                                                        if (Utils.StringCompareHelper
-                                                                                 .Equals(value, alias)
-                                                                            && !abbrdata.Contains(song))
+                                                                        if (Utils.StringCompareHelper.Equals(value, alias) &&
+                                                                            !abbrdata.Contains(song))
                                                                             abbrdata.Add(song);
                                                                     });
 
@@ -58,7 +57,7 @@ public partial class ArcaeaCharts
                             RatingClass = i,
                             SongID = item.Id,
                             NameEn = item.Difficulties[i].TitleLocalized?.En ?? item.TitleLocalized.En,
-                            NameJp = item.Difficulties[i].TitleLocalized?.Ja ?? item.TitleLocalized.Ja ?? "",
+                            NameJp = item.Difficulties[i].TitleLocalized?.Ja ?? item.TitleLocalized.Ja ?? string.Empty,
                             Bpm = item.Difficulties[i].Bpm ?? item.Bpm,
                             BpmBase = item.Difficulties[i].BpmBase ?? item.BpmBase,
                             Set = item.Difficulties[i].Set ?? item.Set,
@@ -73,9 +72,7 @@ public partial class ArcaeaCharts
                             JacketDesigner = item.Difficulties[i].JacketDesigner,
                             JacketOverride = item.Difficulties[i].JacketOverride,
                             AudioOverride = item.Difficulties[i].AudioOverride,
-                            Difficulty = item.Difficulties[i].Rating * 2 + (item.Difficulties[i].RatingPlus == true
-                                ? 1
-                                : 0)
+                            Difficulty = item.Difficulties[i].Rating * 2 + (item.Difficulties[i].RatingPlus == true ? 1 : 0)
                         };
 
             Songs.TryAddOrInsert(item.Id, chart);
@@ -98,6 +95,7 @@ public partial class ArcaeaCharts
 
         if (chart.Rating != @const)
         {
+            Log.RatingLog(record.SongID, chart.NameEn, record.Difficulty, chart.Rating, @const);
             chart.Rating = @const;
             chart.Note = record.MissCount + record.NearCount + record.PerfectCount;
             var str = "UPDATE `charts` SET rating = ?, note = ? WHERE song_id = ? AND rating_class = ?;";
@@ -108,16 +106,23 @@ public partial class ArcaeaCharts
 
     internal static ArcaeaSong RandomSong() => Utils.RandomHelper.GetRandomItem(Songs.Values.ToArray())!;
 
-    internal static ArcaeaCharts? RandomSong(int? start, int? end) =>
-        Utils.RandomHelper.GetRandomItem(GetByDifficulty(start ?? 0, end ?? 24).ToArray());
+    internal static ArcaeaCharts? RandomSong(int? start, int? end)
+        => Utils.RandomHelper.GetRandomItem(GetByDifficulty(start ?? 0, end ?? 24).ToArray());
 }
 
 public partial class ArcaeaCharts
 {
-    [NonSerialized] private static readonly List<(string sid, int dif, int rating)> SortByRating;
-    [NonSerialized] private static readonly ConcurrentDictionary<ArcaeaSong, List<string>> Abbreviations = new();
-    [NonSerialized] private static readonly ConcurrentDictionary<ArcaeaSong, List<string>> Names = new();
-    [NonSerialized] private static readonly ConcurrentDictionary<string, List<ArcaeaSong>> AliasCache = new();
+    [NonSerialized]
+    private static readonly List<ArcaeaCharts> SortByRating;
+
+    [NonSerialized]
+    private static readonly ConcurrentDictionary<ArcaeaSong, List<string>> Abbreviations = new();
+
+    [NonSerialized]
+    private static readonly ConcurrentDictionary<ArcaeaSong, List<string>> Names = new();
+
+    [NonSerialized]
+    private static readonly ConcurrentDictionary<string, List<ArcaeaSong>> AliasCache = new();
 
     static ArcaeaCharts()
     {
@@ -126,8 +131,7 @@ public partial class ArcaeaCharts
         Aliases = new();
         SortByRating = new();
 
-        foreach (var alias in DatabaseManager.Song.SelectAll<ArcaeaAlias>())
-            Aliases.TryAddOrInsert(alias.SongID, alias.Alias);
+        foreach (var alias in DatabaseManager.Song.SelectAll<ArcaeaAlias>()) Aliases.TryAddOrInsert(alias.SongID, alias.Alias);
 
         foreach (var chart in DatabaseManager.Song.SelectAll<ArcaeaCharts>())
         {
@@ -143,28 +147,28 @@ public partial class ArcaeaCharts
             var names = new List<string>();
 
             for (var index = 0; index < value.Count; index++)
+            {
                 if (index == 0 || value[index].AudioOverride)
                 {
                     abbrs.Add(GetAbbreviation(value[index].NameEn));
                     names.Add(value[index].NameEn);
-
                     if (!string.IsNullOrWhiteSpace(value[index].NameJp))
                     {
                         abbrs.Add(GetAbbreviation(value[index].NameJp));
                         names.Add(value[index].NameJp);
                     }
                 }
+            }
 
             Abbreviations.TryAdd(value, abbrs);
             Names.TryAdd(value, names);
-
             SongJsons.TryAdd(sid, value.ToJson(false));
         }
 
         Sort();
     }
 
-    private void Init() { Package = PackageInfo.GetById(Set)?.Name; }
+    private void Init() => Package = PackageInfo.GetById(Set)?.Name;
 
     private static string GetAbbreviation(string str)
     {
@@ -172,8 +176,9 @@ public partial class ArcaeaCharts
         sb.Append(str[0]);
 
         for (var index = 0; index < str.Length - 1; ++index)
-            if (str[index] == ' ')
-                sb.Append(str[index + 1]);
+        {
+            if (str[index] == ' ') sb.Append(str[index + 1]);
+        }
 
         return sb.ToString();
     }
@@ -184,21 +189,16 @@ public partial class ArcaeaCharts
         {
             SortByRating.Clear();
 
-            Songs.ForAllItems<string, ArcaeaCharts, ArcaeaSong>((key, value) =>
-                                                                    SortByRating.Add((key, value.RatingClass,
-                                                                                      value.Rating)));
+            Songs.ForAllItems<string, ArcaeaCharts, ArcaeaSong>((_, value) => SortByRating.Add(value));
 
-            SortByRating.Sort((tuple, valueTuple) => valueTuple.Item3 - tuple.Item3);
+            SortByRating.Sort((tuple, valueTuple) => valueTuple.Rating - tuple.Rating);
         }
     }
 }
 
 public partial class ArcaeaCharts
 {
-    private static ArcaeaSong? GetById(string? songid) =>
-        songid is not null && Songs.TryGetValue(songid, out var value)
-            ? value
-            : null;
+    private static ArcaeaSong? GetById(string? songid) => songid is not null && Songs.TryGetValue(songid, out var value) ? value : null;
 
     private static ArcaeaSong? GetByName(ConcurrentDictionary<string, ArcaeaSong> values, string alias)
     {
@@ -210,8 +210,7 @@ public partial class ArcaeaCharts
 
     private static ArcaeaSong? GetByAlias(string alias)
     {
-        Aliases.TryTakeKey<string, string, List<string>>(value => Utils.StringCompareHelper.Equals(value, alias),
-                                                         out var result);
+        Aliases.TryTakeKey<string, string, List<string>>(value => Utils.StringCompareHelper.Equals(value, alias), out var result);
         return GetById(result);
     }
 
@@ -219,8 +218,7 @@ public partial class ArcaeaCharts
     {
         var dic = new PriorityQueue<ArcaeaSong, byte>();
 
-        Aliases.ForAllItems<string, string, List<string>>((song, sid) =>
-                                                              Enqueue(dic, alias, sid, GetById(song)!, 1, 4));
+        Aliases.ForAllItems<string, string, List<string>>((song, sid) => Enqueue(dic, alias, sid, GetById(song)!, 1, 4));
 
         dic.TryPeek(out _, out var firstpriority);
 
@@ -230,8 +228,7 @@ public partial class ArcaeaCharts
 
         dic.TryPeek(out _, out firstpriority);
 
-        if (firstpriority != 2)
-            Names.ForAllItems<ArcaeaSong, string, List<string>>((song, name) => Enqueue(dic, alias, name, song, 3, 6));
+        if (firstpriority != 2) Names.ForAllItems<ArcaeaSong, string, List<string>>((song, name) => Enqueue(dic, alias, name, song, 3, 6));
 
         if (dic.Count == 0) return default;
 
@@ -240,34 +237,36 @@ public partial class ArcaeaCharts
         var ls = new List<ArcaeaSong> { firstobj! };
 
         while (dic.TryDequeue(out var obj, out var priority) && priority == lowestpriority)
-            if (!ls.Contains(obj))
-                ls.Add(obj);
+        {
+            if (!ls.Contains(obj)) ls.Add(obj);
+        }
 
         AliasCache.TryAdd(alias, ls);
         return ls;
     }
 
-    private static IEnumerable<ArcaeaCharts> GetByDifficulty(int lowerlimit, int upperlimit) =>
-        Songs.Values.SelectMany(charts => charts).Where(t => t.Difficulty >= lowerlimit && t.Difficulty <= upperlimit);
+    private static IEnumerable<ArcaeaCharts> GetByDifficulty(int lowerlimit, int upperlimit)
+        => Songs.Values.SelectMany(charts => charts).Where(t => t.Difficulty >= lowerlimit && t.Difficulty <= upperlimit);
 
-    private static void Enqueue(PriorityQueue<ArcaeaSong, byte> dic, string alias, string key, ArcaeaSong song,
-                                byte upperpriority, byte lowerpriority)
+    private static void Enqueue(
+        PriorityQueue<ArcaeaSong, byte> dic,
+        string alias,
+        string key,
+        ArcaeaSong song,
+        byte upperpriority,
+        byte lowerpriority)
     {
         if (Utils.StringCompareHelper.Contains(key, alias)) dic.Enqueue(song, upperpriority);
         if (Utils.StringCompareHelper.Contains(alias, key)) dic.Enqueue(song, lowerpriority);
     }
 
     private static double CalcSongConst(int score, double rating)
-    {
-        return score switch
-               {
-                   >= 10000000 => rating - 2,
-                   >= 9800000  => rating - 1 - (double)(score - 9800000) / 200000,
-                   _ => rating > 0
-                       ? rating - (double)(score - 9500000) / 300000
-                       : 0
-               };
-    }
+        => score switch
+           {
+               >= 10000000 => rating - 2,
+               >= 9800000  => rating - 1 - (double)(score - 9800000) / 200000,
+               _           => rating > 0 ? rating - (double)(score - 9500000) / 300000 : 0
+           };
 }
 
 [Serializable]
@@ -276,31 +275,31 @@ public partial class ArcaeaCharts
                                             "CREATE TABLE `charts`(`song_id` TEXT PRIMARY KEY NOT NULL DEFAULT '', `rating_class` INTEGER NOT NULL DEFAULT 0, `name_en` TEXT NOT NULL DEFAULT '', `name_jp` TEXT DEFAULT '', `artist` TEXT NOT NULL DEFAULT '', `bpm` TEXT NOT NULL DEFAULT '', `bpm_base` DOUBLE NOT NULL DEFAULT 0, `set` TEXT NOT NULL DEFAULT '', `time` INTEGER DEFAULT 0, `side` INTEGER NOT NULL DEFAULT 0, `world_unlock` BOOLEAN NOT NULL DEFAULT 0, `remote_download` BOOLEAN DEFAULT '', `bg` TEXT NOT NULL DEFAULT '', `date` INTEGER NOT NULL DEFAULT 0, `version` TEXT NOT NULL DEFAULT '', `difficulty` INTEGER NOT NULL DEFAULT 0, `rating` INTEGER NOT NULL DEFAULT 0, `note` INTEGER NOT NULL DEFAULT 0, `chart_designer` TEXT DEFAULT '', `jacket_designer` TEXT DEFAULT '', `jacket_override` BOOLEAN NOT NULL DEFAULT 0, `audio_override` BOOLEAN NOT NULL DEFAULT 0);")]
 public partial class ArcaeaCharts
 {
-#region DataProperties
+    #region DataProperties
 
     [JsonIgnore] [PrimaryKey] [Column("song_id")]
-    public string SongID { get; set; } = "";
+    public string SongID { get; set; } = string.Empty;
 
     [JsonIgnore] [PrimaryKey] [Column("rating_class")]
     public int RatingClass { get; set; }
 
     [JsonProperty("name_en")] [Column("name_en")]
-    public string NameEn { get; set; } = "";
+    public string NameEn { get; set; } = string.Empty;
 
     [JsonProperty("name_jp")] [Column("name_jp")]
-    public string NameJp { get; set; } = "";
+    public string NameJp { get; set; } = string.Empty;
 
     [JsonProperty("artist")] [Column("artist")]
-    public string Artist { get; set; } = "";
+    public string Artist { get; set; } = string.Empty;
 
     [JsonProperty("bpm")] [Column("bpm")]
-    public string Bpm { get; set; } = "";
+    public string Bpm { get; set; } = string.Empty;
 
     [JsonProperty("bpm_base")] [Column("bpm_base")]
     public double BpmBase { get; set; }
 
     [JsonProperty("set")] [Column("set")]
-    public string Set { get; set; } = "";
+    public string Set { get; set; } = string.Empty;
 
     [JsonProperty("set_friendly")] [Ignore]
     public string? Package { get; set; }
@@ -318,13 +317,13 @@ public partial class ArcaeaCharts
     public bool RemoteDownload { get; set; }
 
     [JsonProperty("bg")] [Column("bg")]
-    public string Background { get; set; } = "";
+    public string Background { get; set; } = string.Empty;
 
     [JsonProperty("date")] [Column("date")]
     public long Date { get; set; }
 
     [JsonProperty("version")] [Column("version")]
-    public string Version { get; set; } = "";
+    public string Version { get; set; } = string.Empty;
 
     [JsonProperty("difficulty")] [Column("difficulty")]
     public int Difficulty { get; set; }
@@ -336,10 +335,10 @@ public partial class ArcaeaCharts
     public int Note { get; set; }
 
     [JsonProperty("chart_designer")] [Column("chart_designer")]
-    public string ChartDesigner { get; set; } = "";
+    public string ChartDesigner { get; set; } = string.Empty;
 
     [JsonProperty("jacket_designer")] [Column("jacket_designer")]
-    public string JacketDesigner { get; set; } = "";
+    public string JacketDesigner { get; set; } = string.Empty;
 
     [JsonProperty("jacket_override")] [Column("jacket_override")]
     public bool JacketOverride { get; set; }
@@ -347,5 +346,5 @@ public partial class ArcaeaCharts
     [JsonProperty("audio_override")] [Column("audio_override")]
     public bool AudioOverride { get; set; }
 
-#endregion
+    #endregion
 }
