@@ -1,9 +1,9 @@
 {
   "data_path": "/etc/arcaeaunlimitedapi/data",
   "api_entry": "join/21",
-  "app_version": "4.0.256c",
+  "app_version": "4.1.0c",
   "host": "arcapi-v2.lowiro.com",
-  "cert_name": "cert-4.0.256c.p12",
+  "cert_name": "cert-4.1.0c.p12",
   "cert_password": "HelloWorld",
   "open_register": false,
   "challenge_api": "https://server.awbugl.top/botarcapi/data/challenge",
