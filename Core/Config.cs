@@ -9,6 +9,7 @@ internal static class GlobalConfig
     internal static HashSet<string> Tokens;
 
     internal static volatile bool NeedUpdate = false;
+    internal static volatile bool IllegalHash = false;
 
     static GlobalConfig()
     {
