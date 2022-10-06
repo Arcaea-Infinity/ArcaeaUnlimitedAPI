@@ -85,13 +85,20 @@ internal class RecentConverterAttribute : ActionFilterAttribute
 
 internal class DifficultyConverterAttribute : ActionFilterAttribute
 {
+    private bool IgnoreError { get; }
+    
+    internal DifficultyConverterAttribute(bool ignore = true)
+    {
+        IgnoreError = ignore;
+    }
+
     public override void OnActionExecuting(ActionExecutingContext context)
     {
         var obj = new DifficultyParams(context.GetValue("difficulty"));
 
         context.ActionArguments["difficulty"] = obj.Validate(out var error);
 
-        if (error != null)
+        if (!IgnoreError && error != null)
         {
             context.Result = new JsonResult(error);
             return;
