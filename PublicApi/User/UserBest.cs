@@ -12,7 +12,7 @@ public partial class PublicApi
     [AuthorizationCheck(Order = 0)]
     [PlayerInfoConverter(Order = 1)]
     [SongInfoConverter(Order = 2)]
-    [DifficultyConverter(Order = 3)]
+    [DifficultyConverter(false, Order = 3)]
     [ChartConverter(Order = 4)]
     [HttpGet("/botarcapi/user/best")]
     public async Task<object> GetUserBest(
