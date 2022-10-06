@@ -136,7 +136,7 @@ internal static class BackgroundService
             Config.ApiEntry = decrypt.GetApiEntry();
             Config.CertFileName = $"cert-{version}.p12";
             Config.Appversion = version;
-            Config.WriteConfig(true);
+            Config.WriteConfig();
 
             NeedUpdate = false;
         }

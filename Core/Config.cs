@@ -75,7 +75,7 @@ public class ConfigItem
     [JsonProperty("node")]
     public Node Node { get; set; }
 
-    internal void WriteConfig(bool rewrite) => File.WriteAllText(rewrite ? "config.json" : "config_temp.json", JsonConvert.SerializeObject(this));
+    internal void WriteConfig() => File.WriteAllText("apiconfig.json", JsonConvert.SerializeObject(this, Formatting.Indented));
 }
 
 public class Node
