@@ -11,7 +11,7 @@ namespace ArcaeaUnlimitedAPI.Beans;
 public partial class ArcaeaCharts
 {
     internal static readonly ConcurrentDictionary<string, ArcaeaSong> Songs;
-    internal static readonly ConcurrentDictionary<string, object> SongJsons;
+    internal static readonly SortedDictionary<string, object> SongJsons;
     internal static readonly ConcurrentDictionary<string, List<string>> Aliases;
 
     internal static ArcaeaCharts[] SortedCharts => SortByRating.ToArray();

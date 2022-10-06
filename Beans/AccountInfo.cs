@@ -3,6 +3,9 @@ using ArcaeaUnlimitedAPI.Core;
 using ArcaeaUnlimitedAPI.PublicApi;
 using SQLite;
 
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable once UnusedAutoPropertyAccessor.Global
+
 namespace ArcaeaUnlimitedAPI.Beans;
 
 #pragma warning disable CS8618

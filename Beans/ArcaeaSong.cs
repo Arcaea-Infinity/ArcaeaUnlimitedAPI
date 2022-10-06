@@ -11,7 +11,7 @@ public class ArcaeaSong : List<ArcaeaCharts>, IEquatable<ArcaeaSong>
         return SongID.Equals(other.SongID);
     }
 
-    public object ToJson(bool usejsonlist = true)
+    internal object ToJson(bool usejsonlist = true)
     {
         if (usejsonlist && ArcaeaCharts.SongJsons.ContainsKey(SongID)) return ArcaeaCharts.SongJsons[SongID];
 
@@ -23,7 +23,7 @@ public class ArcaeaSong : List<ArcaeaCharts>, IEquatable<ArcaeaSong>
         return obj;
     }
 
-    public new void Sort() => Sort((chart, another) => chart.RatingClass - another.RatingClass);
+    internal new void Sort() => Sort((chart, another) => chart.RatingClass - another.RatingClass);
 
     public override bool Equals(object? obj)
     {
