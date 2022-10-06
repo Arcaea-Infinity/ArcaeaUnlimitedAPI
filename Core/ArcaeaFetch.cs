@@ -31,6 +31,7 @@ internal static class ArcaeaFetch
             }
 
             if (info?.ErrorCode == 5) NeedUpdate = true;
+            if (info?.ErrorCode == 1) IllegalHash = true;
 
             if (info?.ErrorCode == 106)
             {
@@ -64,6 +65,12 @@ internal static class ArcaeaFetch
         if (info.ErrorCode == 5)
         {
             NeedUpdate = true;
+            return (false, null);
+        }
+        
+        if (info.ErrorCode == 1)
+        {
+            IllegalHash = true;
             return (false, null);
         }
 
@@ -103,6 +110,12 @@ internal static class ArcaeaFetch
             NeedUpdate = true;
             return (false, null);
         }
+        
+        if (info.ErrorCode == 1)
+        {
+            IllegalHash = true;
+            return (false, null);
+        }
 
         if (info.Value is null) return (false, null);
         var value = info.DeserializeContent<AddFriendValue>();
@@ -124,6 +137,12 @@ internal static class ArcaeaFetch
             if (info.ErrorCode == 5)
             {
                 NeedUpdate = true;
+                return (false, null);
+            }
+            
+            if (info.ErrorCode == 1)
+            {
+                IllegalHash = true;
                 return (false, null);
             }
 
@@ -159,6 +178,12 @@ internal static class ArcaeaFetch
                 if (info?.ErrorCode == 5)
                 {
                     NeedUpdate = true;
+                    return;
+                }
+                
+                if (info?.ErrorCode == 1)
+                {
+                    IllegalHash = true;
                     return;
                 }
 
@@ -245,8 +270,7 @@ internal static class ArcaeaFetch
         Dictionary<string, string>? submitData,
         byte retryCount = 0)
     {
-        if (NeedUpdate) return null;
-
+        if (NeedUpdate || IllegalHash) return null;
         var url = submitData is not null ? $"{resturl}?{SubmitDataToString(submitData)}" : resturl;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{_node}/{_apientry}/{url}");
@@ -270,7 +294,7 @@ internal static class ArcaeaFetch
         Dictionary<string, string>? submitData,
         byte retryCount = 0)
     {
-        if (NeedUpdate) return null;
+        if (NeedUpdate || IllegalHash) return null;
         var data = submitData is null ? string.Empty : SubmitDataToString(submitData);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"{_node}/{_apientry}/{resturl}");
@@ -292,7 +316,7 @@ internal static class ArcaeaFetch
 
     private static async Task<ResponseRoot?> Login(AccountInfo info, byte retryCount = 0)
     {
-        if (NeedUpdate) return null;
+        if (NeedUpdate || IllegalHash) return null;
 
         const string resturl = "auth/login";
         const string data = "grant_type=client_credentials";
@@ -320,7 +344,7 @@ internal static class ArcaeaFetch
         string email,
         string deviceID)
     {
-        if (NeedUpdate) return null;
+        if (NeedUpdate || IllegalHash) return null;
         const string resturl = "user";
         var data = SubmitDataToString(new() { { "name", name }, { "password", password }, { "email", email }, { "device_id", deviceID } });
         var request = new HttpRequestMessage(HttpMethod.Post, $"{node}/{_apientry}/{resturl}");

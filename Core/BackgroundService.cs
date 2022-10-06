@@ -139,6 +139,7 @@ internal static class BackgroundService
             Config.WriteConfig();
 
             NeedUpdate = false;
+            IllegalHash = false;
         }
         catch (Exception ex)
         {

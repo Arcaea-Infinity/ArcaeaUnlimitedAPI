@@ -26,6 +26,12 @@ internal class AuthorizationCheck : ActionFilterAttribute
             context.Result = new JsonResult(Response.Error.NeedUpdate);
             return;
         }
+        
+        if (IllegalHash)
+        {
+            context.Result = new JsonResult(Response.Error.IllegalHash);
+            return;
+        }
 
         if (!UserAgentCheck(context.HttpContext) && !TokenCheck(context.HttpContext))
             if (RateLimiter.IsExceeded(context.HttpContext.Connection.RemoteIpAddress?.ToString()))

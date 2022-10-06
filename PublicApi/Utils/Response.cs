@@ -150,6 +150,11 @@ public class Response
         ///     errorCode = -26
         /// </summary>
         internal static readonly Response QuotaExceeded = Exception(-26, "daily query quota exceeded");
+        
+        /// <summary>
+        ///     errorCode = -27
+        /// </summary>
+        internal static readonly Response IllegalHash = Exception(-27, "illegal hash, please contact maintainer");
 
         /// <summary>
         ///     errorCode = -233
