@@ -11,5 +11,9 @@ public partial class PublicApi
     [EnableCors]
     [SongInfoConverter]
     [HttpGet("/botarcapi/song/alias")]
-    public object GetSongAlias([BindNever] ArcaeaSong song) => Success(ArcaeaCharts.Aliases[song.SongID]);
+    public object GetSongAlias([BindNever] ArcaeaSong song)
+    {
+        ArcaeaCharts.Aliases.TryGetValue(song.SongID, out List<string>? alias);
+        return Success(alias ?? new());
+    }
 }
