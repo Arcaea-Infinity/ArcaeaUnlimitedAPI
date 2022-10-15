@@ -96,13 +96,15 @@ internal class DifficultyConverterAttribute : ActionFilterAttribute
     {
         var obj = new DifficultyParams(context.GetValue("difficulty"));
 
-        context.ActionArguments["difficulty"] = obj.Validate(out var error);
+        var difficulty = obj.Validate(out var error);
 
-        if (!IgnoreError && error != null)
+        if ((difficulty < 0 || !IgnoreError) && error != null)
         {
             context.Result = new JsonResult(error);
             return;
         }
+        
+        context.ActionArguments["difficulty"] = difficulty;
 
         base.OnActionExecuting(context);
     }
@@ -117,7 +119,6 @@ internal class ChartConverterAttribute : ActionFilterAttribute
     {
         var song = (context.ActionArguments["song"] as ArcaeaSong)!;
         var difficulty = (sbyte)context.ActionArguments["difficulty"]!;
-
         if (ChartMissingCheck(song, difficulty))
         {
             context.Result = new JsonResult(Response.Error.NoThisLevel);
