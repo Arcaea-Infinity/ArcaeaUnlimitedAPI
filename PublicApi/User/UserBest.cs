@@ -40,11 +40,6 @@ public partial class PublicApi
                 return errorresp ?? GetResponse(response!, withrecent, withsonginfo, chart);
             }
         }
-        catch (Exception ex)
-        {
-            Log.ExceptionError(ex);
-            return Error.InternalErrorOccurred;
-        }
         finally
         {
             UserBestConcurrent.CallBack(key);
@@ -99,11 +94,6 @@ public partial class PublicApi
             rank.UserID = null!;
 
             return (new() { AccountInfo = friend, Record = rank }, null);
-        }
-        catch (Exception ex)
-        {
-            Log.ExceptionError(ex);
-            return (null, Error.AddFriendFailed);
         }
         finally
         {

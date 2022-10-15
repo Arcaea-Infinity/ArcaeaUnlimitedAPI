@@ -31,11 +31,6 @@ public partial class PublicApi
                 return errorresp ?? GetResponse(response!, recent, withsonginfo);
             }
         }
-        catch (Exception ex)
-        {
-            Log.ExceptionError(ex);
-            return Error.InternalErrorOccurred;
-        }
         finally
         {
             UserInfoConcurrent.CallBack(player.Code);
