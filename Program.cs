@@ -1,13 +1,11 @@
 using System.Net;
 using ArcaeaUnlimitedAPI.Core;
-using ArcaeaUnlimitedAPI.PublicApi;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.HttpOverrides;
 using Newtonsoft.Json;
 
 TaskScheduler.UnobservedTaskException += (_, eventArgs) =>
 {
-    Log.ExceptionError(eventArgs.Exception.InnerException!);
+    Logger.ExceptionError(eventArgs.Exception.InnerException!);
     eventArgs.SetObserved();
 };
 
@@ -27,14 +25,7 @@ builder.Services.AddCors(options => options.AddDefaultPolicy(i => i.AllowAnyOrig
 var app = builder.Build();
 app.UseCors();
 
-app.UseExceptionHandler(build => build.Run(async context =>
-{
-    var ex = context.Features.Get<IExceptionHandlerFeature>()?.Error;
-    if (ex != null) Log.ExceptionError(ex);
-    context.Response.StatusCode = 500;
-    context.Response.ContentType = "application/json";
-    await context.Response.WriteAsync(JsonConvert.SerializeObject(Response.Error.InternalErrorOccurred));
-}));
+app.UseExceptionHandler(new ExceptionHandlerOptions { ExceptionHandler = ExceptionHandler.Invoke });
 
 app.UseForwardedHeaders(new() { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto });
 app.MapControllers();

@@ -80,32 +80,32 @@ internal class PollingBestsHelper
 
     private Task<Records?> GetNewTask(ArcaeaCharts chart)
         => Task.Run(() =>
-                    {
-                        var (success, result) = _account.FriendRank(chart).Result;
+        {
+            var (success, result) = _account.FriendRank(chart).Result;
 
-                        // Check invalid response and add them into failed list
-                        if (!success || result is null)
-                        {
-                            _failedlist.Enqueue(chart, chart.Rating);
-                            return null;
-                        }
+            // Check invalid response and add them into failed list
+            if (!success || result is null)
+            {
+                _failedlist.Enqueue(chart, chart.Rating);
+                return null;
+            }
 
-                        foreach (var i in result)
-                        {
-                            i.Potential = _friend.Rating;
-                            i.Rating = Utils.CalcSongRating(i.Score, chart.Rating);
-                            DatabaseManager.Bests.InsertOrReplace(i);
-                        }
+            foreach (var i in result)
+            {
+                i.Potential = _friend.Rating;
+                i.Rating = Utils.CalcSongRating(i.Score, chart.Rating);
+                DatabaseManager.Bests.InsertOrReplace(i);
+            }
 
-                        var record = result.FirstOrDefault(i => i.UserID == _friend.UserID);
+            var record = result.FirstOrDefault(i => i.UserID == _friend.UserID);
 
-                        if (record is null) return null;
+            if (record is null) return null;
 
-                        //for json
-                        record.UserID = null!;
+            //for json
+            record.UserID = null!;
 
-                        return record;
-                    });
+            return record;
+        });
 
     private void InsertRecords(Records?[] results)
     {

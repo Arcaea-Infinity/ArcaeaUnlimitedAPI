@@ -37,11 +37,9 @@ public partial class ArcaeaCharts
         var abbrdata = new List<ArcaeaSong>();
 
         Abbreviations.ForAllItems<ArcaeaSong, string, List<string>>((song, value) =>
-                                                                    {
-                                                                        if (Utils.StringCompareHelper.Equals(value, alias) &&
-                                                                            !abbrdata.Contains(song))
-                                                                            abbrdata.Add(song);
-                                                                    });
+        {
+            if (Utils.StringCompareHelper.Equals(value, alias) && !abbrdata.Contains(song)) abbrdata.Add(song);
+        });
 
         if (abbrdata.Count > 0) return abbrdata;
 
@@ -95,7 +93,7 @@ public partial class ArcaeaCharts
 
         if (chart.Rating != @const)
         {
-            Log.RatingLog(record.SongID, chart.NameEn, record.Difficulty, chart.Rating, @const);
+            Logger.RatingLog(record.SongID, chart.NameEn, record.Difficulty, chart.Rating, @const);
             chart.Rating = @const;
             chart.Note = record.MissCount + record.NearCount + record.PerfectCount;
             var str = "UPDATE `charts` SET rating = ?, note = ? WHERE song_id = ? AND rating_class = ?;";
@@ -176,9 +174,8 @@ public partial class ArcaeaCharts
         sb.Append(str[0]);
 
         for (var index = 0; index < str.Length - 1; ++index)
-        {
-            if (str[index] == ' ') sb.Append(str[index + 1]);
-        }
+            if (str[index] == ' ')
+                sb.Append(str[index + 1]);
 
         return sb.ToString();
     }
@@ -237,9 +234,8 @@ public partial class ArcaeaCharts
         var ls = new List<ArcaeaSong> { firstobj! };
 
         while (dic.TryDequeue(out var obj, out var priority) && priority == lowestpriority)
-        {
-            if (!ls.Contains(obj)) ls.Add(obj);
-        }
+            if (!ls.Contains(obj))
+                ls.Add(obj);
 
         AliasCache.TryAdd(alias, ls);
         return ls;
@@ -275,7 +271,7 @@ public partial class ArcaeaCharts
                                             "CREATE TABLE `charts`(`song_id` TEXT PRIMARY KEY NOT NULL DEFAULT '', `rating_class` INTEGER NOT NULL DEFAULT 0, `name_en` TEXT NOT NULL DEFAULT '', `name_jp` TEXT DEFAULT '', `artist` TEXT NOT NULL DEFAULT '', `bpm` TEXT NOT NULL DEFAULT '', `bpm_base` DOUBLE NOT NULL DEFAULT 0, `set` TEXT NOT NULL DEFAULT '', `time` INTEGER DEFAULT 0, `side` INTEGER NOT NULL DEFAULT 0, `world_unlock` BOOLEAN NOT NULL DEFAULT 0, `remote_download` BOOLEAN DEFAULT '', `bg` TEXT NOT NULL DEFAULT '', `date` INTEGER NOT NULL DEFAULT 0, `version` TEXT NOT NULL DEFAULT '', `difficulty` INTEGER NOT NULL DEFAULT 0, `rating` INTEGER NOT NULL DEFAULT 0, `note` INTEGER NOT NULL DEFAULT 0, `chart_designer` TEXT DEFAULT '', `jacket_designer` TEXT DEFAULT '', `jacket_override` BOOLEAN NOT NULL DEFAULT 0, `audio_override` BOOLEAN NOT NULL DEFAULT 0);")]
 public partial class ArcaeaCharts
 {
-#region DataProperties
+    #region DataProperties
 
     [JsonIgnore] [PrimaryKey] [Column("song_id")]
     public string SongID { get; set; } = string.Empty;
@@ -346,5 +342,5 @@ public partial class ArcaeaCharts
     [JsonProperty("audio_override")] [Column("audio_override")]
     public bool AudioOverride { get; set; }
 
-#endregion
+    #endregion
 }

@@ -14,22 +14,17 @@ internal static class ConfigWatcher
 
         Timer timer = new(OnTimer, null, Timeout.Infinite, Timeout.Infinite);
         Watcher.Changed += (_, e) =>
-                           {
-                               TmpFiles.Add(e.Name!);
-                               timer.Change(TimeoutMillis, Timeout.Infinite);
-                           };
+        {
+            TmpFiles.Add(e.Name!);
+            timer.Change(TimeoutMillis, Timeout.Infinite);
+        };
     }
 
     private static void OnTimer(object? _)
     {
         lock (TmpFiles)
         {
-            foreach (var file in TmpFiles)
-            {
-                Log.FunctionLog("ConfigWatcher", $"{file} changed.");
-                GlobalConfig.Init(file);
-            }
-
+            foreach (var file in TmpFiles) GlobalConfig.Init(file);
             TmpFiles.Clear();
         }
     }

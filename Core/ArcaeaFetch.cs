@@ -43,7 +43,7 @@ internal static class ArcaeaFetch
         }
         catch (Exception ex)
         {
-            Log.ExceptionError(ex);
+            Logger.ExceptionError(ex);
             return false;
         }
     }
@@ -67,7 +67,7 @@ internal static class ArcaeaFetch
             NeedUpdate = true;
             return (false, null);
         }
-        
+
         if (info.ErrorCode == 1)
         {
             IllegalHash = true;
@@ -110,7 +110,7 @@ internal static class ArcaeaFetch
             NeedUpdate = true;
             return (false, null);
         }
-        
+
         if (info.ErrorCode == 1)
         {
             IllegalHash = true;
@@ -139,7 +139,7 @@ internal static class ArcaeaFetch
                 NeedUpdate = true;
                 return (false, null);
             }
-            
+
             if (info.ErrorCode == 1)
             {
                 IllegalHash = true;
@@ -152,7 +152,7 @@ internal static class ArcaeaFetch
         }
         catch (Exception ex)
         {
-            Log.ExceptionError(ex);
+            Logger.ExceptionError(ex);
             return (false, null);
         }
     }
@@ -180,7 +180,7 @@ internal static class ArcaeaFetch
                     NeedUpdate = true;
                     return;
                 }
-                
+
                 if (info?.ErrorCode == 1)
                 {
                     IllegalHash = true;
@@ -206,7 +206,7 @@ internal static class ArcaeaFetch
         }
         catch (Exception ex)
         {
-            Log.ExceptionError(ex);
+            Logger.ExceptionError(ex);
         }
     }
 
@@ -233,7 +233,7 @@ internal static class ArcaeaFetch
         }
     }
 
-#region Privite Methods
+    #region Privite Methods
 
     private static HttpClient _client = null!;
     private static string _apientry = null!;
@@ -251,10 +251,10 @@ internal static class ArcaeaFetch
         var handler = new HttpClientHandler();
         handler.ClientCertificates.Add(certificate);
         handler.ServerCertificateCustomValidationCallback = (
-                                                                _,
-                                                                _,
-                                                                _,
-                                                                _) => true;
+            _,
+            _,
+            _,
+            _) => true;
         _client = new(handler);
         _client.Timeout = TimeSpan.FromSeconds(30);
         _client.DefaultRequestHeaders.Add("Host", Config.Host);
@@ -284,7 +284,7 @@ internal static class ArcaeaFetch
         if (success) return result;
 
         if (retryCount < MaxRetryCount) return await Get(resturl, info, submitData, ++retryCount);
-        Log.ApiError(resturl);
+        Logger.ApiError(resturl);
         return default;
     }
 
@@ -310,7 +310,7 @@ internal static class ArcaeaFetch
 
 
         if (retryCount < MaxRetryCount) return await Post(resturl, info, submitData, ++retryCount);
-        Log.ApiError(resturl);
+        Logger.ApiError(resturl);
         return default;
     }
 
@@ -333,7 +333,7 @@ internal static class ArcaeaFetch
         if (success) return result;
 
         if (retryCount < MaxRetryCount) return await Login(info, ++retryCount);
-        Log.ApiError(resturl);
+        Logger.ApiError(resturl);
         return default;
     }
 
@@ -360,21 +360,23 @@ internal static class ArcaeaFetch
         try
         {
             var resp = await _client.SendAsync(request);
+
             var success = resp.Content.Headers.ContentType?.ToString() == "application/json";
+
             if (!success)
             {
-                Log.ApiError(resturl, (int)resp.StatusCode);
+                Logger.ApiError(resturl, (int)resp.StatusCode);
                 return (false, null);
             }
 
             var result = JsonConvert.DeserializeObject<ResponseRoot>(await resp.Content.ReadAsStringAsync())!;
-            if (!result.Success && result.ErrorCode != 401) Log.ApiError(resturl, result);
+            if (!result.Success && result.ErrorCode != 401) Logger.ApiError(resturl, result);
 
             return (success, result);
         }
         catch (Exception ex)
         {
-            Log.HttpError(ex.Message, request.RequestUri);
+            Logger.HttpError(ex, request.RequestUri);
             return (false, null);
         }
         finally
@@ -386,5 +388,5 @@ internal static class ArcaeaFetch
     private static string SubmitDataToString(Dictionary<string, string> submitData)
         => new FormUrlEncodedContent(submitData).ReadAsStringAsync().Result;
 
-#endregion
+    #endregion
 }

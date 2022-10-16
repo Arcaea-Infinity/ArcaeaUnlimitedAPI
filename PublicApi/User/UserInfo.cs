@@ -73,7 +73,7 @@ public partial class PublicApi
         }
         catch (Exception ex)
         {
-            Log.ExceptionError(ex);
+            Logger.ExceptionError(ex);
             return (null, Error.AddFriendFailed);
         }
         finally

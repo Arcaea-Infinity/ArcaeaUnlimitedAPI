@@ -85,12 +85,12 @@ internal class RecentConverterAttribute : ActionFilterAttribute
 
 internal class DifficultyConverterAttribute : ActionFilterAttribute
 {
-    private bool IgnoreError { get; }
-    
     internal DifficultyConverterAttribute(bool ignore = true)
     {
         IgnoreError = ignore;
     }
+
+    private bool IgnoreError { get; }
 
     public override void OnActionExecuting(ActionExecutingContext context)
     {
@@ -103,7 +103,7 @@ internal class DifficultyConverterAttribute : ActionFilterAttribute
             context.Result = new JsonResult(error);
             return;
         }
-        
+
         context.ActionArguments["difficulty"] = difficulty;
 
         base.OnActionExecuting(context);

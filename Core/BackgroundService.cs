@@ -114,7 +114,7 @@ internal static class BackgroundService
         }
         catch (Exception ex)
         {
-            Log.ExceptionError(ex);
+            Logger.ExceptionError(ex);
         }
         finally
         {
@@ -143,7 +143,7 @@ internal static class BackgroundService
         }
         catch (Exception ex)
         {
-            Log.ExceptionError(ex);
+            Logger.ExceptionError(ex);
         }
     }
 

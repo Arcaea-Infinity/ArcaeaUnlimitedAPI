@@ -26,7 +26,7 @@ internal static class Utils
         }
         catch (Exception ex)
         {
-            Log.ExceptionError(ex);
+            Logger.ExceptionError(ex);
             return null;
         }
     }
@@ -39,10 +39,10 @@ internal static class Utils
         {
             var handler = new HttpClientHandler();
             handler.ServerCertificateCustomValidationCallback = (
-                                                                    _,
-                                                                    _,
-                                                                    _,
-                                                                    _) => true;
+                _,
+                _,
+                _,
+                _) => true;
             Client = new(handler);
         }
 
