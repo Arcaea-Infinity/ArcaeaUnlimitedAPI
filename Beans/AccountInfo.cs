@@ -50,7 +50,7 @@ internal class AccountInfo
             {
                 if (!Queue.Value.TryDequeue(out account))
                 {
-                    Log.FunctionError("Account", "ranout.");
+                    Logger.FunctionError("Account", "ranout.");
                     return null;
                 }
 
@@ -74,7 +74,7 @@ internal class AccountInfo
             }
             catch (Exception ex)
             {
-                Log.ExceptionError(ex);
+                Logger.ExceptionError(ex);
                 Recycle(account);
                 continue;
             }

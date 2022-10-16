@@ -22,7 +22,7 @@ internal class AuthorizationCheck : ActionFilterAttribute
             context.Result = new JsonResult(Response.Error.NeedUpdate);
             return;
         }
-        
+
         if (IllegalHash)
         {
             context.Result = new JsonResult(Response.Error.IllegalHash);

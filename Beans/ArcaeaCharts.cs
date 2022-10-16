@@ -37,11 +37,9 @@ public partial class ArcaeaCharts
         var abbrdata = new List<ArcaeaSong>();
 
         Abbreviations.ForAllItems<ArcaeaSong, string, List<string>>((song, value) =>
-                                                                    {
-                                                                        if (Utils.StringCompareHelper.Equals(value, alias) &&
-                                                                            !abbrdata.Contains(song))
-                                                                            abbrdata.Add(song);
-                                                                    });
+        {
+            if (Utils.StringCompareHelper.Equals(value, alias) && !abbrdata.Contains(song)) abbrdata.Add(song);
+        });
 
         if (abbrdata.Count > 0) return abbrdata;
 
@@ -95,7 +93,7 @@ public partial class ArcaeaCharts
 
         if (chart.Rating != @const)
         {
-            Log.RatingLog(record.SongID, chart.NameEn, record.Difficulty, chart.Rating, @const);
+            Logger.RatingLog(record.SongID, chart.NameEn, record.Difficulty, chart.Rating, @const);
             chart.Rating = @const;
             chart.Note = record.MissCount + record.NearCount + record.PerfectCount;
             var str = "UPDATE `charts` SET rating = ?, note = ? WHERE song_id = ? AND rating_class = ?;";
@@ -176,9 +174,8 @@ public partial class ArcaeaCharts
         sb.Append(str[0]);
 
         for (var index = 0; index < str.Length - 1; ++index)
-        {
-            if (str[index] == ' ') sb.Append(str[index + 1]);
-        }
+            if (str[index] == ' ')
+                sb.Append(str[index + 1]);
 
         return sb.ToString();
     }
@@ -237,9 +234,8 @@ public partial class ArcaeaCharts
         var ls = new List<ArcaeaSong> { firstobj! };
 
         while (dic.TryDequeue(out var obj, out var priority) && priority == lowestpriority)
-        {
-            if (!ls.Contains(obj)) ls.Add(obj);
-        }
+            if (!ls.Contains(obj))
+                ls.Add(obj);
 
         AliasCache.TryAdd(alias, ls);
         return ls;
