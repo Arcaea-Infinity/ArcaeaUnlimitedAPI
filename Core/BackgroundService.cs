@@ -1,6 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Timers;
 using ArcaeaUnlimitedAPI.Beans;
+using ArcaeaUnlimitedAPI.Json.Packlist;
 using ArcaeaUnlimitedAPI.Json.Songlist;
 using Downloader;
 using Newtonsoft.Json;
@@ -52,63 +53,84 @@ internal static class BackgroundService
             if (Config.Appversion != info.Version) NeedUpdate = true;
             var dirname = info.Version;
             var apkpth = $"{Config.DataPath}/update/arcaea_{dirname}.apk";
-            var dirpth = $"{Config.DataPath}/update/{dirname}dir/";
 
-            try
+            if (!File.Exists(apkpth)) DownloadApk(info.Url);
+
+            // not apk
+            if (new FileInfo(apkpth).Length < 81920)
             {
-                if (!File.Exists(apkpth)) DownloadApk(info.Url);
+                File.Delete(apkpth);
+                return;
+            }
 
-                // not apk
-                if (new FileInfo(apkpth).Length < 81920) File.Delete(apkpth);
+            var apk = ZipFile.OpenRead(apkpth);
 
-                if (Directory.Exists(dirpth)) Directory.Delete(dirpth, true);
-                Directory.CreateDirectory(dirpth);
-                ZipFile.ExtractToDirectory(apkpth, dirpth);
+            var molnight = $"{Config.DataPath}/source/songs/melodyoflove_night.jpg";
+            if (!File.Exists(molnight)) apk.GetEntry("assets/songs/dl_melodyoflove/base_night.jpg")!.ExtractToFile(molnight);
 
-                var molnight = $"{Config.DataPath}/source/songs/melodyoflove_night.jpg";
-                if (!File.Exists(molnight)) File.Move($"{dirpth}/assets/songs/dl_melodyoflove/base_night.jpg", molnight);
-
-                foreach (var file in new DirectoryInfo($"{dirpth}/assets/char/").GetFiles())
+            foreach (var entry in apk.Entries)
+            {
+                if (entry.FullName.StartsWith("assets/char/") && entry.Name.EndsWith(".png"))
                 {
-                    var name = $"{Config.DataPath}/source/char/{file.Name}";
-                    if (!File.Exists(name)) file.MoveTo(name);
+                    var path = $"{Config.DataPath}/source/char/{entry.Name}";
+                    entry.ExtractToFile(path, true);
                 }
+            }
 
-                var list = JsonConvert.DeserializeObject<Songlist>(File.ReadAllText($"{dirpth}/assets/songs/songlist"));
+            using var songlist = apk.GetEntry("assets/songs/songlist")!.Open();
+            List<SongItem> list = JsonConvert.DeserializeObject<Songlist>(new StreamReader(songlist).ReadToEnd())!.Songs;
 
-                if (list is not null)
-                    foreach (var i in list.Songs)
+            foreach (var i in list)
+            {
+                var destdir = $"{Config.DataPath}/source/songs";
+                var rawdir = $"assets/songs/{(i.NeedDownload ? "dl_" : string.Empty)}{i.Id}";
+
+                for (var j = 0; j < i.Difficulties.Count; ++j)
+                {
+                    string pth, entry;
+
+                    if (j == 2)
                     {
-                        var destdir = $"{Config.DataPath}/source/songs";
-                        var rawdir = $"{dirpth}/assets/songs/{(i.NeedDownload ? "dl_" : string.Empty)}{i.Id}";
-
-                        for (var j = 0; j < i.Difficulties.Count; ++j)
-                        {
-                            if (j == 2)
-                            {
-                                var pth = $"{destdir}/{i.Id}.jpg";
-                                var rawpth = $"{rawdir}/base.jpg";
-                                if (!File.Exists(pth) && File.Exists(rawpth)) File.Move(rawpth, pth);
-                            }
-                            else if (i.Difficulties[j].JacketOverride)
-                            {
-                                var pth = $"{destdir}/{i.Id}_{j}.jpg";
-                                var rawpth = $"{rawdir}/{j}.jpg";
-                                if (!File.Exists(pth) && File.Exists(rawpth)) File.Move(rawpth, pth);
-                            }
-                        }
-
-                        ArcaeaCharts.Insert(i);
-                        Thread.Sleep(300);
+                        pth = $"{destdir}/{i.Id}.jpg";
+                        entry = $"{rawdir}/base.jpg";
+                    }
+                    else if (i.Difficulties[j].JacketOverride)
+                    {
+                        pth = $"{destdir}/{i.Id}_{j}.jpg";
+                        entry = $"{rawdir}/{j}.jpg";
+                    }
+                    else
+                    {
+                        continue;
                     }
 
-                Version = info.Version;
-                File.Delete(apkpth);
+                    if (!File.Exists(pth)) apk.GetEntry(entry)!.ExtractToFile(pth);
+                }
+
+                ArcaeaCharts.Insert(i);
             }
-            finally
+
+            using var packlist = apk.GetEntry("assets/songs/packlist")!.Open();
+            Dictionary<string, PackItem> packs
+                = JsonConvert.DeserializeObject<Packlist>(new StreamReader(packlist).ReadToEnd())!.Packs.ToDictionary(i => i.ID);
+
+            foreach (var (_, packItem) in packs)
             {
-                Directory.Delete(dirpth, true);
+                PackageInfo.Insert(new()
+                                   {
+                                       PackageID = packItem.ID,
+                                       Name = string.IsNullOrWhiteSpace(packItem.PackParent)
+                                                  ? packItem.NameLocalized.En
+                                                  : packs[packItem.PackParent].NameLocalized.En
+                                   });
             }
+
+            var ms = new MemoryStream();
+            using var libcocos2dcpp = apk.GetEntry("lib/arm64-v8a/libcocos2dcpp.so")!.Open();
+            libcocos2dcpp.CopyTo(ms);
+            AutoDecrypt(ms.ToArray(), info.Version);
+
+            Version = info.Version;
         }
         catch (Exception ex)
         {

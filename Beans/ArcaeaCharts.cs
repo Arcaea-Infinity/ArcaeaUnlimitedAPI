@@ -50,32 +50,34 @@ public partial class ArcaeaCharts
     {
         for (var i = GetById(item.Id)?.Count ?? 0; i < item.Difficulties.Count; i++)
         {
+            var difficultiesItem = item.Difficulties[i];
             var chart = new ArcaeaCharts
                         {
                             RatingClass = i,
                             SongID = item.Id,
-                            NameEn = item.Difficulties[i].TitleLocalized?.En ?? item.TitleLocalized.En,
-                            NameJp = item.Difficulties[i].TitleLocalized?.Ja ?? item.TitleLocalized.Ja ?? string.Empty,
-                            Bpm = item.Difficulties[i].Bpm ?? item.Bpm,
-                            BpmBase = item.Difficulties[i].BpmBase ?? item.BpmBase,
-                            Set = item.Difficulties[i].Set ?? item.Set,
-                            Artist = item.Difficulties[i].Artist ?? item.Artist,
-                            Side = item.Difficulties[i].Side ?? item.Side,
-                            Date = item.Difficulties[i].Date ?? item.Date,
-                            Version = item.Difficulties[i].Version ?? item.Version,
-                            WorldUnlock = item.Difficulties[i].WorldUnlock ?? item.WorldUnlock,
-                            RemoteDownload = item.Difficulties[i].NeedDownload ?? item.NeedDownload,
-                            Background = item.Difficulties[i].Background ?? item.Background,
-                            ChartDesigner = item.Difficulties[i].ChartDesigner,
-                            JacketDesigner = item.Difficulties[i].JacketDesigner,
-                            JacketOverride = item.Difficulties[i].JacketOverride,
-                            AudioOverride = item.Difficulties[i].AudioOverride,
-                            Difficulty = item.Difficulties[i].Rating * 2 + (item.Difficulties[i].RatingPlus == true ? 1 : 0)
+                            NameEn = difficultiesItem.TitleLocalized?.En ?? item.TitleLocalized.En,
+                            NameJp = difficultiesItem.TitleLocalized?.Ja ?? item.TitleLocalized.Ja ?? string.Empty,
+                            Bpm = difficultiesItem.Bpm ?? item.Bpm,
+                            BpmBase = difficultiesItem.BpmBase ?? item.BpmBase,
+                            Set = difficultiesItem.Set ?? item.Set,
+                            Artist = difficultiesItem.Artist ?? item.Artist,
+                            Side = difficultiesItem.Side ?? item.Side,
+                            Date = difficultiesItem.Date ?? item.Date,
+                            Version = difficultiesItem.Version ?? item.Version,
+                            WorldUnlock = difficultiesItem.WorldUnlock ?? item.WorldUnlock,
+                            RemoteDownload = difficultiesItem.NeedDownload ?? item.NeedDownload,
+                            Background = difficultiesItem.Background ?? item.Background,
+                            ChartDesigner = difficultiesItem.ChartDesigner,
+                            JacketDesigner = difficultiesItem.JacketDesigner,
+                            JacketOverride = difficultiesItem.JacketOverride,
+                            AudioOverride = difficultiesItem.AudioOverride,
+                            Difficulty = difficultiesItem.Rating * 2 + (difficultiesItem.RatingPlus == true ? 1 : 0)
                         };
 
             Songs.TryAddOrInsert(item.Id, chart);
 
-            DatabaseManager.Song.Value.Insert(chart);
+            DatabaseManager.Song.Insert(chart);
+            Thread.Sleep(300);
         }
     }
 
@@ -166,7 +168,7 @@ public partial class ArcaeaCharts
         Sort();
     }
 
-    private void Init() => Package = PackageInfo.GetById(Set)?.Name;
+    private void Init() => Package = PackageInfo.GetNameById(Set);
 
     private static string GetAbbreviation(string str)
     {
