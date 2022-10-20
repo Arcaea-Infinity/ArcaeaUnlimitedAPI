@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <RuntimeIdentifiers>win-x64; linux-x64;</RuntimeIdentifiers>
+        <RuntimeIdentifiers>linux-x64;win10-x64;</RuntimeIdentifiers>
         <ImplicitUsings>enable</ImplicitUsings>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
