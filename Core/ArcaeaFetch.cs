@@ -210,7 +210,7 @@ internal static class ArcaeaFetch
                 }
                 catch (Exception ex)
                 {
-                    Log.ExceptionError(ex);
+                    Logger.ExceptionError(ex);
                     continue;
                 }
         }

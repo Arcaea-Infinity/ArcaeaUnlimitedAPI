@@ -125,11 +125,6 @@ internal static class BackgroundService
                                    });
             }
 
-            var ms = new MemoryStream();
-            using var libcocos2dcpp = apk.GetEntry("lib/arm64-v8a/libcocos2dcpp.so")!.Open();
-            libcocos2dcpp.CopyTo(ms);
-            AutoDecrypt(ms.ToArray(), info.Version);
-
             Version = info.Version;
         }
         catch (Exception ex)

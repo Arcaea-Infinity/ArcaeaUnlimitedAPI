@@ -25,7 +25,7 @@ internal static class NodeInfo
             if (curnodeindex == nodeindex)
             {
                 Parallel.ForEach(Config.Nodes, Utils.TestNode);
-                Log.FunctionError("Node", "ranout.");
+                Logger.FunctionError("Node", "ranout.");
                 return null;
             }
         }

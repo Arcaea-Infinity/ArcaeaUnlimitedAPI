@@ -43,7 +43,7 @@ internal static class Utils
         }
         catch (Exception ex)
         {
-            Log.ExceptionError(ex);
+            Logger.ExceptionError(ex);
             node.Active = false;
         }
     }
