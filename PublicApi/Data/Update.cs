@@ -13,7 +13,6 @@ public partial class PublicApi
     public async Task<object> GetUpdate()
     {
         var obj = await Utils.GetLatestVersion();
-
         return obj is not null ? Success(obj) : Error.UpdateServiceUnavailable;
     }
 }
