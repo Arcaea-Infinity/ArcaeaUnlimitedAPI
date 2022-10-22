@@ -16,4 +16,12 @@ public partial class PublicApi
     [HttpGet("/botarcapi/data/playdata")]
     public object GetPlaydata([BindNever] ArcaeaCharts chart, int start, int end)
         => Success(PlayData.Query(start, end, chart.SongID, chart.RatingClass));
+
+    [EnableCors]
+    [SongInfoConverter(Order = 0)]
+    [DifficultyConverter(Order = 1)]
+    [ChartConverter(Order = 2)]
+    [HttpGet("/botarcapi/data/density")]
+    public object GetPlaydataArray([BindNever] ArcaeaCharts chart)
+        => PlayDataArray.Query(chart).Select(i => new[] { i.FormattedScore, i.FormattedPotential, i.Count });
 }
