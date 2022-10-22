@@ -23,5 +23,5 @@ public partial class PublicApi
     [ChartConverter(Order = 2)]
     [HttpGet("/botarcapi/data/density")]
     public object GetPlaydataArray([BindNever] ArcaeaCharts chart)
-        => PlayDataArray.Query(chart).Select(i => new[] { i.FormattedScore, i.FormattedPotential, i.Count });
+        => Success(PlayDataArray.Query(chart).Select(i => new[] { i.FormattedScore, i.FormattedPotential, i.Count }));
 }
