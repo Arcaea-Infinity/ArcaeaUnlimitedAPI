@@ -1,12 +1,11 @@
 ﻿using ArcaeaUnlimitedAPI.Beans;
-using ArcaeaUnlimitedAPI.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
-public partial class PublicApi
+public sealed partial class PublicApi
 {
     [AuthorizationCheck(Order = 0)]
     [PlayerInfoConverter(Order = 1)]
@@ -17,19 +16,21 @@ public partial class PublicApi
         try
         {
             TaskCompletionSource<(UserInfoResponse? infodata, Response? error)>? task = UserInfoConcurrent.GetTask(player.Code);
+            UserInfoResponse? response;
+            Response? errorresp;
 
             if (task is null)
             {
                 UserInfoConcurrent.NewTask(player.Code);
-                var (response, errorresp) = await QueryUserInfo(player);
+                (response, errorresp) = await QueryUserInfo(player);
                 UserInfoConcurrent.SetResult(player.Code, (response, errorresp));
-                return errorresp ?? GetResponse(response!, recent, withsonginfo);
             }
             else
             {
-                var (response, errorresp) = await task.Task;
-                return errorresp ?? GetResponse(response!, recent, withsonginfo);
+                (response, errorresp) = await task.Task;
             }
+
+            return errorresp ?? GetResponse(response!, recent, withsonginfo);
         }
         finally
         {
@@ -39,23 +40,27 @@ public partial class PublicApi
 
     private static Response GetResponse(UserInfoResponse response, int recent, bool withsonginfo)
     {
-        response.AccountInfo.RecentScore = null!;
-
-        response.RecentScore = recent switch
-                               {
-                                   0   => null,
-                                   > 1 => Records.Query(response.AccountInfo.UserID, recent),
-                                   _   => response.RecentScore
-                               };
-
-        if (response.RecentScore?.Count > 0)
+        UserInfoResponse ret = new()
         {
-            foreach (var record in response.RecentScore) record.UserID = null!;
-
-            if (withsonginfo) response.Songinfo = response.RecentScore.Select(i => ArcaeaCharts.QueryByRecord(i)!);
+            AccountInfo = response.AccountInfo,
+            RecentScore = recent switch
+                          {
+                              0   => null,
+                              > 1 => Records.Query(response.AccountInfo.UserID, recent),
+                              1   => response.RecentScore?.ToList(),
+                              _   => null
+                          }
+        };
+        
+        if (ret.RecentScore?.Count > 0)
+        {
+            foreach (var record in ret.RecentScore) record.UserID = null!;
+            if (withsonginfo) ret.Songinfo = ret.RecentScore.Select(i => ArcaeaCharts.QueryByRecord(i)!);
         }
+        
+        ret.AccountInfo.RecentScore = null!;
 
-        return Success(response);
+        return Success(ret);
     }
 
     private static async Task<(UserInfoResponse? response, Response? error)> QueryUserInfo(PlayerInfo player)
@@ -70,11 +75,6 @@ public partial class PublicApi
             if (friend is null) return (null, recorderror!);
 
             return (new() { AccountInfo = friend, RecentScore = friend.RecentScore }, null);
-        }
-        catch (Exception ex)
-        {
-            Logger.ExceptionError(ex);
-            return (null, Error.AddFriendFailed);
         }
         finally
         {

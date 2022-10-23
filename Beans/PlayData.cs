@@ -1,10 +1,10 @@
-﻿using ArcaeaUnlimitedAPI.PublicApi;
+﻿using ArcaeaUnlimitedAPI.Core;
 using Newtonsoft.Json;
 using SQLite;
 
 namespace ArcaeaUnlimitedAPI.Beans;
 
-public class PlayData
+public sealed class PlayData
 {
     private const string RangeQuerystr
         = "SELECT score/10000 as fscore, count(*) as count FROM records WHERE song_id = ? AND difficulty = ? AND fscore >= 900 AND potential BETWEEN ? AND ? GROUP BY fscore order by fscore desc;";
@@ -23,7 +23,7 @@ public class PlayData
         => DatabaseManager.Bests.Value.Query<PlayData>(RangeQuerystr, songid, difficulty, potentialstart, potentialend);
 }
 
-public class PlayDataArray
+public sealed class PlayDataArray
 {
     private const string RangeQuerystr
         = "SELECT score/10000 as fscore, potential/10 as fpotential, count(*) as count FROM records WHERE song_id = ? AND difficulty = ? AND fscore >= 950 AND fpotential >= 110 GROUP BY fscore, fpotential order by fscore desc;";

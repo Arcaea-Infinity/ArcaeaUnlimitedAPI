@@ -1,5 +1,5 @@
-﻿using ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
-using ArcaeaUnlimitedAPI.PublicApi;
+﻿using ArcaeaUnlimitedAPI.Core;
+using ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
 using SQLite;
 
 namespace ArcaeaUnlimitedAPI.Beans;
@@ -9,7 +9,7 @@ namespace ArcaeaUnlimitedAPI.Beans;
 [Serializable]
 [Table("players")]
 [DatabaseManager.CreateTableSqlAttribute("CREATE TABLE `players` (`uid`  INTEGER NOT NULL,`code` TEXT NOT NULL,`name` TEXT NOT NULL,`ptt` INTEGER DEFAULT -1,`join_date` INTEGER NOT NULL,PRIMARY KEY (`uid` ASC));")]
-public class PlayerInfo
+public sealed class PlayerInfo
 {
     [PrimaryKey] [Column("uid")]
     public string UserID { get; set; }

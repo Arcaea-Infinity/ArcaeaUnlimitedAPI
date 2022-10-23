@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
-public class Response
+public sealed class Response
 {
     [JsonProperty("status")]
     public int Status { get; set; }

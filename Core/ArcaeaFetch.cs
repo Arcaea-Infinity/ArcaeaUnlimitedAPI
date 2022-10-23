@@ -2,7 +2,6 @@
 using System.Text;
 using ArcaeaUnlimitedAPI.Beans;
 using ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
-using ArcaeaUnlimitedAPI.PublicApi;
 using Newtonsoft.Json;
 using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 
@@ -15,7 +14,7 @@ internal static class ArcaeaFetch
         string body,
         string path,
         ulong time = 0)
-        => _arcaeaHash.GenerateChallenge(method, body, path, time);
+        => ArcaeaHash.GenerateChallenge(method, body, path, time);
 
     internal static async Task<bool> GetToken(this AccountInfo accountInfo)
     {
@@ -48,7 +47,7 @@ internal static class ArcaeaFetch
         }
     }
 
-    internal static async Task<(bool, List<FriendsItem>?)> UserMe(this AccountInfo accountInfo, bool tryagain = true)
+    private static async Task<(bool, List<FriendsItem>?)> UserMe(this AccountInfo accountInfo, bool tryagain = true)
     {
         var info = await Get("user/me", accountInfo, null);
         if (info is null) return (false, null);
@@ -56,9 +55,14 @@ internal static class ArcaeaFetch
         if (info.Success)
         {
             var value = info.DeserializeContent<UserMeValue>();
-            accountInfo.UserID = value.UserID;
-            accountInfo.Code = value.UserCode;
-            DatabaseManager.Account.Update(accountInfo);
+
+            if (accountInfo.UserID != value.UserID || accountInfo.Code != value.UserCode)
+            {
+                accountInfo.UserID = value.UserID;
+                accountInfo.Code = value.UserCode;
+                DatabaseManager.Account.Update(accountInfo);
+            }
+
             return (true, value.Friends);
         }
 
@@ -170,7 +174,6 @@ internal static class ArcaeaFetch
                 var email = RandomStringGenerator.GetRandString() + "@gmail.com";
                 var deviceID = RandomStringGenerator.GetRandDeviceID();
 
-
                 var info = Register(Config.Node, name, password, email, deviceID).Result;
 
                 if (info?.ErrorCode == 124) return;
@@ -239,14 +242,12 @@ internal static class ArcaeaFetch
     private static string _apientry = null!;
     private static Node _node = null!;
     private static readonly int MaxRetryCount = 3;
-    private static ArcaeaHash _arcaeaHash = null!;
 
     internal static void Init()
     {
+        ArcaeaHash.Init();
         _apientry = Config.ApiEntry;
         _node = Config.Node;
-        _arcaeaHash = new();
-        _arcaeaHash.Init();
         var certificate = new X509Certificate2($"{Config.DataPath}/{Config.CertFileName}", Config.CertPassword);
         var handler = new HttpClientHandler();
         handler.ClientCertificates.Add(certificate);

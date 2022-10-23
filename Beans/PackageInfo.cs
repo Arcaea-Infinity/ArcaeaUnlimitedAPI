@@ -1,5 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using ArcaeaUnlimitedAPI.PublicApi;
+using ArcaeaUnlimitedAPI.Core;
 using SQLite;
 
 namespace ArcaeaUnlimitedAPI.Beans;
@@ -9,7 +9,7 @@ namespace ArcaeaUnlimitedAPI.Beans;
 [Serializable]
 [Table("packages")]
 [DatabaseManager.CreateTableSqlAttribute("CREATE TABLE `packages`(`id` TEXT PRIMARY KEY NOT NULL, `name` TEXT NOT NULL DEFAULT '', FOREIGN KEY(`id`) REFERENCES `charts`(`set`));")]
-internal class PackageInfo
+internal sealed class PackageInfo
 {
     private static Lazy<ConcurrentDictionary<string, string>> _list
         = new(() => new(DatabaseManager.Song.SelectAll<PackageInfo>().ToDictionary(i => i.PackageID, i => i.Name)));

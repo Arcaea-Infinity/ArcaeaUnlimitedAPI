@@ -3,7 +3,7 @@
 namespace ArcaeaUnlimitedAPI.Json.Songlist;
 
 [Serializable]
-public class DifficultiesItem
+public sealed class DifficultiesItem
 {
     [JsonProperty("ratingClass")]
     public int RatingClass { get; set; }

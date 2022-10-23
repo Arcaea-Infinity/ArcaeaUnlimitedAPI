@@ -2,7 +2,7 @@
 
 namespace ArcaeaUnlimitedAPI.PublicApi.Params;
 
-internal record PlayerInfoParams(string User, string UserCode) : IParams<PlayerInfo>
+internal sealed record PlayerInfoParams(string User, string UserCode) : IParams<PlayerInfo>
 {
     public PlayerInfo? Validate(out Response? error)
     {

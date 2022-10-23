@@ -6,7 +6,7 @@ using ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
 // ReSharper disable InconsistentlySynchronizedField
-internal class PollingBestsHelper
+internal sealed class PollingBestsHelper
 {
     private readonly AccountInfo _account;
     private readonly PriorityQueue<ArcaeaCharts, int> _failedlist = new();

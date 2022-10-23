@@ -4,7 +4,7 @@ using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
-public partial class PublicApi
+public sealed partial class PublicApi
 {
     private static readonly string[] PathList =
     {
@@ -26,7 +26,6 @@ public partial class PublicApi
     public object PostChallenges([FromBody] ChallengeData[] data)
     {
         if (data.Select(i => i.Path).Any(path => PathList.All(i => !path.StartsWith(i)))) return NotFound(null);
-
         return Success(data.Select(i => ArcaeaFetch.GenerateChallenge(string.Empty, i.Body, i.Path, i.Time)));
     }
 

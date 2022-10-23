@@ -5,7 +5,7 @@ namespace ArcaeaUnlimitedAPI.Json.Songlist;
 #pragma warning disable CS8618
 
 [Serializable]
-public class SongItem
+public sealed class SongItem
 {
     [JsonProperty("id")]
     public string Id { get; set; }

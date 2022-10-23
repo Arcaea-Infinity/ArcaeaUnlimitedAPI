@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
-internal class ConcurrentApiRequest<T, TU> where T : notnull
+internal sealed class ConcurrentApiRequest<T, TU> where T : notnull
 {
     private readonly ConcurrentDictionary<T, TaskCompletionSource<TU>> _connPending = new();
 

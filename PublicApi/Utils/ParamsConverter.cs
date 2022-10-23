@@ -11,7 +11,7 @@ internal static class ConverterUtils
     internal static string GetValue(this ActionExecutingContext context, string key) => context.HttpContext.Request.Query[key].ToString();
 }
 
-internal class SongInfoConverterAttribute : ActionFilterAttribute
+internal sealed class SongInfoConverterAttribute : ActionFilterAttribute
 {
     public override void OnActionExecuting(ActionExecutingContext context)
     {
@@ -29,7 +29,7 @@ internal class SongInfoConverterAttribute : ActionFilterAttribute
     }
 }
 
-internal class PlayerInfoConverterAttribute : ActionFilterAttribute
+internal sealed class PlayerInfoConverterAttribute : ActionFilterAttribute
 {
     public override void OnActionExecuting(ActionExecutingContext context)
     {
@@ -47,7 +47,7 @@ internal class PlayerInfoConverterAttribute : ActionFilterAttribute
     }
 }
 
-internal class OverflowConverterAttribute : ActionFilterAttribute
+internal sealed class OverflowConverterAttribute : ActionFilterAttribute
 {
     public override void OnActionExecuting(ActionExecutingContext context)
     {
@@ -65,7 +65,7 @@ internal class OverflowConverterAttribute : ActionFilterAttribute
     }
 }
 
-internal class RecentConverterAttribute : ActionFilterAttribute
+internal sealed class RecentConverterAttribute : ActionFilterAttribute
 {
     public override void OnActionExecuting(ActionExecutingContext context)
     {
@@ -83,7 +83,7 @@ internal class RecentConverterAttribute : ActionFilterAttribute
     }
 }
 
-internal class DifficultyConverterAttribute : ActionFilterAttribute
+internal sealed class DifficultyConverterAttribute : ActionFilterAttribute
 {
     internal DifficultyConverterAttribute(bool ignore = true)
     {
@@ -110,7 +110,7 @@ internal class DifficultyConverterAttribute : ActionFilterAttribute
     }
 }
 
-internal class ChartConverterAttribute : ActionFilterAttribute
+internal sealed class ChartConverterAttribute : ActionFilterAttribute
 {
     private static bool ChartMissingCheck(ArcaeaSong song, sbyte difficulty)
         => (difficulty == 3 && song.Count < 4) || (song.SongID == "lasteternity" && difficulty != 3);
@@ -131,7 +131,7 @@ internal class ChartConverterAttribute : ActionFilterAttribute
     }
 }
 
-internal class FileConverterAttribute : ActionFilterAttribute
+internal sealed class FileConverterAttribute : ActionFilterAttribute
 {
     public override void OnActionExecuting(ActionExecutingContext context)
     {

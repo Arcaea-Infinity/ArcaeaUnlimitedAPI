@@ -2,7 +2,7 @@
 
 namespace ArcaeaUnlimitedAPI.PublicApi.Params;
 
-internal record SongInfoParams(string SongName, string SongID) : IParams<ArcaeaSong>
+internal sealed record SongInfoParams(string SongName, string SongID) : IParams<ArcaeaSong>
 {
     public ArcaeaSong? Validate(out Response? error)
     {

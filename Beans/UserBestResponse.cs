@@ -5,7 +5,7 @@ namespace ArcaeaUnlimitedAPI.Beans;
 
 #pragma warning disable CS8618
 
-public class UserBestResponse
+public sealed class UserBestResponse
 {
     [JsonProperty("account_info")]
     public FriendsItem AccountInfo { get; set; }

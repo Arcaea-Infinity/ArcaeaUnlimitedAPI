@@ -1,8 +1,7 @@
 ﻿using System.Linq.Expressions;
-using ArcaeaUnlimitedAPI.Core;
 using SQLite;
 
-namespace ArcaeaUnlimitedAPI.PublicApi;
+namespace ArcaeaUnlimitedAPI.Core;
 
 internal static class DatabaseManager
 {

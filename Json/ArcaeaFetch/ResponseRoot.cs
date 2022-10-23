@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
 
-public class ResponseRoot
+public sealed class ResponseRoot
 {
     [JsonProperty("success")]
     public bool Success { get; set; }
@@ -22,7 +22,7 @@ public class ResponseRoot
     internal T DeserializeContent<T>() => JsonConvert.DeserializeObject<T>(Value!.ToString(), new Int32Converter());
 }
 
-internal class Int32Converter : JsonConverter<int?>
+internal sealed class Int32Converter : JsonConverter<int?>
 {
     public override bool CanWrite => false;
 

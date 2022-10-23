@@ -4,7 +4,7 @@ namespace ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
 
 #pragma warning disable CS8618
 
-public class UserMeValue
+public sealed class UserMeValue
 {
     [JsonProperty("max_friend")]
     public int MaxFriend { get; set; }
@@ -19,7 +19,7 @@ public class UserMeValue
     public List<FriendsItem> Friends { get; set; }
 }
 
-public class RegisterValue
+public sealed class RegisterValue
 {
     [JsonProperty("user_id")]
     public int UserID { get; set; }
@@ -28,7 +28,7 @@ public class RegisterValue
     public string AccessToken { get; set; }
 }
 
-public class ArcUpdateValue
+public sealed class ArcUpdateValue
 {
     [JsonProperty("url")]
     public string Url { get; set; }
@@ -37,7 +37,7 @@ public class ArcUpdateValue
     public string Version { get; set; }
 }
 
-public class AddFriendValue
+public sealed class AddFriendValue
 {
     [JsonProperty("friends")]
     public List<FriendsItem> Friends { get; set; }

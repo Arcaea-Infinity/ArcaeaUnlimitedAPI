@@ -7,7 +7,7 @@ using static ArcaeaUnlimitedAPI.PublicApi.Response;
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
 [ApiController]
-public partial class PublicApi : ControllerBase
+public sealed partial class PublicApi : ControllerBase
 {
     private static readonly ConcurrentApiRequest<string, (UserInfoResponse? infodata, Response? error)> UserInfoConcurrent = new();
 

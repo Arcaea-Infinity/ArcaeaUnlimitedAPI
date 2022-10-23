@@ -5,7 +5,7 @@ namespace ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
 
 #pragma warning disable CS8618
 
-public class FriendsItem
+public sealed class FriendsItem
 {
     [JsonProperty("code")]
     public string Code { get; set; }

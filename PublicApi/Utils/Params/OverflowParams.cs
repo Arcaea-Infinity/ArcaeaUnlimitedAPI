@@ -1,6 +1,6 @@
 ﻿namespace ArcaeaUnlimitedAPI.PublicApi.Params;
 
-internal record OverflowParams(string Overflow) : IParams<int>
+internal sealed record OverflowParams(string Overflow) : IParams<int>
 {
     public int Validate(out Response? error)
     {

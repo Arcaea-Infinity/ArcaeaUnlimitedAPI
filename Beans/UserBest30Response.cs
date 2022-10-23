@@ -1,6 +1,6 @@
 ﻿using System.Text;
+using ArcaeaUnlimitedAPI.Core;
 using ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
-using ArcaeaUnlimitedAPI.PublicApi;
 using Newtonsoft.Json;
 using SQLite;
 
@@ -11,7 +11,7 @@ namespace ArcaeaUnlimitedAPI.Beans;
 [Serializable]
 [Table("cache")]
 [DatabaseManager.CreateTableSqlAttribute("CREATE TABLE `cache` (`uid` INTEGER NOT NULL,`last_played`  INTEGER NOT NULL DEFAULT 0,`best30_avg`   INTEGER NOT NULL DEFAULT 0,`recent10_avg` INTEGER NOT NULL DEFAULT 0,`best30_list`  TEXT DEFAULT '',`best30_overflow`  TEXT DEFAULT '',PRIMARY KEY (`uid` ASC));")]
-public class UserBest30Response
+public sealed class UserBest30Response
 {
     [JsonIgnore] [PrimaryKey] [Column("uid")]
     public int UserID { get; set; }

@@ -4,7 +4,7 @@ using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
-internal class AuthorizationCheck : ActionFilterAttribute
+internal sealed class AuthorizationCheck : ActionFilterAttribute
 {
     private static bool TokenCheck(HttpContext context)
     {

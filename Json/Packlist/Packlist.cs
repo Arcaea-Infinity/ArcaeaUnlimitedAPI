@@ -4,13 +4,13 @@
 
 namespace ArcaeaUnlimitedAPI.Json.Packlist;
 
-public class NameLocalized
+public sealed class NameLocalized
 {
     [JsonProperty("en")]
     public string En { get; set; }
 }
 
-public class PackItem
+public sealed class PackItem
 {
     [JsonProperty("id")]
     public string ID { get; set; }
@@ -22,7 +22,7 @@ public class PackItem
     public NameLocalized NameLocalized { get; set; }
 }
 
-public class Packlist
+public sealed class Packlist
 {
     [JsonProperty("packs")]
     public List<PackItem> Packs { get; set; }

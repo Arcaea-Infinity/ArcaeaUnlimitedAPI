@@ -7,7 +7,7 @@ using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
-public partial class PublicApi
+public sealed partial class PublicApi
 {
     [AuthorizationCheck(Order = 0)]
     [PlayerInfoConverter(Order = 1)]
@@ -26,19 +26,21 @@ public partial class PublicApi
         try
         {
             TaskCompletionSource<(UserBestResponse? bestdata, Response? error)>? task = UserBestConcurrent.GetTask(key);
+            UserBestResponse? response;
+            Response? errorresp;
 
             if (task is null)
             {
                 UserBestConcurrent.NewTask(key);
-                var (response, errorresp) = await QueryUserBest(player, chart);
+                (response, errorresp) = await QueryUserBest(player, chart);
                 UserBestConcurrent.SetResult(key, (response, errorresp));
-                return errorresp ?? GetResponse(response!, withrecent, withsonginfo, chart);
             }
             else
             {
-                var (response, errorresp) = await task.Task;
-                return errorresp ?? GetResponse(response!, withrecent, withsonginfo, chart);
+                (response, errorresp) = await task.Task;
             }
+
+            return errorresp ?? GetResponse(response!, withrecent, withsonginfo, chart);
         }
         finally
         {
@@ -52,19 +54,25 @@ public partial class PublicApi
         bool withsonginfo,
         ArcaeaCharts chart)
     {
+        UserBestResponse ret = new()
+                               {
+                                   AccountInfo = response.AccountInfo,
+                                   Record = response.Record,
+                               };
+
         if (withsonginfo)
             // add song info
-            response.Songinfo = new[] { chart };
+            ret.Songinfo = new[] { chart };
 
         if (withrecent)
         {
-            if (response.AccountInfo.RecentScore is not null) response.RecentScore = response.AccountInfo.RecentScore.FirstOrDefault();
-            if (withsonginfo) response.RecentSonginfo = ArcaeaCharts.QueryByRecord(response.RecentScore);
+            if (response.AccountInfo.RecentScore is not null) ret.RecentScore = response.AccountInfo.RecentScore.FirstOrDefault();
+            if (withsonginfo) ret.RecentSonginfo = ArcaeaCharts.QueryByRecord(ret.RecentScore);
         }
 
-        response.AccountInfo.RecentScore = null!;
+        ret.AccountInfo.RecentScore = null!;
 
-        return Success(response);
+        return Success(ret);
     }
 
     private static async Task<(UserBestResponse? response, Response? error)> QueryUserBest(PlayerInfo player, ArcaeaCharts chart)
