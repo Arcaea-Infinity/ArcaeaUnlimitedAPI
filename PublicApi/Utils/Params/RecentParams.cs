@@ -1,6 +1,6 @@
 ﻿namespace ArcaeaUnlimitedAPI.PublicApi.Params;
 
-internal record RecentParams(string Recent) : IParams<int>
+internal sealed record RecentParams(string Recent) : IParams<int>
 {
     public int Validate(out Response? error)
     {

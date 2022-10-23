@@ -2,7 +2,7 @@
 
 namespace ArcaeaUnlimitedAPI.PublicApi.Params;
 
-internal record DifficultyParams(string Difficulty) : IParams<sbyte>
+internal sealed record DifficultyParams(string Difficulty) : IParams<sbyte>
 {
     private static readonly ConcurrentDictionary<sbyte, string[]> List;
 

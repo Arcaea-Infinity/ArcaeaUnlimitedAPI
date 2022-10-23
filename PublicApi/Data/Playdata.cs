@@ -6,7 +6,7 @@ using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
-public partial class PublicApi
+public sealed partial class PublicApi
 {
     [EnableCors]
     [SongInfoConverter(Order = 0)]

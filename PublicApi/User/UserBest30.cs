@@ -6,7 +6,7 @@ using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
-public partial class PublicApi
+public sealed partial class PublicApi
 {
     [AuthorizationCheck(Order = 0)]
     [PlayerInfoConverter(Order = 1)]
@@ -21,19 +21,21 @@ public partial class PublicApi
         try
         {
             TaskCompletionSource<(UserBest30Response? b30data, Response? error)>? task = UserBest30Concurrent.GetTask(player.Code);
+            UserBest30Response? response;
+            Response? errorresp;
 
             if (task is null)
             {
                 UserBest30Concurrent.NewTask(player.Code);
-                var (response, errorresp) = await QueryUserBest30(player);
+                (response, errorresp) = await QueryUserBest30(player);
                 UserBest30Concurrent.SetResult(player.Code, (response, errorresp));
-                return errorresp ?? GetResponse(response!, overflow, withrecent, withsonginfo);
             }
             else
             {
-                var (response, errorresp) = await task.Task;
-                return errorresp ?? GetResponse(response!, overflow, withrecent, withsonginfo);
+                (response, errorresp) = await task.Task;
             }
+
+            return errorresp ?? GetResponse(response!, overflow, withrecent, withsonginfo);
         }
         finally
         {
@@ -47,28 +49,36 @@ public partial class PublicApi
         bool withrecent,
         bool withsonginfo)
     {
+        UserBest30Response ret = new()
+                                 {
+                                     AccountInfo = response.AccountInfo,
+                                     Best30Avg = response.Best30Avg,
+                                     Recent10Avg = response.Recent10Avg,
+                                     Best30List = response.Best30List,
+                                 };
+        
         if (response.Best30Overflow is not null)
-            response.Best30Overflow = overflowCount == 0
-                                          ? null!
-                                          : response.Best30Overflow.Take(Math.Min(overflowCount, response.Best30Overflow.Count)).ToList();
+            ret.Best30Overflow = overflowCount == 0
+                                     ? null!
+                                     : response.Best30Overflow.Take(Math.Min(overflowCount, response.Best30Overflow.Count)).ToList();
 
         if (withsonginfo)
         {
-            if (response.Best30List is not null) response.Best30Songinfo = response.Best30List.Select(i => ArcaeaCharts.QueryByRecord(i)!);
+            if (ret.Best30List is not null) ret.Best30Songinfo = ret.Best30List.Select(i => ArcaeaCharts.QueryByRecord(i)!);
 
-            if (response.Best30Overflow is not null)
-                response.Best30OverflowSonginfo = response.Best30Overflow.Select(i => ArcaeaCharts.QueryByRecord(i)!);
+            if (ret.Best30Overflow is not null)
+                ret.Best30OverflowSonginfo = ret.Best30Overflow.Select(i => ArcaeaCharts.QueryByRecord(i)!);
         }
 
         if (withrecent)
         {
-            if (response.AccountInfo.RecentScore is not null) response.RecentScore = response.AccountInfo.RecentScore.FirstOrDefault();
-            if (withsonginfo) response.RecentSonginfo = ArcaeaCharts.QueryByRecord(response.RecentScore);
+            if (response.AccountInfo.RecentScore is not null) ret.RecentScore = response.AccountInfo.RecentScore.FirstOrDefault();
+            if (withsonginfo) ret.RecentSonginfo = ArcaeaCharts.QueryByRecord(ret.RecentScore);
         }
 
-        response.AccountInfo.RecentScore = null;
+        ret.AccountInfo.RecentScore = null;
 
-        return Success(response);
+        return Success(ret);
     }
 
     private static async Task<(UserBest30Response? response, Response? error)> QueryUserBest30(PlayerInfo player)
@@ -118,11 +128,6 @@ public partial class PublicApi
 
             best30Cache.AccountInfo = friend;
             return (best30Cache, null);
-        }
-        catch (Exception ex)
-        {
-            Logger.ExceptionError(ex);
-            return (null, Error.AddFriendFailed);
         }
         finally
         {

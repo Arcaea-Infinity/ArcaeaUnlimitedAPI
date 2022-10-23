@@ -1,4 +1,4 @@
-﻿using ArcaeaUnlimitedAPI.PublicApi;
+﻿using ArcaeaUnlimitedAPI.Core;
 using SQLite;
 
 namespace ArcaeaUnlimitedAPI.Beans;
@@ -8,7 +8,7 @@ namespace ArcaeaUnlimitedAPI.Beans;
 [Serializable]
 [Table("alias")]
 [DatabaseManager.CreateTableSqlAttribute("CREATE TABLE `alias` (`sid` TEXT NOT NULL,`alias` TEXT NOT NULL PRIMARY KEY, FOREIGN KEY(`sid`) REFERENCES `charts`(`song_id`));")]
-public class ArcaeaAlias
+public sealed class ArcaeaAlias
 {
     [PrimaryKey] [Column("alias")]
     public string Alias { get; set; }

@@ -2,13 +2,12 @@
 using System.Text;
 using ArcaeaUnlimitedAPI.Core;
 using ArcaeaUnlimitedAPI.Json.Songlist;
-using ArcaeaUnlimitedAPI.PublicApi;
 using Newtonsoft.Json;
 using SQLite;
 
 namespace ArcaeaUnlimitedAPI.Beans;
 
-public partial class ArcaeaCharts
+public sealed partial class ArcaeaCharts
 {
     internal static readonly ConcurrentDictionary<string, ArcaeaSong> Songs;
     internal static readonly SortedDictionary<string, object> SongJsons;
@@ -110,7 +109,7 @@ public partial class ArcaeaCharts
         => Utils.RandomHelper.GetRandomItem(GetByDifficulty(start ?? 0, end ?? 24).ToArray());
 }
 
-public partial class ArcaeaCharts
+public sealed partial class ArcaeaCharts
 {
     [NonSerialized]
     private static readonly List<ArcaeaCharts> SortByRating;
@@ -195,7 +194,7 @@ public partial class ArcaeaCharts
     }
 }
 
-public partial class ArcaeaCharts
+public sealed partial class ArcaeaCharts
 {
     private static ArcaeaSong? GetById(string? songid) => songid is not null && Songs.TryGetValue(songid, out var value) ? value : null;
 
@@ -271,7 +270,7 @@ public partial class ArcaeaCharts
 [Table("charts")]
 [DatabaseManager.CreateTableSqlAttribute(
                                             "CREATE TABLE `charts`(`song_id` TEXT PRIMARY KEY NOT NULL DEFAULT '', `rating_class` INTEGER NOT NULL DEFAULT 0, `name_en` TEXT NOT NULL DEFAULT '', `name_jp` TEXT DEFAULT '', `artist` TEXT NOT NULL DEFAULT '', `bpm` TEXT NOT NULL DEFAULT '', `bpm_base` DOUBLE NOT NULL DEFAULT 0, `set` TEXT NOT NULL DEFAULT '', `time` INTEGER DEFAULT 0, `side` INTEGER NOT NULL DEFAULT 0, `world_unlock` BOOLEAN NOT NULL DEFAULT 0, `remote_download` BOOLEAN DEFAULT '', `bg` TEXT NOT NULL DEFAULT '', `date` INTEGER NOT NULL DEFAULT 0, `version` TEXT NOT NULL DEFAULT '', `difficulty` INTEGER NOT NULL DEFAULT 0, `rating` INTEGER NOT NULL DEFAULT 0, `note` INTEGER NOT NULL DEFAULT 0, `chart_designer` TEXT DEFAULT '', `jacket_designer` TEXT DEFAULT '', `jacket_override` BOOLEAN NOT NULL DEFAULT 0, `audio_override` BOOLEAN NOT NULL DEFAULT 0);")]
-public partial class ArcaeaCharts
+public sealed partial class ArcaeaCharts
 {
     #region DataProperties
 

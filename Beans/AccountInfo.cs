@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using ArcaeaUnlimitedAPI.Core;
-using ArcaeaUnlimitedAPI.PublicApi;
 using SQLite;
 
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
@@ -15,7 +14,7 @@ namespace ArcaeaUnlimitedAPI.Beans;
 
 [Table("accounts")]
 [DatabaseManager.CreateTableSqlAttribute("CREATE TABLE `accounts` (`name` TEXT NOT NULL,`passwd` TEXT NOT NULL,`device` TEXT NOT NULL DEFAULT '',`uid` INTEGER DEFAULT 0,`ucode`  TEXT DEFAULT '', `token`  TEXT DEFAULT '',`banned` TEXT NOT NULL DEFAULT 'false' CHECK(`banned` IN('true', 'false')),PRIMARY KEY (`name` ASC));")]
-internal class AccountInfo
+internal sealed class AccountInfo
 {
     private static readonly Lazy<ConcurrentQueue<AccountInfo>> Queue
         = new(new ConcurrentQueue<AccountInfo>(DatabaseManager.Account.Where<AccountInfo>(i => i.Banned != "true")));
@@ -61,8 +60,6 @@ internal class AccountInfo
                     if (account.Banned != "true") Recycle(account);
                     continue;
                 }
-
-                if (account.UserID == 0) await account.UserMe(false);
 
                 if (!await account.ClearFriend())
                 {
