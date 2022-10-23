@@ -13,5 +13,5 @@
 [Oo]bj/
 
 Core/ArcaeaHash.cs
-Core/ArcaeaDecrypt.cs
 PublicApi/Assets/Preview.cs
+PublicApi/Data/Challenge.cs

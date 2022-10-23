@@ -20,7 +20,6 @@
 
     <ItemGroup>
       <Compile Remove="Core\ArcaeaHash.cs" />
-      <Compile Remove="Core\ArcaeaDecrypt.cs" />
     </ItemGroup>
 
 </Project>

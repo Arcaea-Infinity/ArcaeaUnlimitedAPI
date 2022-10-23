@@ -75,6 +75,8 @@ public class ConfigItem
 
     [JsonProperty("nodes")]
     public List<Node> Nodes { get; set; }
+    
+    internal void WriteConfig() => File.WriteAllText("apiconfig.json", JsonConvert.SerializeObject(this, Formatting.Indented));
 }
 
 public class Node
