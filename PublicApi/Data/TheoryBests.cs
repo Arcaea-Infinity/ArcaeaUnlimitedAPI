@@ -43,7 +43,7 @@ public sealed partial class PublicApi
         {
             if (results.Count >= count) break;
 
-            if (double.IsNaN(verNum) || double.Parse(chart.Version) < verNum)
+            if (double.IsNaN(verNum) || double.Parse(chart.Version) <= verNum)
             {
                 var result = new Records
                              {
