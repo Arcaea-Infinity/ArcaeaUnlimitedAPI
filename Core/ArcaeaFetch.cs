@@ -9,12 +9,12 @@ namespace ArcaeaUnlimitedAPI.Core;
 
 internal static class ArcaeaFetch
 {
-    internal static string GenerateChallenge(
+    private static string GenerateChallenge(
         string method,
         string body,
         string path,
         ulong time = 0)
-        => ArcaeaHash.GenerateChallenge(method, body, path, time);
+        => _arcaeaHash.GenerateChallenge(method, body, path, time);
 
     internal static async Task<bool> GetToken(this AccountInfo accountInfo)
     {
