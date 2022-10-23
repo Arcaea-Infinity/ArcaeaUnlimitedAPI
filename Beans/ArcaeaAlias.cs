@@ -7,7 +7,7 @@ namespace ArcaeaUnlimitedAPI.Beans;
 
 [Serializable]
 [Table("alias")]
-[DatabaseManager.CreateTableSqlAttribute("CREATE TABLE `alias` (`sid` TEXT NOT NULL,`alias` TEXT NOT NULL PRIMARY KEY, FOREIGN KEY(`sid`) REFERENCES `charts`(`song_id`));")]
+[DatabaseManager.CreateTableSqlAttribute("CREATE TABLE IF NOT EXISTS `alias` (`sid` TEXT NOT NULL,`alias` TEXT NOT NULL PRIMARY KEY, FOREIGN KEY(`sid`) REFERENCES `charts`(`song_id`));")]
 public sealed class ArcaeaAlias
 {
     [PrimaryKey] [Column("alias")]

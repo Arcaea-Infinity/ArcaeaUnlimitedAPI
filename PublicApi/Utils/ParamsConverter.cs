@@ -137,7 +137,13 @@ internal sealed class FileConverterAttribute : ActionFilterAttribute
     {
         var file = context.GetValue("file");
 
-        if (string.IsNullOrWhiteSpace(file) || file.Contains("/")) return;
+        if (string.IsNullOrWhiteSpace(file)) return;
+
+        if (file.Contains("/"))
+        {
+            context.Result = new JsonResult(Response.Error.FileUnavailable) { StatusCode = 404 };
+            return;
+        }
 
         var fileinfo = new FileInfo($"{GlobalConfig.Config.DataPath}/source/songs/{file}.jpg");
 

@@ -248,7 +248,7 @@ internal static class ArcaeaFetch
         ArcaeaHash.Init();
         _apientry = Config.ApiEntry;
         _node = Config.Node;
-        var certificate = new X509Certificate2($"{Config.DataPath}/{Config.CertFileName}", Config.CertPassword);
+        var certificate = new X509Certificate2(Path.Combine(Config.DataPath, Config.CertFileName), Config.CertPassword);
         var handler = new HttpClientHandler();
         handler.ClientCertificates.Add(certificate);
         handler.ServerCertificateCustomValidationCallback = (
