@@ -148,11 +148,9 @@ internal static class BackgroundService
         {
             var decrypt = new ArcaeaDecrypt();
             decrypt.ReadLib(lib);
-
-            File.WriteAllBytes($"{Config.DataPath}/cert-{version}.p12", decrypt.GetCert());
-
-            Config.ApiEntry = decrypt.GetApiEntry();
             Config.CertFileName = $"cert-{version}.p12";
+            File.WriteAllBytes(Path.Combine(Config.DataPath, Config.CertFileName), decrypt.GetCert());
+            Config.ApiEntry = decrypt.GetApiEntry();
             Config.Appversion = version;
             
             Config.WriteConfig();
@@ -178,6 +176,6 @@ internal static class BackgroundService
                                                        Timeout = 5000
                                                    });
 
-        downloader.DownloadFileTaskAsync(url, new DirectoryInfo($"{Config.DataPath}/update/")).Wait();
+        downloader.DownloadFileTaskAsync(url, new DirectoryInfo(Path.Combine(Config.DataPath, "update"))).Wait();
     }
 }
