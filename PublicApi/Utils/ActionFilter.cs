@@ -35,7 +35,7 @@ internal sealed class AuthorizationCheck : ActionFilterAttribute
             return;
         }
 
-        string currentTokenID;
+        var currentTokenID = "0000";
 
         if (TokenCheck(context.HttpContext, out var token))
         {
@@ -46,10 +46,6 @@ internal sealed class AuthorizationCheck : ActionFilterAttribute
         {
             context.Result = new ObjectResult(Response.Error.QuotaExceeded) { StatusCode = 429 };
             return;
-        }
-        else
-        {
-            currentTokenID = "0000";
         }
 
         context.ActionArguments["currentTokenID"] = currentTokenID;

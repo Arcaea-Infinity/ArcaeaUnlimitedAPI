@@ -50,4 +50,8 @@ public sealed partial class PublicApi : ControllerBase
 
         return friend;
     }
+
+    [AuthorizationCheck(Order = 0)]
+    [HttpGet("/botarcapi/stat")]
+    public object GetStat() => Success(new { fetch = QueryCounter.FetchCounter, query = QueryCounter.AuaQueryCounter });
 }

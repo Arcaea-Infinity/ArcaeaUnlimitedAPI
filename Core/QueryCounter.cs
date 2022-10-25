@@ -4,9 +4,9 @@ namespace ArcaeaUnlimitedAPI.Core;
 
 internal static class QueryCounter
 {
-    private static readonly ConcurrentDictionary<string, ConcurrentDictionary<string, long>> FetchCounter = new(), AuaQueryCounter = new();
+    internal static readonly ConcurrentDictionary<string, ConcurrentDictionary<string, long>> FetchCounter = new(), AuaQueryCounter = new();
 
-    private static string DateString => DateTime.Now.ToShortDateString();
+    private static string DateString => DateTime.UtcNow.ToShortDateString();
 
     internal static void RecordQuery(string tokenid)
     {

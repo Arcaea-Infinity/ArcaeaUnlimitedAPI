@@ -37,9 +37,9 @@ internal sealed class AccountInfo
     [Column("banned")]
     public string Banned { get; set; }
 
-    [Ignore] public string CurrentTokenId { get; set; }
+    [Ignore] public string CurrentTokenId { get; private set; }
 
-    internal static async Task<AccountInfo?> Alloc()
+    internal static async Task<AccountInfo?> Alloc(string tokenid)
     {
         AccountInfo? account = null;
         while (true)
@@ -51,6 +51,8 @@ internal sealed class AccountInfo
                     Logger.FunctionError("Account", "ranout.");
                     return null;
                 }
+                
+                account.CurrentTokenId = tokenid;
 
                 if (account.Banned == "true") continue;
 

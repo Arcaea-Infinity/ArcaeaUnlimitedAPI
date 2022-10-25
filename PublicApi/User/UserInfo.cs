@@ -73,9 +73,9 @@ public sealed partial class PublicApi
 
         try
         {
-            account = await AccountInfo.Alloc();
+            account = await AccountInfo.Alloc(tokenid);
             if (account is null) return (null, Error.AllocateAccountFailed);
-            account.CurrentTokenId = tokenid;
+            
             var friend = RecordPlayers(account, player, out var recorderror);
             if (friend is null) return (null, recorderror!);
 
