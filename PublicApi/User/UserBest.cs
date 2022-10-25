@@ -18,6 +18,7 @@ public sealed partial class PublicApi
     public async Task<object> GetUserBest(
         [BindNever] [FromQuery] PlayerInfo player,
         [BindNever] [FromQuery] ArcaeaCharts chart,
+        [BindNever] string currentTokenID,
         bool withrecent = false,
         bool withsonginfo = false)
     {
@@ -32,7 +33,7 @@ public sealed partial class PublicApi
             if (task is null)
             {
                 UserBestConcurrent.NewTask(key);
-                (response, errorresp) = await QueryUserBest(player, chart);
+                (response, errorresp) = await QueryUserBest(player, chart, currentTokenID);
                 UserBestConcurrent.SetResult(key, (response, errorresp));
             }
             else
@@ -54,11 +55,7 @@ public sealed partial class PublicApi
         bool withsonginfo,
         ArcaeaCharts chart)
     {
-        UserBestResponse ret = new()
-                               {
-                                   AccountInfo = response.AccountInfo,
-                                   Record = response.Record,
-                               };
+        UserBestResponse ret = new() { AccountInfo = response.AccountInfo, Record = response.Record };
 
         if (withsonginfo)
             // add song info
@@ -75,7 +72,7 @@ public sealed partial class PublicApi
         return Success(ret);
     }
 
-    private static async Task<(UserBestResponse? response, Response? error)> QueryUserBest(PlayerInfo player, ArcaeaCharts chart)
+    private static async Task<(UserBestResponse? response, Response? error)> QueryUserBest(PlayerInfo player, ArcaeaCharts chart, string tokenid)
     {
         AccountInfo? account = null;
 
@@ -83,6 +80,8 @@ public sealed partial class PublicApi
         {
             account = await AccountInfo.Alloc();
             if (account is null) return (null, Error.AllocateAccountFailed);
+            account.CurrentTokenId = tokenid;
+
             var friend = RecordPlayers(account, player, out var recorderror);
             if (friend is null) return (null, recorderror!);
 

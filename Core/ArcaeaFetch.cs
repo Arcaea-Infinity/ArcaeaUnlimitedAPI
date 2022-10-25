@@ -272,6 +272,7 @@ internal static class ArcaeaFetch
         byte retryCount = 0)
     {
         if (NeedUpdate || IllegalHash) return null;
+        QueryCounter.RecordFetch(info.CurrentTokenId);
         var url = submitData is not null ? $"{resturl}?{SubmitDataToString(submitData)}" : resturl;
 
         var request = new HttpRequestMessage(HttpMethod.Get, $"{_node}/{_apientry}/{url}");
@@ -296,6 +297,7 @@ internal static class ArcaeaFetch
         byte retryCount = 0)
     {
         if (NeedUpdate || IllegalHash) return null;
+        QueryCounter.RecordFetch(info.CurrentTokenId);
         var data = submitData is null ? string.Empty : SubmitDataToString(submitData);
 
         var request = new HttpRequestMessage(HttpMethod.Post, $"{_node}/{_apientry}/{resturl}");
@@ -318,7 +320,6 @@ internal static class ArcaeaFetch
     private static async Task<ResponseRoot?> Login(AccountInfo info, byte retryCount = 0)
     {
         if (NeedUpdate || IllegalHash) return null;
-
         const string resturl = "auth/login";
         const string data = "grant_type=client_credentials";
 

@@ -11,7 +11,11 @@ public sealed partial class PublicApi
     [PlayerInfoConverter(Order = 1)]
     [RecentConverter(Order = 2)]
     [HttpGet("/botarcapi/user/info")]
-    public async Task<object> GetUserInfo([BindNever] PlayerInfo player, [BindNever] int recent, bool withsonginfo = false)
+    public async Task<object> GetUserInfo(
+        [BindNever] PlayerInfo player,
+        [BindNever] int recent,
+        [BindNever] string currentTokenID,
+        bool withsonginfo = false)
     {
         try
         {
@@ -22,7 +26,7 @@ public sealed partial class PublicApi
             if (task is null)
             {
                 UserInfoConcurrent.NewTask(player.Code);
-                (response, errorresp) = await QueryUserInfo(player);
+                (response, errorresp) = await QueryUserInfo(player, currentTokenID);
                 UserInfoConcurrent.SetResult(player.Code, (response, errorresp));
             }
             else
@@ -41,29 +45,29 @@ public sealed partial class PublicApi
     private static Response GetResponse(UserInfoResponse response, int recent, bool withsonginfo)
     {
         UserInfoResponse ret = new()
-        {
-            AccountInfo = response.AccountInfo,
-            RecentScore = recent switch
-                          {
-                              0   => null,
-                              > 1 => Records.Query(response.AccountInfo.UserID, recent),
-                              1   => response.RecentScore?.ToList(),
-                              _   => null
-                          }
-        };
-        
+                               {
+                                   AccountInfo = response.AccountInfo,
+                                   RecentScore = recent switch
+                                                 {
+                                                     0   => null,
+                                                     > 1 => Records.Query(response.AccountInfo.UserID, recent),
+                                                     1   => response.RecentScore?.ToList(),
+                                                     _   => null
+                                                 }
+                               };
+
         if (ret.RecentScore?.Count > 0)
         {
             foreach (var record in ret.RecentScore) record.UserID = null!;
             if (withsonginfo) ret.Songinfo = ret.RecentScore.Select(i => ArcaeaCharts.QueryByRecord(i)!);
         }
-        
+
         ret.AccountInfo.RecentScore = null!;
 
         return Success(ret);
     }
 
-    private static async Task<(UserInfoResponse? response, Response? error)> QueryUserInfo(PlayerInfo player)
+    private static async Task<(UserInfoResponse? response, Response? error)> QueryUserInfo(PlayerInfo player, string tokenid)
     {
         AccountInfo? account = null;
 
@@ -71,6 +75,7 @@ public sealed partial class PublicApi
         {
             account = await AccountInfo.Alloc();
             if (account is null) return (null, Error.AllocateAccountFailed);
+            account.CurrentTokenId = tokenid;
             var friend = RecordPlayers(account, player, out var recorderror);
             if (friend is null) return (null, recorderror!);
 

@@ -15,6 +15,7 @@ public sealed partial class PublicApi
     public async Task<object> GetUserBest30(
         [BindNever] PlayerInfo player,
         [BindNever] int overflow,
+        [BindNever] string currentTokenID,
         bool withrecent = false,
         bool withsonginfo = false)
     {
@@ -27,7 +28,7 @@ public sealed partial class PublicApi
             if (task is null)
             {
                 UserBest30Concurrent.NewTask(player.Code);
-                (response, errorresp) = await QueryUserBest30(player);
+                (response, errorresp) = await QueryUserBest30(player, currentTokenID);
                 UserBest30Concurrent.SetResult(player.Code, (response, errorresp));
             }
             else
@@ -56,7 +57,7 @@ public sealed partial class PublicApi
                                      Recent10Avg = response.Recent10Avg,
                                      Best30List = response.Best30List,
                                  };
-        
+
         if (response.Best30Overflow is not null)
             ret.Best30Overflow = overflowCount == 0
                                      ? null!
@@ -66,8 +67,7 @@ public sealed partial class PublicApi
         {
             if (ret.Best30List is not null) ret.Best30Songinfo = ret.Best30List.Select(i => ArcaeaCharts.QueryByRecord(i)!);
 
-            if (ret.Best30Overflow is not null)
-                ret.Best30OverflowSonginfo = ret.Best30Overflow.Select(i => ArcaeaCharts.QueryByRecord(i)!);
+            if (ret.Best30Overflow is not null) ret.Best30OverflowSonginfo = ret.Best30Overflow.Select(i => ArcaeaCharts.QueryByRecord(i)!);
         }
 
         if (withrecent)
@@ -81,13 +81,14 @@ public sealed partial class PublicApi
         return Success(ret);
     }
 
-    private static async Task<(UserBest30Response? response, Response? error)> QueryUserBest30(PlayerInfo player)
+    private static async Task<(UserBest30Response? response, Response? error)> QueryUserBest30(PlayerInfo player, string tokenid)
     {
         AccountInfo? account = null;
         try
         {
             account = await AccountInfo.Alloc();
             if (account is null) return (null, Error.AllocateAccountFailed);
+            account.CurrentTokenId = tokenid;
 
             var friend = RecordPlayers(account, player, out var recorderror);
             if (friend is null) return (null, recorderror!);
@@ -101,15 +102,13 @@ public sealed partial class PublicApi
             if (best30Cache is null || best30Cache.LastPlayed != friend.RecentScore[0].TimePlayed)
             {
                 // check shadow ban
-                {
-                    var (success, friendRank) = await account.FriendRank(ArcaeaCharts.QueryByRecord(friend.RecentScore[0])!);
-                    if (!success || friendRank is null || friendRank.Count == 0) return (null, Error.Shadowbanned);
+                var (success, friendRank) = await account.FriendRank(ArcaeaCharts.QueryByRecord(friend.RecentScore[0])!);
+                if (!success || friendRank is null || friendRank.Count == 0) return (null, Error.Shadowbanned);
 
-                    foreach (var record in friendRank)
-                    {
-                        record.Potential = player.Potential;
-                        DatabaseManager.Bests.InsertOrReplace(record);
-                    }
+                foreach (var record in friendRank)
+                {
+                    record.Potential = player.Potential;
+                    DatabaseManager.Bests.InsertOrReplace(record);
                 }
 
                 best30Cache = await PollingBestsHelper.GetResult(account, friend);

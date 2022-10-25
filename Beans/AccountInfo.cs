@@ -37,6 +37,8 @@ internal sealed class AccountInfo
     [Column("banned")]
     public string Banned { get; set; }
 
+    [Ignore] public string CurrentTokenId { get; set; }
+
     internal static async Task<AccountInfo?> Alloc()
     {
         AccountInfo? account = null;

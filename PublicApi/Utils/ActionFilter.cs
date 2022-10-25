@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ArcaeaUnlimitedAPI.Core;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 
@@ -6,11 +7,16 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 
 internal sealed class AuthorizationCheck : ActionFilterAttribute
 {
-    private static bool TokenCheck(HttpContext context)
+    private static bool TokenCheck(HttpContext context, out string token)
     {
+        token = string.Empty;
         if (!context.Request.Headers.TryGetValue("Authorization", out var authString)) return false;
         var str = authString.ToString();
-        if (str.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)) return Tokens.Contains(str[7..]);
+        if (str.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            token = str[7..];
+            return Tokens.Contains(token);
+        }
 
         return false;
     }
@@ -29,12 +35,24 @@ internal sealed class AuthorizationCheck : ActionFilterAttribute
             return;
         }
 
-        if (!TokenCheck(context.HttpContext))
-            if (RateLimiter.IsExceeded(context.HttpContext.Connection.RemoteIpAddress?.ToString()))
-            {
-                context.Result = new ObjectResult(Response.Error.QuotaExceeded) { StatusCode = 429 };
-                return;
-            }
+        string currentTokenID;
+
+        if (TokenCheck(context.HttpContext, out var token))
+        {
+            currentTokenID = token[..4];
+            QueryCounter.RecordQuery(currentTokenID);
+        }
+        else if (RateLimiter.IsExceeded(context.HttpContext.Connection.RemoteIpAddress?.ToString()))
+        {
+            context.Result = new ObjectResult(Response.Error.QuotaExceeded) { StatusCode = 429 };
+            return;
+        }
+        else
+        {
+            currentTokenID = "0000";
+        }
+
+        context.ActionArguments["currentTokenID"] = currentTokenID;
 
         base.OnActionExecuting(context);
     }

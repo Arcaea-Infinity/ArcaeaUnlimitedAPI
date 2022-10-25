@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using ArcaeaUnlimitedAPI.Json.ArcaeaFetch;
 
 namespace ArcaeaUnlimitedAPI.Core;
@@ -19,9 +20,9 @@ internal static class Logger
         }
     }
 
-    public static void ApiError(string resturl) => WriteLog("apierr", $"{resturl}: query failed");
+    internal static void ApiError(string resturl) => WriteLog("apierr", $"{resturl}: query failed");
 
-    public static void ApiError(string resturl, ResponseRoot json)
+    internal static void ApiError(string resturl, ResponseRoot json)
         => WriteLog("apierr", $"{resturl}: code: {json.ErrorCode?.ToString() ?? json.Code}");
 
     internal static void ApiError(string resturl, int httpstatus)
@@ -34,7 +35,20 @@ internal static class Logger
 
     internal static void ExceptionError(Exception ex) => WriteLog("exception", ex.ToString());
 
-    public static void HttpError(Exception ex, Uri? uri) => WriteLog("http", $"{uri}\n{ex}");
+    internal static void HttpError(Exception ex, Uri? uri) => WriteLog("http", $"{uri}\n{ex}");
+
+    internal static void FetchCount(ConcurrentDictionary<string, ConcurrentDictionary<string, long>> counter)
+        => WriteLog("fetchcount", Counter(counter));
+
+    internal static void QueryCount(ConcurrentDictionary<string, ConcurrentDictionary<string, long>> counter)
+        => WriteLog("querycount", Counter(counter));
+
+    private static string Counter(ConcurrentDictionary<string, ConcurrentDictionary<string, long>> counter)
+    {
+        var shortDateString = DateTime.Today.AddDays(-1).ToShortDateString();
+        ConcurrentDictionary<string, long> yestdcounter = counter[shortDateString];
+        return $"{shortDateString}  {yestdcounter.Values.Sum()}\n{string.Join('\n', yestdcounter.Select(i => $"{i.Key} : {i.Value}"))}";
+    }
 
     internal static void RatingLog(
         string songID,
