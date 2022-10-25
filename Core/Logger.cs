@@ -46,8 +46,9 @@ internal static class Logger
     private static string Counter(ConcurrentDictionary<string, ConcurrentDictionary<string, long>> counter)
     {
         var shortDateString = DateTime.Today.AddDays(-1).ToShortDateString();
-        ConcurrentDictionary<string, long> yestdcounter = counter[shortDateString];
-        return $"{shortDateString}  {yestdcounter.Values.Sum()}\n{string.Join('\n', yestdcounter.Select(i => $"{i.Key} : {i.Value}"))}";
+        return counter.TryGetValue(shortDateString, out ConcurrentDictionary<string, long>? yestdcounter)
+                   ? $"{shortDateString}  {yestdcounter.Values.Sum()}\n{string.Join('\n', yestdcounter.Select(i => $"{i.Key} : {i.Value}"))}"
+                   : $"{shortDateString}  0";
     }
 
     internal static void RatingLog(

@@ -42,7 +42,7 @@ internal static class QueryCounter
         {
             Logger.FetchCount(FetchCounter);
             FetchCounter.Clear();
-            AuaQueryCounter[date] = new() { [tokenid] = 1 };
+            FetchCounter[date] = new() { [tokenid] = 1 };
         }
     }
 }
