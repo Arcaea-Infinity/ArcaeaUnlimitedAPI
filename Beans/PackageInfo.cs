@@ -24,7 +24,6 @@ internal sealed class PackageInfo
 
     internal static void Insert(PackageInfo info)
     {
-        _list.Value.TryAdd(info.PackageID, info.Name);
-        DatabaseManager.Song.Insert(info);
+        if (_list.Value.TryAdd(info.PackageID, info.Name)) DatabaseManager.Song.Insert(info);
     }
 }
