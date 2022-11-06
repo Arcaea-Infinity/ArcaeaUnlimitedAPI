@@ -12,10 +12,10 @@ internal static class GlobalConfig
 
     static GlobalConfig()
     {
+        CreateDirectory();
+
         Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("apiconfig.json"))!;
         Tokens = JsonConvert.DeserializeObject<HashSet<string>>(File.ReadAllText("tokens.json"))!;
-
-        CreateDirectory();
 
         DatabaseManager.Init();
         ArcaeaFetch.Init();
@@ -25,16 +25,20 @@ internal static class GlobalConfig
 
     private static void CreateDirectory()
     {
-        Directory.CreateDirectory(Config.DataPath);
         Directory.CreateDirectory(Path.Combine(Config.DataPath, "log"));
         Directory.CreateDirectory(Path.Combine(Config.DataPath, "database"));
         Directory.CreateDirectory(Path.Combine(Config.DataPath, "update"));
-        Directory.CreateDirectory(Path.Combine(Config.DataPath, "source"));
         Directory.CreateDirectory(Path.Combine(Config.DataPath, "source", "songs"));
         Directory.CreateDirectory(Path.Combine(Config.DataPath, "source", "char"));
 
         var arcversion = Path.Combine(Config.DataPath, "arcversion");
         if (!File.Exists(arcversion)) File.WriteAllText(arcversion, "4.0.0c");
+
+        var tokens = Path.Combine(AppContext.BaseDirectory, "tokens.json");
+        if (!File.Exists(tokens)) File.WriteAllText(tokens, "[]");
+
+        var apiconfig = Path.Combine(AppContext.BaseDirectory, "apiconfig.json");
+        if (!File.Exists(apiconfig)) File.WriteAllText(apiconfig, JsonConvert.SerializeObject(new ConfigItem(), Formatting.Indented));
     }
 
     internal static void Init(string fileName)
