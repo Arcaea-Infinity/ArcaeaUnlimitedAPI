@@ -19,6 +19,8 @@ internal sealed class AccountInfo
     private static readonly Lazy<ConcurrentQueue<AccountInfo>> Queue
         = new(new ConcurrentQueue<AccountInfo>(DatabaseManager.Account.Where<AccountInfo>(i => i.Banned != "true")));
 
+    internal static bool IsEmpty => Queue.Value.IsEmpty;
+
     [PrimaryKey] [Column("name")]
     public string Name { get; set; }
 
@@ -47,6 +49,8 @@ internal sealed class AccountInfo
         {
             try
             {
+                if (GlobalConfig.IllegalHash || GlobalConfig.NeedUpdate) return null;
+
                 if (!Queue.Value.TryDequeue(out account))
                 {
                     Logger.FunctionError("Account", "ranout.");
