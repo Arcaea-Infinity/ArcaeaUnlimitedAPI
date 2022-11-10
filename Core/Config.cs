@@ -10,16 +10,7 @@ internal static class GlobalConfig
     internal static volatile bool NeedUpdate = false;
     internal static volatile bool IllegalHash = false;
 
-    static GlobalConfig()
-    {
-        Init();
-        DatabaseManager.Init();
-        ArcaeaFetch.Init();
-        BackgroundService.Init();
-        ConfigWatcher.Init();
-    }
-
-    private static void Init()
+    internal static void Init()
     {
         var apiconfig = Path.Combine(AppContext.BaseDirectory, "apiconfig.json");
         if (!File.Exists(apiconfig)) File.WriteAllText(apiconfig, JsonConvert.SerializeObject(new ConfigItem(), Formatting.Indented));
