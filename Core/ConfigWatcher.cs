@@ -24,7 +24,7 @@ internal static class ConfigWatcher
     {
         lock (TmpFiles)
         {
-            foreach (var file in TmpFiles) GlobalConfig.Init(file);
+            foreach (var file in TmpFiles) GlobalConfig.Reload(file);
             TmpFiles.Clear();
         }
     }

@@ -19,6 +19,8 @@ ArcaeaFetch.Init();
 BackgroundService.Init();
 ConfigWatcher.Init();
 
+GlobalConfig.CheckUpdate();
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore)
        .ConfigureApiBehaviorOptions(options =>
