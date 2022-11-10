@@ -2,6 +2,7 @@ using System.Net;
 using ArcaeaUnlimitedAPI.Core;
 using Microsoft.AspNetCore.HttpOverrides;
 using Newtonsoft.Json;
+using BackgroundService = ArcaeaUnlimitedAPI.Core.BackgroundService;
 
 TaskScheduler.UnobservedTaskException += (_, eventArgs) =>
 {
@@ -11,6 +12,12 @@ TaskScheduler.UnobservedTaskException += (_, eventArgs) =>
 
 ServicePointManager.DefaultConnectionLimit = 64;
 ServicePointManager.ReusePort = true;
+
+GlobalConfig.Init();
+DatabaseManager.Init();
+ArcaeaFetch.Init();
+BackgroundService.Init();
+ConfigWatcher.Init();
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore)
