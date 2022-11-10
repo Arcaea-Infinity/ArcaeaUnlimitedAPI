@@ -1,5 +1,4 @@
 ﻿using System.IO.Compression;
-using System.Timers;
 using ArcaeaUnlimitedAPI.Beans;
 using ArcaeaUnlimitedAPI.Json.Packlist;
 using ArcaeaUnlimitedAPI.Json.Songlist;
@@ -15,14 +14,14 @@ internal static class BackgroundService
 {
     internal static ulong TimerCount;
 
-    private static string? _version;
-
     private static volatile int _running;
 
-    private static string Version
+    private static string? _version;
+
+    internal static string Version
     {
         get => _version ??= File.ReadAllText($"{Config.DataPath}/arcversion");
-        set
+        private set
         {
             _version = value;
             File.WriteAllText($"{Config.DataPath}/arcversion", value);
@@ -35,13 +34,17 @@ internal static class BackgroundService
 
         if (Config.OpenRegister == true) timer.Elapsed += (_, _) => ArcaeaFetch.RegisterTask();
 
-        timer.Elapsed += ArcUpdate;
-        timer.Elapsed += (_, _) => ++TimerCount;
+        timer.Elapsed += (_, _) =>
+        {
+            ArcUpdate();
+            ++TimerCount;
+        };
+
         timer.AutoReset = true;
         timer.Start();
     }
 
-    private static void ArcUpdate(object? source, ElapsedEventArgs? e)
+    internal static void ArcUpdate()
     {
         if (Interlocked.CompareExchange(ref _running, 1, 0) != 0) return;
 
@@ -51,17 +54,34 @@ internal static class BackgroundService
             if (info?.Url is null || Version == info.Version) return;
 
             if (Config.Appversion != info.Version) NeedUpdate = true;
-            var dirname = info.Version;
-            var apkpth = $"{Config.DataPath}/update/arcaea_{dirname}.apk";
+            var version = info.Version;
+            var apkpth = Path.Combine(Config.DataPath, "update", $"arcaea_{version}.apk");
 
-            if (!File.Exists(apkpth)) DownloadApk(info.Url);
+            if (!File.Exists(apkpth))
+            {
+                Console.WriteLine($"Downloading arcaea_{version}.apk");
+                Console.WriteLine($" - from `{info.Url}`  ");
+                Console.WriteLine($" - save to `{apkpth}`");
+                Console.WriteLine("Note: If it is slow to download, you can also download the apk manually,");
+                Console.WriteLine("close this program and place it in the specified location then restart it.");
+                Console.WriteLine("Press Ctrl+C to cancel the download.");
+
+                DownloadApk(info.Url);
+            }
+            else
+            {
+                Console.WriteLine($"arcaea_{version}.apk already exists, skip download.");
+            }
 
             // not apk
             if (new FileInfo(apkpth).Length < 81920)
             {
                 File.Delete(apkpth);
+                Console.WriteLine("Download failed.");
                 return;
             }
+
+            Console.WriteLine("Download complete, start to extract the apk file.");
 
             var apk = ZipFile.OpenRead(apkpth);
 
@@ -131,10 +151,13 @@ internal static class BackgroundService
             AutoDecrypt(ms.ToArray(), info.Version);
 
             Version = info.Version;
+
+            Console.WriteLine("Update complete.");
         }
         catch (Exception ex)
         {
             Logger.ExceptionError(ex);
+            Console.WriteLine("Error occurred while updating. Please check the log file.");
         }
         finally
         {
