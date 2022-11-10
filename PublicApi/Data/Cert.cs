@@ -6,7 +6,7 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 
 public sealed partial class PublicApi
 {
-    [AuthorizationCheck]
+    [AuthorizationCheck(NotCounted = true)]
     [HttpGet("/botarcapi/data/cert")]
     public object GetCert()
     {

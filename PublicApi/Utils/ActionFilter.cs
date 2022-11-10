@@ -7,6 +7,10 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 
 internal sealed class AuthorizationCheck : ActionFilterAttribute
 {
+    public bool NotCounted { get; init; }
+    
+    public bool Strict { get; init; }
+
     private static bool TokenCheck(HttpContext context, out string token)
     {
         token = string.Empty;
@@ -42,7 +46,12 @@ internal sealed class AuthorizationCheck : ActionFilterAttribute
             currentTokenID = token[..4];
             QueryCounter.RecordQuery(currentTokenID);
         }
-        else if (RateLimiter.IsExceeded(context.HttpContext.Connection.RemoteIpAddress?.ToString()))
+        else if (Strict)
+        {
+            context.Result = new ObjectResult(null) { StatusCode = 404 };
+            return;
+        }
+        else if (!NotCounted && RateLimiter.IsExceeded(context.HttpContext.Connection.RemoteIpAddress?.ToString()))
         {
             context.Result = new ObjectResult(Response.Error.QuotaExceeded) { StatusCode = 429 };
             return;

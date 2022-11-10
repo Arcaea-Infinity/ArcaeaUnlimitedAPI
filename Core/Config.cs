@@ -42,7 +42,7 @@ public class ConfigItem
 public class Node
 {
     [JsonProperty("url")]
-    public string Url { get; set; } = string.Empty;
+    public string Url { get; set; }
 
     [JsonProperty("port")]
     public int? Port { get; set; } = 443;
