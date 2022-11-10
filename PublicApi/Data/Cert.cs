@@ -8,9 +8,9 @@ public sealed partial class PublicApi
 {
     [AuthorizationCheck]
     [HttpGet("/botarcapi/data/cert")]
-    public async Task<object> GetCert()
+    public object GetCert()
     {
-        var certstr = Convert.ToBase64String(await System.IO.File.ReadAllBytesAsync(Path.Combine(Config.DataPath, Config.CertFileName)));
-        return Success(new { name = Config.CertFileName, cert = certstr });
+        var certstr = Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(Config.DataPath, Config.CertFileName)));
+        return Success(new { entry = Config.ApiEntry, version = Config.Appversion, cert = certstr, password = Config.CertPassword });
     }
 }
