@@ -82,10 +82,10 @@ public class ConfigItem
 
     [JsonProperty("challenge_token")]
     public string ChallengeToken { get; set; } = string.Empty;
- 
+
     [JsonProperty("nodes")]
     public List<Node> Nodes { get; set; } = new() { new() };
-    
+
     internal void WriteConfig() => File.WriteAllText("apiconfig.json", JsonConvert.SerializeObject(this, Formatting.Indented));
 }
 
