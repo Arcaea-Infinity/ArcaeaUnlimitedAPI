@@ -11,7 +11,7 @@ public sealed partial class PublicApi
 {
     [EnableCors]
     [OverflowConverter]
-    [HttpGet("/botarcapi/data/theory")]
+    [HttpGet("data/theory")]
     public object GetTheoryBests(
         [BindNever] int overflow,
         bool withrecent = false,

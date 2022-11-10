@@ -10,6 +10,6 @@ public sealed partial class PublicApi
 {
     [EnableCors]
     [SongInfoConverter]
-    [HttpGet("/botarcapi/song/info")]
+    [HttpGet("song/info")]
     public object GetSongInfo([BindNever] ArcaeaSong song) => Success(song.ToJson());
 }

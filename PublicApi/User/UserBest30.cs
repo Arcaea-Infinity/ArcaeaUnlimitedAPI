@@ -11,7 +11,7 @@ public sealed partial class PublicApi
     [AuthorizationCheck(Order = 0)]
     [PlayerInfoConverter(Order = 1)]
     [OverflowConverter(Order = 2)]
-    [HttpGet("/botarcapi/user/best30")]
+    [HttpGet("user/best30")]
     public async Task<object> GetUserBest30(
         [BindNever] PlayerInfo player,
         [BindNever] int overflow,

@@ -8,7 +8,7 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 public sealed partial class PublicApi
 {
     [EnableCors]
-    [HttpGet("/botarcapi/song/random")]
+    [HttpGet("song/random")]
     public object GetSongRandom(int? start, int? end, bool withsonginfo = false)
     {
         if (start is null && end is null)

@@ -8,6 +8,6 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 public sealed partial class PublicApi
 {
     [EnableCors]
-    [HttpGet("/botarcapi/song/list")]
+    [HttpGet("song/list")]
     public object GetSongList() => Success(new { songs = ArcaeaCharts.SongJsons.Values });
 }

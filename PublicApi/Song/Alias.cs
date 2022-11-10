@@ -10,7 +10,7 @@ public sealed partial class PublicApi
 {
     [EnableCors]
     [SongInfoConverter]
-    [HttpGet("/botarcapi/song/alias")]
+    [HttpGet("song/alias")]
     public object GetSongAlias([BindNever] ArcaeaSong song)
     {
         ArcaeaCharts.Aliases.TryGetValue(song.SongID, out List<string>? alias);

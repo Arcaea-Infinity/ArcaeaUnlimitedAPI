@@ -7,6 +7,7 @@ using static ArcaeaUnlimitedAPI.PublicApi.Response;
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
 [ApiController]
+[Route("/botarcapi/")]
 public sealed partial class PublicApi : ControllerBase
 {
     private static readonly ConcurrentApiRequest<string, (UserInfoResponse? infodata, Response? error)> UserInfoConcurrent = new();
