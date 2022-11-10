@@ -222,6 +222,7 @@ internal static class ArcaeaFetch
         catch (Exception ex)
         {
             Logger.ExceptionError(ex);
+            Console.WriteLine("Error occurred while registering account. Please check the log file. Task Aborted.");
         }
     }
 

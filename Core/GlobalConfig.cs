@@ -85,8 +85,8 @@ internal static class GlobalConfig
         if (AccountInfo.IsEmpty)
         {
             Console.WriteLine("Account pool is empty. Do you need to register some accounts automatically? (y/n)");
-            Console.WriteLine("Note: You can configure enable or disable `Auto Register Account Task` to daily scheduled tasks in apiconfig.json.");
-            
+            Console.WriteLine("[Note: You can configure enable or disable `Auto Register Account Task` to daily scheduled tasks in apiconfig.json.]");
+
             if (Console.ReadKey().Key == ConsoleKey.Y)
             {
                 Console.WriteLine();
@@ -101,7 +101,7 @@ internal static class GlobalConfig
             Console.WriteLine("The assets version is not the same as the config version.");
             Console.WriteLine($"Current config version: {Config.Appversion}, Assets version: {BackgroundService.Version}");
             Console.WriteLine("Do you want to update assets? (y/n)");
-            Console.WriteLine("Note: Whether you choose to update or not, daily scheduled tasks will automatically check for versions and update assets.");
+            Console.WriteLine("[Note: Whether you choose to update or not, daily scheduled tasks will automatically check for versions and update assets.]");
             if (Console.ReadKey().Key == ConsoleKey.Y)
             {
                 Console.WriteLine();
@@ -110,6 +110,8 @@ internal static class GlobalConfig
                 Console.WriteLine("Update task completed.");
             }
         }
+
+        Console.Clear();
     }
 
     internal static void Reload(string fileName)
