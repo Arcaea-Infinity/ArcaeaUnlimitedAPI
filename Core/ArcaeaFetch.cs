@@ -204,7 +204,8 @@ internal static class ArcaeaFetch
                                               Password = password,
                                               DeviceID = deviceID,
                                               UserID = value.UserID,
-                                              Token = value.AccessToken,
+                                              Code = "",
+                                              Token = "",
                                               Banned = "false"
                                           };
 
