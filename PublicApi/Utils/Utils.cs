@@ -7,6 +7,7 @@ using static ArcaeaUnlimitedAPI.PublicApi.Response;
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
 [ApiController]
+[Route("/botarcapi/")]
 public sealed partial class PublicApi : ControllerBase
 {
     private static readonly ConcurrentApiRequest<string, (UserInfoResponse? infodata, Response? error)> UserInfoConcurrent = new();
@@ -52,6 +53,6 @@ public sealed partial class PublicApi : ControllerBase
     }
 
     [AuthorizationCheck(Order = 0)]
-    [HttpGet("/botarcapi/stat")]
+    [HttpGet("stat")]
     public object GetStat() => Success(new { fetch = QueryCounter.FetchCounter, query = QueryCounter.AuaQueryCounter });
 }

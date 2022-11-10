@@ -14,7 +14,7 @@ public sealed partial class PublicApi
     [SongInfoConverter(Order = 2)]
     [DifficultyConverter(false, Order = 3)]
     [ChartConverter(Order = 4)]
-    [HttpGet("/botarcapi/user/best")]
+    [HttpGet("user/best")]
     public async Task<object> GetUserBest(
         [BindNever] [FromQuery] PlayerInfo player,
         [BindNever] [FromQuery] ArcaeaCharts chart,

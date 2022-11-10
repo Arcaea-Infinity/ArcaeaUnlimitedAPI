@@ -13,7 +13,7 @@ public sealed partial class PublicApi
     [SongInfoConverter(Order = 0)]
     [DifficultyConverter(Order = 1)]
     [ChartConverter(Order = 2)]
-    [HttpGet("/botarcapi/assets/preview")]
+    [HttpGet("assets/preview")]
     public object GetPreviewAssets([BindNever] ArcaeaCharts chart)
     {
         FileInfo fileinfo = new($"{GlobalConfig.Config.DataPath}/source/preview/{chart.SongID}/{chart.RatingClass}.jpeg");

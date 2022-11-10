@@ -7,7 +7,7 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 public sealed partial class PublicApi
 {
     [AuthorizationCheck(NotCounted = true)]
-    [HttpGet("/botarcapi/data/cert")]
+    [HttpGet("data/cert")]
     public object GetCert()
     {
         var certstr = Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(Config.DataPath, Config.CertFileName)));

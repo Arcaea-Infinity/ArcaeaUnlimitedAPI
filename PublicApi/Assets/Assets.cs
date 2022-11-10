@@ -14,7 +14,7 @@ public sealed partial class PublicApi
     [SongInfoConverter(Order = 1)]
     [DifficultyConverter(Order = 2)]
     [ChartConverter(Order = 3)]
-    [HttpGet("/botarcapi/assets/song")]
+    [HttpGet("assets/song")]
     public object GetSongAssets([BindNever] ArcaeaCharts chart)
     {
         var difextend = chart.JacketOverride ? $"_{chart.RatingClass}" : string.Empty;
@@ -27,7 +27,7 @@ public sealed partial class PublicApi
     }
 
     [EnableCors]
-    [HttpGet("/botarcapi/assets/icon")]
+    [HttpGet("assets/icon")]
     public object GetIconAssets(string? partner, bool awakened = false)
     {
         // check for request arguments
@@ -41,7 +41,7 @@ public sealed partial class PublicApi
     }
 
     [EnableCors]
-    [HttpGet("/botarcapi/assets/char")]
+    [HttpGet("assets/char")]
     public object GetCharAssets(string? partner, bool awakened = false)
     {
         // check for request arguments

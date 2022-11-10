@@ -12,8 +12,8 @@ public sealed partial class PublicApi
     };
 
     [AuthorizationCheck(Strict = true)]
-    [HttpGet("/botarcapi/challenge")]
-    [HttpGet("/botarcapi/data/challenge")]
+    [HttpGet("challenge")]
+    [HttpGet("data/challenge")]
     public object GetChallenge([FromQuery] ChallengeData? data)
     {
         if (data is null || PathList.All(i => !data.Path.StartsWith(i))) return NotFound(null);

@@ -10,7 +10,7 @@ public sealed partial class PublicApi
     [AuthorizationCheck(Order = 0)]
     [PlayerInfoConverter(Order = 1)]
     [RecentConverter(Order = 2)]
-    [HttpGet("/botarcapi/user/info")]
+    [HttpGet("user/info")]
     public async Task<object> GetUserInfo(
         [BindNever] PlayerInfo player,
         [BindNever] int recent,

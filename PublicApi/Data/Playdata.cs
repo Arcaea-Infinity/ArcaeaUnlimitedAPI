@@ -12,8 +12,8 @@ public sealed partial class PublicApi
     [SongInfoConverter(Order = 0)]
     [DifficultyConverter(Order = 1)]
     [ChartConverter(Order = 2)]
-    [HttpGet("/botarcapi/playdata")]
-    [HttpGet("/botarcapi/data/playdata")]
+    [HttpGet("playdata")]
+    [HttpGet("data/playdata")]
     public object GetPlaydata([BindNever] ArcaeaCharts chart, int start, int end)
         => Success(PlayData.Query(start, end, chart.SongID, chart.RatingClass));
 
@@ -21,7 +21,7 @@ public sealed partial class PublicApi
     [SongInfoConverter(Order = 0)]
     [DifficultyConverter(Order = 1)]
     [ChartConverter(Order = 2)]
-    [HttpGet("/botarcapi/data/density")]
+    [HttpGet("data/density")]
     public object GetPlaydataArray([BindNever] ArcaeaCharts chart)
         => Success(PlayDataArray.Query(chart).Select(i => new[] { i.FormattedScore, i.FormattedPotential, i.Count }));
 }
