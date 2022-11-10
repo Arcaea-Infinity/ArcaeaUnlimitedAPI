@@ -48,9 +48,7 @@ internal static class Utils
         }
     }
 
-    internal static Dictionary<string,string> GetJson(string url) => JsonConvert.DeserializeObject<Dictionary<string,string>>(WebHelper.GetString(url).Result)!;
-
-    private static class WebHelper
+    internal static class WebHelper
     {
         internal static readonly HttpClient Client;
 
