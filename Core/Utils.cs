@@ -31,7 +31,7 @@ internal static class Utils
         }
     }
 
-    private static class WebHelper
+    internal static class WebHelper
     {
         private static readonly HttpClient Client;
 

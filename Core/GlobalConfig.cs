@@ -13,17 +13,42 @@ internal static class GlobalConfig
     internal static void Init()
     {
         var apiconfig = Path.Combine(AppContext.BaseDirectory, "apiconfig.json");
-        
+
         if (!File.Exists(apiconfig))
         {
-            File.WriteAllText(apiconfig, JsonConvert.SerializeObject(new ConfigItem(), Formatting.Indented));
-            Console.WriteLine("apiconfig.json not found, created a new one.");
-            Console.WriteLine("Please fill in the information and restart the program.");
+            Console.WriteLine("apiconfig.json not found, get infomation from main server...");
+
+            Dictionary<string, string> json = CertResponse.GetContent();
+
+            Config = new()
+                     {
+                         ApiEntry = json["entry"],
+                         Appversion = json["version"],
+                         Host = "arcapi-v2.lowiro.com",
+                         CertFileName = $"cert-{json["version"]}.p12",
+                         CertPassword = json["password"],
+                         DataPath = Path.Combine(AppContext.BaseDirectory, "data"),
+                         ApiSalt = Array.Empty<byte>(),
+                         Node = new() { Url = "arcapi-v2.lowiro.com" }
+                     };
+
+            Console.WriteLine($"set the data_path as \"{Config.DataPath}\"");
+
+            File.WriteAllText(apiconfig, JsonConvert.SerializeObject(Config, Formatting.Indented));
+            Console.WriteLine("apiconfig.json created.");
+
+            Directory.CreateDirectory(Config.DataPath);
+            File.WriteAllBytes(Path.Combine(Config.DataPath, Config.CertFileName), Convert.FromBase64String(json["cert"]));
+            Console.WriteLine("cert file created.");
+
+            Console.WriteLine("Please fill in the information into apiconfig.json and restart the program.");
+            Console.WriteLine("Folders needed by the program will be created automatically after restart.");
+            Console.WriteLine("Other information can be found in the README.md and deploy.md.");
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
             Environment.Exit(0);
         }
-        
+
         Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("apiconfig.json"))!;
 
         var tokens = Path.Combine(AppContext.BaseDirectory, "tokens.json");
@@ -38,14 +63,17 @@ internal static class GlobalConfig
 
         var arcversion = Path.Combine(Config.DataPath, "arcversion");
         if (!File.Exists(arcversion)) File.WriteAllText(arcversion, "4.0.0c");
-        
+
         var arccert = Path.Combine(Config.DataPath, Config.CertFileName);
+
         if (!File.Exists(arccert))
         {
-            Console.WriteLine("Certificate file not found, please put it in the data folder and restart the program.");
-            Console.WriteLine("Press any key to exit.");
-            Console.ReadKey();
-            Environment.Exit(0);
+            Console.WriteLine("cert file not found, get infomation from main server...");
+
+            Dictionary<string, string> json = CertResponse.GetContent();
+            File.WriteAllBytes(Config.CertFileName, Convert.FromBase64String(json["cert"]));
+
+            Console.WriteLine("cert file created.");
         }
     }
 
@@ -62,5 +90,18 @@ internal static class GlobalConfig
                 Tokens = JsonConvert.DeserializeObject<HashSet<string>>(File.ReadAllText("tokens.json"))!;
                 break;
         }
+    }
+
+#pragma warning disable CS8618
+
+    [Serializable]
+    internal class CertResponse
+    {
+        [JsonProperty("content")]
+        public Dictionary<string, string> Content { get; set; }
+
+        internal static Dictionary<string, string> GetContent()
+            => JsonConvert.DeserializeObject<CertResponse>(Utils.WebHelper.GetString("https://server.awbugl.top/botarcapi/data/cert").Result)!
+                          .Content;
     }
 }

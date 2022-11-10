@@ -7,22 +7,22 @@ namespace ArcaeaUnlimitedAPI.Core;
 public class ConfigItem
 {
     [JsonProperty("api_entry")]
-    public string ApiEntry { get; set; } = string.Empty;
+    public string ApiEntry { get; set; }
 
     [JsonProperty("app_version")]
-    public string Appversion { get; set; } = string.Empty;
+    public string Appversion { get; set; }
 
     [JsonProperty("host")]
-    public string Host { get; set; } = string.Empty;
+    public string Host { get; set; }
 
     [JsonProperty("cert_name")]
-    public string CertFileName { get; set; } = string.Empty;
+    public string CertFileName { get; set; }
 
     [JsonProperty("cert_password")]
-    public string CertPassword { get; set; } = string.Empty;
+    public string CertPassword { get; set; }
 
     [JsonProperty("data_path")]
-    public string DataPath { get; set; } = Path.Combine(AppContext.BaseDirectory, "data");
+    public string DataPath { get; set; }
 
     [JsonProperty("open_register")]
     public bool? OpenRegister { get; set; } = false;
@@ -31,10 +31,10 @@ public class ConfigItem
     public int Quota { get; set; } = 10;
 
     [JsonConverter(typeof(BytesConverter))] [JsonProperty("api_salt")]
-    public byte[] ApiSalt { get; set; } = Array.Empty<byte>();
+    public byte[] ApiSalt { get; set; }
 
     [JsonProperty("node")]
-    public Node Node { get; set; } = new();
+    public Node Node { get; set; }
 
     internal void WriteConfig() => File.WriteAllText("apiconfig.json", JsonConvert.SerializeObject(this, Formatting.Indented));
 }
