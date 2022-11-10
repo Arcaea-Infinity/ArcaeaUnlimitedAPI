@@ -13,17 +13,37 @@ internal static class GlobalConfig
     internal static void Init()
     {
         var apiconfig = Path.Combine(AppContext.BaseDirectory, "apiconfig.json");
-        
+
         if (!File.Exists(apiconfig))
         {
-            File.WriteAllText(apiconfig, JsonConvert.SerializeObject(new ConfigItem(), Formatting.Indented));
+            Dictionary<string, string> json = Utils.GetJson("https://server.awbugl.top/botarcapi/data/cert");
+
+            Config = new()
+                     {
+                         ApiEntry = json["entry"],
+                         Appversion = json["version"],
+                         Host = "arcapi-v2.lowiro.com",
+                         CertFileName = $"cert-{json["version"]}.p12",
+                         CertPassword = json["password"],
+                         DataPath = Path.Combine(AppContext.BaseDirectory, "data"),
+                         ChallengeUrl = "https://server.awbugl.top/botarcapi/data/challenge",
+                         ChallengeType = "aua",
+                         ChallengeToken = "",
+                         Nodes = new() { new() { Url = "arcapi-v2.lowiro.com" } }
+                     };
+            
+            File.WriteAllText(apiconfig, JsonConvert.SerializeObject(Config, Formatting.Indented));
+            Directory.CreateDirectory(Config.DataPath);
+            File.WriteAllBytes(Config.CertFileName, Convert.FromBase64String(json["cert"]));
+            
             Console.WriteLine("apiconfig.json not found, created a new one.");
-            Console.WriteLine("Please fill in the information and restart the program.");
+            Console.WriteLine($"set the path of data folder to {Config.DataPath}.");
+            Console.WriteLine("Please fill in the information in the file and restart the program.");
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
             Environment.Exit(0);
         }
-        
+
         Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("apiconfig.json"))!;
 
         var tokens = Path.Combine(AppContext.BaseDirectory, "tokens.json");
@@ -38,7 +58,7 @@ internal static class GlobalConfig
 
         var arcversion = Path.Combine(Config.DataPath, "arcversion");
         if (!File.Exists(arcversion)) File.WriteAllText(arcversion, "4.0.0c");
-        
+
         var arccert = Path.Combine(Config.DataPath, Config.CertFileName);
         if (!File.Exists(arccert))
         {

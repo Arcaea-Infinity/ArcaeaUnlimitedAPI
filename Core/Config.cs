@@ -7,22 +7,22 @@ namespace ArcaeaUnlimitedAPI.Core;
 public class ConfigItem
 {
     [JsonProperty("api_entry")]
-    public string ApiEntry { get; set; } = string.Empty;
+    public string ApiEntry { get; set; }
 
     [JsonProperty("app_version")]
-    public string Appversion { get; set; } = string.Empty;
+    public string Appversion { get; set; }
 
     [JsonProperty("host")]
-    public string Host { get; set; } = string.Empty;
+    public string Host { get; set; }
 
     [JsonProperty("cert_name")]
-    public string CertFileName { get; set; } = string.Empty;
+    public string CertFileName { get; set; }
 
     [JsonProperty("cert_password")]
-    public string CertPassword { get; set; } = string.Empty;
+    public string CertPassword { get; set; }
 
     [JsonProperty("data_path")]
-    public string DataPath { get; set; } = Path.Combine(AppContext.BaseDirectory, "data");
+    public string DataPath { get; set; }
 
     [JsonProperty("open_register")]
     public bool? OpenRegister { get; set; } = false;
@@ -31,16 +31,16 @@ public class ConfigItem
     public int Quota { get; set; } = 10;
 
     [JsonProperty("challenge_type")]
-    public string ChallengeType { get; set; } = string.Empty;
+    public string ChallengeType { get; set; }
 
     [JsonProperty("challenge_api")]
-    public string ChallengeUrl { get; set; } = string.Empty;
+    public string ChallengeUrl { get; set; }
 
     [JsonProperty("challenge_token")]
-    public string ChallengeToken { get; set; } = string.Empty;
+    public string ChallengeToken { get; set; }
 
     [JsonProperty("nodes")]
-    public List<Node> Nodes { get; set; } = new() { new() };
+    public List<Node> Nodes { get; set; }
 
     internal void WriteConfig() => File.WriteAllText("apiconfig.json", JsonConvert.SerializeObject(this, Formatting.Indented));
 }
@@ -48,7 +48,7 @@ public class ConfigItem
 public class Node
 {
     [JsonProperty("url")]
-    public string Url { get; set; } = string.Empty;
+    public string Url { get; set; }
 
     [JsonProperty("port")]
     public int? Port { get; set; } = 443;
