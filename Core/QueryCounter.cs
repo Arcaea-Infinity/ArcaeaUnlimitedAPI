@@ -31,22 +31,19 @@ internal static class QueryCounter
     {
         var date = DateString;
 
-        lock (FetchCounter)
+        if (FetchCounter.ContainsKey(date))
         {
-            if (FetchCounter.ContainsKey(date))
-            {
-                if (FetchCounter[date].ContainsKey(tokenid))
-                    ++FetchCounter[date][tokenid];
-                else
-                    FetchCounter[date][tokenid] = 1;
-            }
+            if (FetchCounter[date].ContainsKey(tokenid))
+                ++FetchCounter[date][tokenid];
             else
-            {
-                Logger.FetchCount(FetchCounter);
-                FetchCounter.Clear();
+                FetchCounter[date][tokenid] = 1;
+        }
+        else
+        {
+            Logger.FetchCount(FetchCounter);
+            FetchCounter.Clear();
 
-                FetchCounter[date] = new() { [tokenid] = 1 };
-            }
+            FetchCounter[date] = new() { [tokenid] = 1 };
         }
     }
 }
