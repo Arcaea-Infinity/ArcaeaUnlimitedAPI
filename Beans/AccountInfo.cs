@@ -10,7 +10,7 @@ namespace ArcaeaUnlimitedAPI.Beans;
 #pragma warning disable CS8618
 
 [Table("accounts")]
-[DatabaseManager.CreateTableSqlAttribute("CREATE TABLE IF NOT EXISTS `accounts` (`name` TEXT NOT NULL,`passwd` TEXT NOT NULL,`device` TEXT NOT NULL DEFAULT '',`uid` INTEGER DEFAULT 0,`ucode`  TEXT DEFAULT '', `token`  TEXT DEFAULT '',`banned` TEXT NOT NULL DEFAULT 'false' CHECK(`banned` IN('true', 'false')),PRIMARY KEY (`name` ASC));")]
+[DatabaseManager.CreateTableSqlAttribute("CREATE TABLE IF NOT EXISTS `accounts` (`name` TEXT NOT NULL,`passwd` TEXT NOT NULL,`device` TEXT NOT NULL DEFAULT '',`uid` INTEGER NOT NULL DEFAULT 0,`ucode` TEXT NOT NULL DEFAULT '', `token` TEXT NOT NULL DEFAULT '',`banned` TEXT NOT NULL DEFAULT 'false' CHECK(`banned` IN('true', 'false')),PRIMARY KEY (`name` ASC));")]
 internal sealed class AccountInfo
 {
     private static readonly Lazy<ConcurrentQueue<AccountInfo>> Queue
