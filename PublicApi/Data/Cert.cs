@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ArcaeaUnlimitedAPI.Core;
+using Microsoft.AspNetCore.Mvc;
 using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
@@ -9,8 +10,5 @@ public sealed partial class PublicApi
     [AuthorizationCheck(NotCounted = true)]
     [HttpGet("data/cert")]
     public object GetCert()
-    {
-        var certstr = Convert.ToBase64String(System.IO.File.ReadAllBytes(Path.Combine(Config.DataPath, Config.CertFileName)));
-        return Success(new { entry = Config.ApiEntry, version = Config.Appversion, cert = certstr, password = Config.CertPassword });
-    }
+        => Success(new { entry = Config.ApiEntry, version = Config.Appversion, cert = ArcaeaFetch.Base64Cert, password = Config.CertPassword });
 }

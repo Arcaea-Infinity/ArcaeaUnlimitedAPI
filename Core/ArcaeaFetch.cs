@@ -244,13 +244,16 @@ internal static class ArcaeaFetch
     private static string _apientry = null!;
     private static Node _node = null!;
     private static readonly int MaxRetryCount = 3;
+    internal static string Base64Cert = null!;
 
     internal static void Init()
     {
         ArcaeaHash.Init();
         _apientry = Config.ApiEntry;
         _node = Config.Node;
-        var certificate = new X509Certificate2(Path.Combine(Config.DataPath, Config.CertFileName), Config.CertPassword);
+        var fileName = Path.Combine(Config.DataPath, Config.CertFileName);
+        Base64Cert =  Convert.ToBase64String(File.ReadAllBytes(fileName));
+        var certificate = new X509Certificate2(fileName, Config.CertPassword);
         var handler = new HttpClientHandler();
         handler.ClientCertificates.Add(certificate);
         handler.ServerCertificateCustomValidationCallback = (
