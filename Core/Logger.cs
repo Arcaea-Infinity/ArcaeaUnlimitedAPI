@@ -9,14 +9,12 @@ internal static class Logger
 
     private static readonly string LogDir = Path.Combine(GlobalConfig.Config.DataPath, "log");
 
-    private static string LogPath(string type, DateTime time) => Path.Combine(LogDir, $"{type}_{time:yyMMdd}.log");
-
     private static void WriteLog(string type, string msg)
     {
         lock (SyncObj)
         {
             var time = DateTime.Now;
-            File.AppendAllText(LogPath(type, time), $"\n\n{time}\n{msg}");
+            File.AppendAllText(LogDir + $"/{type}_{time:yyMMdd}.log", $"\n\n{time}\n{msg}");
         }
     }
 
@@ -35,7 +33,7 @@ internal static class Logger
 
     internal static void ExceptionError(Exception ex) => WriteLog("exception", ex.ToString());
 
-    internal static void HttpError(Exception ex, Uri? uri) => WriteLog("http", $"{uri}\n{ex}");
+    internal static void HttpError(Exception ex, Uri? uri) => WriteLog("http", $"{uri}\n{ex.Message}\n ---> {ex.InnerException?.Message}");
 
     internal static void FetchCount(ConcurrentDictionary<string, ConcurrentDictionary<string, long>> counter)
         => WriteLog("fetchcount", Counter(counter));
