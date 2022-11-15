@@ -21,8 +21,8 @@ public sealed partial class PublicApi
     }
 
     [AuthorizationCheck(Strict = true)]
-    [HttpPost("/botarcapi/challenge")]
-    [HttpPost("/botarcapi/data/challenge")]
+    [HttpPost("challenge")]
+    [HttpPost("data/challenge")]
     public object PostChallenges([FromBody] ChallengeData[] data)
     {
         if (data.Select(i => i.Path).Any(path => PathList.All(i => !path.StartsWith(i)))) return NotFound(null);
