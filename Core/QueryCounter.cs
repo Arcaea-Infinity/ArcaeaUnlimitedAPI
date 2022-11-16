@@ -12,18 +12,21 @@ internal static class QueryCounter
     {
         var date = DateString;
 
-        if (AuaQueryCounter.ContainsKey(date))
+        lock (AuaQueryCounter)
         {
-            if (AuaQueryCounter[date].ContainsKey(tokenid))
-                ++AuaQueryCounter[date][tokenid];
+            if (AuaQueryCounter.ContainsKey(date))
+            {
+                if (AuaQueryCounter[date].ContainsKey(tokenid))
+                    ++AuaQueryCounter[date][tokenid];
+                else
+                    AuaQueryCounter[date][tokenid] = 1;
+            }
             else
-                AuaQueryCounter[date][tokenid] = 1;
-        }
-        else
-        {
-            Logger.QueryCount(AuaQueryCounter);
-            AuaQueryCounter.Clear();
-            AuaQueryCounter[date] = new() { [tokenid] = 1 };
+            {
+                Logger.QueryCount(AuaQueryCounter);
+                AuaQueryCounter.Clear();
+                AuaQueryCounter[date] = new() { [tokenid] = 1 };
+            }
         }
     }
 
@@ -31,19 +34,21 @@ internal static class QueryCounter
     {
         var date = DateString;
 
-        if (FetchCounter.ContainsKey(date))
+        lock (FetchCounter)
         {
-            if (FetchCounter[date].ContainsKey(tokenid))
-                ++FetchCounter[date][tokenid];
+            if (FetchCounter.ContainsKey(date))
+            {
+                if (FetchCounter[date].ContainsKey(tokenid))
+                    ++FetchCounter[date][tokenid];
+                else
+                    FetchCounter[date][tokenid] = 1;
+            }
             else
-                FetchCounter[date][tokenid] = 1;
-        }
-        else
-        {
-            Logger.FetchCount(FetchCounter);
-            FetchCounter.Clear();
-
-            FetchCounter[date] = new() { [tokenid] = 1 };
+            {
+                Logger.FetchCount(FetchCounter);
+                FetchCounter.Clear();
+                FetchCounter[date] = new() { [tokenid] = 1 };
+            }
         }
     }
 }
