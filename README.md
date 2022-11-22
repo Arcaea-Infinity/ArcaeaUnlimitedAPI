@@ -4,9 +4,9 @@
 
 A fast and easy Arcaea API for your bot.
 
-### Wiki & Docs
+This branch is for my own use.
 
-[Wiki](https://github.com/Arcaea-Infinity/ArcaeaUnlimitedAPI-Wiki)
+Don't use this branch unless you know what you are doing.
 
 ### License
 
