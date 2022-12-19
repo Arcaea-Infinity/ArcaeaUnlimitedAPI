@@ -18,7 +18,7 @@ public sealed partial class ArcaeaCharts
     internal static ArcaeaCharts? QueryByRecord(Records? record)
     {
         if (record is null) return null;
-        return GetById(record.SongID)![record.Difficulty];
+        return GetById(record.SongID)?[record.Difficulty];
     }
 
     internal static ArcaeaSong? QueryById(string? songid) => GetById(songid);
