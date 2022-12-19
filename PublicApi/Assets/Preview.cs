@@ -10,9 +10,10 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 public sealed partial class PublicApi
 {
     [EnableCors]
-    [SongInfoConverter(Order = 0)]
-    [DifficultyConverter(Order = 1)]
-    [ChartConverter(Order = 2)]
+    [AuthorizationCheck(Order = 0)]
+    [SongInfoConverter(Order = 1)]
+    [DifficultyConverter(Order = 2)]
+    [ChartConverter(Order = 3)]
     [HttpGet("assets/preview")]
     public object GetPreviewAssets([BindNever] ArcaeaCharts chart)
     {

@@ -5,10 +5,26 @@ using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 
 namespace ArcaeaUnlimitedAPI.PublicApi;
 
+internal sealed class APIStatusCheck : ActionFilterAttribute
+{
+    public override void OnActionExecuting(ActionExecutingContext context)
+    {
+        if (NeedUpdate)
+        {
+            context.Result = new JsonResult(Response.Error.NeedUpdate);
+            return;
+        }
+
+        if (IllegalHash)
+        {
+            context.Result = new JsonResult(Response.Error.IllegalHash);
+            return;
+        }
+    }
+}
+
 internal sealed class AuthorizationCheck : ActionFilterAttribute
 {
-    public bool NotCounted { get; init; }
-    
     public bool Strict { get; init; }
 
     private static bool TokenCheck(HttpContext context, out string token)
@@ -27,18 +43,6 @@ internal sealed class AuthorizationCheck : ActionFilterAttribute
 
     public override void OnActionExecuting(ActionExecutingContext context)
     {
-        if (NeedUpdate)
-        {
-            context.Result = new JsonResult(Response.Error.NeedUpdate);
-            return;
-        }
-
-        if (IllegalHash)
-        {
-            context.Result = new JsonResult(Response.Error.IllegalHash);
-            return;
-        }
-
         var currentTokenID = "0000";
 
         if (TokenCheck(context.HttpContext, out var token))
@@ -51,7 +55,7 @@ internal sealed class AuthorizationCheck : ActionFilterAttribute
             context.Result = new ObjectResult(null) { StatusCode = 404 };
             return;
         }
-        else if (!NotCounted && RateLimiter.IsExceeded(context.HttpContext.Connection.RemoteIpAddress?.ToString()))
+        else if (RateLimiter.IsExceeded(context.HttpContext.Connection.RemoteIpAddress?.ToString()))
         {
             context.Result = new ObjectResult(Response.Error.QuotaExceeded) { StatusCode = 429 };
             return;

@@ -11,6 +11,7 @@ public sealed partial class PublicApi
         "auth/login", "user", "user/me", "friend/me/delete", "friend/me/add", "score/song/friend", "purchase/me/stamina/fragment", "world/map/me"
     };
 
+    [APIStatusCheck(Order = 0)]
     [AuthorizationCheck(Strict = true)]
     [HttpGet("challenge")]
     [HttpGet("data/challenge")]
@@ -20,6 +21,7 @@ public sealed partial class PublicApi
         return Success(ArcaeaFetch.GenerateChallenge(string.Empty, data.Body, data.Path, data.Time));
     }
 
+    [APIStatusCheck(Order = 0)]
     [AuthorizationCheck(Strict = true)]
     [HttpPost("challenge")]
     [HttpPost("data/challenge")]

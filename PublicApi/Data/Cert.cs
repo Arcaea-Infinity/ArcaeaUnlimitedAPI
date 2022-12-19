@@ -7,7 +7,7 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 
 public sealed partial class PublicApi
 {
-    [AuthorizationCheck(NotCounted = true)]
+    [APIStatusCheck(Order = 0)]
     [HttpGet("data/cert")]
     public object GetCert()
         => Success(new { entry = Config.ApiEntry, version = Config.Appversion, cert = ArcaeaFetch.Base64Cert, password = Config.CertPassword });

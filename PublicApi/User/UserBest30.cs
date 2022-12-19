@@ -8,9 +8,10 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 
 public sealed partial class PublicApi
 {
-    [AuthorizationCheck(Order = 0)]
-    [PlayerInfoConverter(Order = 1)]
-    [OverflowConverter(Order = 2)]
+    [APIStatusCheck(Order = 0)]
+    [AuthorizationCheck(Order = 1)]
+    [PlayerInfoConverter(Order = 2)]
+    [OverflowConverter(Order = 3)]
     [HttpGet("user/best30")]
     public async Task<object> GetUserBest30(
         [BindNever] PlayerInfo player,

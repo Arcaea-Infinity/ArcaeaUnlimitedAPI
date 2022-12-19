@@ -2,6 +2,7 @@
 using ArcaeaUnlimitedAPI.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using SQLite;
 using static ArcaeaUnlimitedAPI.Core.Utils;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
 
@@ -9,11 +10,12 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 
 public sealed partial class PublicApi
 {
-    [AuthorizationCheck(Order = 0)]
-    [PlayerInfoConverter(Order = 1)]
-    [SongInfoConverter(Order = 2)]
-    [DifficultyConverter(false, Order = 3)]
-    [ChartConverter(Order = 4)]
+    [APIStatusCheck(Order = 0)]
+    [AuthorizationCheck(Order = 1)]
+    [PlayerInfoConverter(Order = 2)]
+    [SongInfoConverter(Order = 3)]
+    [DifficultyConverter(Order = 4, IgnoreError = false)]
+    [ChartConverter(Order = 5)]
     [HttpGet("user/best")]
     public async Task<object> GetUserBest(
         [BindNever] [FromQuery] PlayerInfo player,

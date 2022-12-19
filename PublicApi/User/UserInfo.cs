@@ -7,9 +7,10 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 
 public sealed partial class PublicApi
 {
-    [AuthorizationCheck(Order = 0)]
-    [PlayerInfoConverter(Order = 1)]
-    [RecentConverter(Order = 2)]
+    [APIStatusCheck(Order = 0)]
+    [AuthorizationCheck(Order = 1)]
+    [PlayerInfoConverter(Order = 2)]
+    [RecentConverter(Order = 3)]
     [HttpGet("user/info")]
     public async Task<object> GetUserInfo(
         [BindNever] PlayerInfo player,

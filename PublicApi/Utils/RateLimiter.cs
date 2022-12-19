@@ -9,8 +9,8 @@ internal static class RateLimiter
 
     internal static bool IsExceeded(string? ip)
     {
-        if (string.IsNullOrWhiteSpace(ip)) return true;
-
+        if (string.IsNullOrWhiteSpace(ip) || Config.Quota <= 0) return true;
+        
         var date = DateTime.UtcNow.ToShortDateString();
 
         if (Counter.ContainsKey(ip) && Counter[ip].ContainsKey(date))
