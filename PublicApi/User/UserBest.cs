@@ -2,7 +2,6 @@
 using ArcaeaUnlimitedAPI.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using SQLite;
 using static ArcaeaUnlimitedAPI.Core.Utils;
 using static ArcaeaUnlimitedAPI.PublicApi.Response;
 

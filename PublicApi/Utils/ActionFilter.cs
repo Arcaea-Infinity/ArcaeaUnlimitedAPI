@@ -24,9 +24,7 @@ internal sealed class APIStatusCheck : ActionFilterAttribute
 
 internal sealed class AuthorizationCheck : ActionFilterAttribute
 {
-    public bool Strict { get; init; }
-
-    private static bool TokenCheck(HttpContext context, out string token)
+    private static bool TokenCheck(HttpContext context)
     {
         if (!context.Request.Headers.TryGetValue("Authorization", out var authString)) return false;
         var str = authString.ToString();
@@ -39,17 +37,7 @@ internal sealed class AuthorizationCheck : ActionFilterAttribute
     {
         var currentTokenID = "0000";
 
-        if (TokenCheck(context.HttpContext, out var token))
-        {
-            currentTokenID = token[..4];
-            QueryCounter.RecordQuery(currentTokenID);
-        }
-        else if (Strict)
-        {
-            context.Result = new ObjectResult(null) { StatusCode = 404 };
-            return;
-        }
-        else if (RateLimiter.IsExceeded(context.HttpContext.Connection.RemoteIpAddress?.ToString()))
+        if (!TokenCheck(context.HttpContext) && RateLimiter.IsExceeded(context.HttpContext.Connection.RemoteIpAddress?.ToString()))
         {
             context.Result = new ObjectResult(Response.Error.QuotaExceeded) { StatusCode = 429 };
             return;
