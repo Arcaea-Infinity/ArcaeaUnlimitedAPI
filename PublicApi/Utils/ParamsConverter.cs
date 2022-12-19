@@ -85,12 +85,7 @@ internal sealed class RecentConverterAttribute : ActionFilterAttribute
 
 internal sealed class DifficultyConverterAttribute : ActionFilterAttribute
 {
-    internal DifficultyConverterAttribute(bool ignore = true)
-    {
-        IgnoreError = ignore;
-    }
-
-    private bool IgnoreError { get; }
+    public bool IgnoreError { get; set; }
 
     public override void OnActionExecuting(ActionExecutingContext context)
     {
