@@ -179,9 +179,6 @@ internal static class BackgroundService
             
             Config.WriteConfig();
             
-            NeedUpdate = false;
-            IllegalHash = false;
-            
             _configTimer = new(1800000);
             _configTimer.Elapsed += (_, _) => Reload("apiconfig.json");
             _configTimer.AutoReset = false;

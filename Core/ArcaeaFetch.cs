@@ -258,6 +258,8 @@ internal static class ArcaeaFetch
 
     internal static void Init()
     {
+        NeedUpdate = false;
+        IllegalHash = false;
         _apientry = Config.ApiEntry;
         _arcaeaHash = new();
         _arcaeaHash.Init();
