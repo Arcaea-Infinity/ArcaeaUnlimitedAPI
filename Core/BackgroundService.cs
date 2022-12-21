@@ -17,6 +17,8 @@ internal static class BackgroundService
     private static volatile int _running;
 
     private static string? _version;
+    private static Timer _timer = null!;
+    private static Timer _configTimer = null!;
 
     internal static string Version
     {
@@ -30,18 +32,17 @@ internal static class BackgroundService
 
     internal static void Init()
     {
-        Timer timer = new(600000);
+        _timer = new(600000);
 
-        if (Config.OpenRegister == true) timer.Elapsed += (_, _) => ArcaeaFetch.RegisterTask();
+        if (Config.OpenRegister == true) _timer.Elapsed += (_, _) => ArcaeaFetch.RegisterTask();
 
-        timer.Elapsed += (_, _) =>
+        _timer.Elapsed += (_, _) =>
         {
             ArcUpdate();
             ++TimerCount;
         };
 
-        timer.AutoReset = true;
-        timer.Start();
+        _timer.Start();
     }
 
     internal static void ArcUpdate()
@@ -184,6 +185,11 @@ internal static class BackgroundService
 
             NeedUpdate = false;
             IllegalHash = false;
+            
+            _configTimer = new(1800000);
+            _configTimer.Elapsed += (_, _) => Reload("apiconfig.json");
+            _configTimer.AutoReset = false;
+            _configTimer.Start();
         }
         catch (Exception ex)
         {
