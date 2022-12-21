@@ -182,9 +182,6 @@ internal static class BackgroundService
             File.WriteAllBytes(Path.Combine(Config.DataPath, Config.CertFileName), decrypt.GetCert());
 
             Config.WriteConfig();
-
-            NeedUpdate = false;
-            IllegalHash = false;
             
             _configTimer = new(1800000);
             _configTimer.Elapsed += (_, _) => Reload("apiconfig.json");
