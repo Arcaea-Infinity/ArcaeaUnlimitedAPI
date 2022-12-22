@@ -11,7 +11,7 @@ public sealed partial class PublicApi
     [EnableCors]
     [SongInfoConverter]
     [HttpGet("song/alias")]
-    public object GetSongAlias([BindNever] ArcaeaSong song)
+    public JsonResult GetSongAlias([BindNever] ArcaeaSong song)
     {
         ArcaeaCharts.Aliases.TryGetValue(song.SongID, out List<string>? alias);
         return Success(alias ?? new());

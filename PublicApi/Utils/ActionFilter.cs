@@ -10,13 +10,13 @@ internal sealed class APIStatusCheck : ActionFilterAttribute
     {
         if (NeedUpdate)
         {
-            context.Result = new JsonResult(Response.Error.NeedUpdate);
+            context.Result = Response.Error.NeedUpdate;
             return;
         }
 
         if (IllegalHash)
         {
-            context.Result = new JsonResult(Response.Error.IllegalHash);
+            context.Result = Response.Error.IllegalHash;
             return;
         }
     }
@@ -39,7 +39,7 @@ internal sealed class AuthorizationCheck : ActionFilterAttribute
 
         if (!TokenCheck(context.HttpContext) && RateLimiter.IsExceeded(context.HttpContext.Connection.RemoteIpAddress?.ToString()))
         {
-            context.Result = new ObjectResult(Response.Error.QuotaExceeded) { StatusCode = 429 };
+            context.Result = Response.Error.QuotaExceeded;
             return;
         }
 

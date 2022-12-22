@@ -12,13 +12,16 @@ public sealed partial class PublicApi
     [PlayerInfoConverter(Order = 2)]
     [RecentConverter(Order = 3)]
     [HttpGet("user/info")]
-    public async Task<object> GetUserInfo([BindNever] PlayerInfo player, [BindNever] int recent, bool withsonginfo = false)
+    public async Task<JsonResult> GetUserInfo(
+        [BindNever] PlayerInfo player,
+        [BindNever] int recent,
+        bool withsonginfo = false)
     {
         try
         {
-            TaskCompletionSource<(UserInfoResponse? infodata, Response? error)>? task = UserInfoConcurrent.GetTask(player.Code);
+            TaskCompletionSource<(UserInfoResponse? infodata, JsonResult? error)>? task = UserInfoConcurrent.GetTask(player.Code);
             UserInfoResponse? response;
-            Response? errorresp;
+            JsonResult? errorresp;
 
             if (task is null)
             {
@@ -39,7 +42,7 @@ public sealed partial class PublicApi
         }
     }
 
-    private static Response GetResponse(UserInfoResponse response, int recent, bool withsonginfo)
+    private static JsonResult GetResponse(UserInfoResponse response, int recent, bool withsonginfo)
     {
         UserInfoResponse ret = new()
         {
@@ -64,7 +67,7 @@ public sealed partial class PublicApi
         return Success(ret);
     }
 
-    private static async Task<(UserInfoResponse? response, Response? error)> QueryUserInfo(PlayerInfo player)
+    private static async Task<(UserInfoResponse? response, JsonResult? error)> QueryUserInfo(PlayerInfo player)
     {
         AccountInfo? account = null;
 

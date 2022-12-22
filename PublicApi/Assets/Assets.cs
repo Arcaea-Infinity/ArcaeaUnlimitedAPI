@@ -15,41 +15,41 @@ public sealed partial class PublicApi
     [DifficultyConverter(Order = 2)]
     [ChartConverter(Order = 3)]
     [HttpGet("assets/song")]
-    public object GetSongAssets([BindNever] ArcaeaCharts chart)
+    public ActionResult GetSongAssets([BindNever] ArcaeaCharts chart)
     {
         var difextend = chart.JacketOverride ? $"_{chart.RatingClass}" : string.Empty;
 
         var fileinfo = new FileInfo($"{Config.DataPath}/source/songs/{chart.SongID}{difextend}.jpg");
 
-        if (!fileinfo.Exists) return NotFound(Error.FileUnavailable);
+        if (!fileinfo.Exists) return Error.FileUnavailable;
 
         return PhysicalFile(fileinfo.FullName, "image/jpeg");
     }
 
     [EnableCors]
     [HttpGet("assets/icon")]
-    public object GetIconAssets(string? partner, bool awakened = false)
+    public ActionResult GetIconAssets(string? partner, bool awakened = false)
     {
         // check for request arguments
-        if (!int.TryParse(partner, out _)) return NotFound(Error.InvalidPartner);
+        if (!int.TryParse(partner, out _)) return Error.InvalidPartner;
 
         var fileinfo = new FileInfo($"{Config.DataPath}/source/char/{partner}{(awakened ? "u" : string.Empty)}_icon.png");
 
-        if (!fileinfo.Exists) return NotFound(Error.FileUnavailable);
+        if (!fileinfo.Exists) return Error.FileUnavailable;
 
         return PhysicalFile(fileinfo.FullName, "image/png");
     }
 
     [EnableCors]
     [HttpGet("assets/char")]
-    public object GetCharAssets(string? partner, bool awakened = false)
+    public ActionResult GetCharAssets(string? partner, bool awakened = false)
     {
         // check for request arguments
-        if (!int.TryParse(partner, out _)) return NotFound(Error.InvalidPartner);
+        if (!int.TryParse(partner, out _)) return Error.InvalidPartner;
 
         var fileinfo = new FileInfo($"{Config.DataPath}/source/char/{partner}{(awakened ? "u" : string.Empty)}.png");
 
-        if (!fileinfo.Exists) return NotFound(Error.FileUnavailable);
+        if (!fileinfo.Exists) return Error.FileUnavailable;
 
         return PhysicalFile(fileinfo.FullName, "image/png");
     }

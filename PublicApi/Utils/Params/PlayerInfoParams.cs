@@ -1,10 +1,11 @@
 ﻿using ArcaeaUnlimitedAPI.Beans;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ArcaeaUnlimitedAPI.PublicApi.Params;
 
 internal sealed record PlayerInfoParams(string User, string UserCode) : IParams<PlayerInfo>
 {
-    public PlayerInfo? Validate(out Response? error)
+    public PlayerInfo? Validate(out JsonResult? error)
     {
         error = null;
 

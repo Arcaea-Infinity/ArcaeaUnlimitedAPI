@@ -21,7 +21,7 @@ internal sealed class SongInfoConverterAttribute : ActionFilterAttribute
 
         if (error != null)
         {
-            context.Result = new JsonResult(error);
+            context.Result = error;
             return;
         }
 
@@ -39,7 +39,7 @@ internal sealed class PlayerInfoConverterAttribute : ActionFilterAttribute
 
         if (error != null)
         {
-            context.Result = new JsonResult(error);
+            context.Result = error;
             return;
         }
 
@@ -57,7 +57,7 @@ internal sealed class OverflowConverterAttribute : ActionFilterAttribute
 
         if (error != null)
         {
-            context.Result = new JsonResult(error);
+            context.Result = error;
             return;
         }
 
@@ -75,7 +75,7 @@ internal sealed class RecentConverterAttribute : ActionFilterAttribute
 
         if (error != null)
         {
-            context.Result = new JsonResult(error);
+            context.Result = error;
             return;
         }
 
@@ -95,7 +95,7 @@ internal sealed class DifficultyConverterAttribute : ActionFilterAttribute
 
         if ((difficulty < 0 || !IgnoreError) && error != null)
         {
-            context.Result = new JsonResult(error);
+            context.Result = error;
             return;
         }
 
@@ -116,7 +116,7 @@ internal sealed class ChartConverterAttribute : ActionFilterAttribute
         var difficulty = (sbyte)context.ActionArguments["difficulty"]!;
         if (ChartMissingCheck(song, difficulty))
         {
-            context.Result = new JsonResult(Response.Error.NoThisLevel);
+            context.Result = Response.Error.NoThisLevel;
             return;
         }
 
@@ -132,23 +132,25 @@ internal sealed class FileConverterAttribute : ActionFilterAttribute
     {
         var file = context.GetValue("file");
 
-        if (string.IsNullOrWhiteSpace(file)) return;
-
-        if (file.Contains("/"))
+        if (!string.IsNullOrWhiteSpace(file))
         {
-            context.Result = new JsonResult(Response.Error.FileUnavailable) { StatusCode = 404 };
-            return;
+            if (file.Contains("/"))
+            {
+                context.Result = Response.Error.FileUnavailable;
+                return;
+            }
+
+            var fileinfo = new FileInfo($"{GlobalConfig.Config.DataPath}/source/songs/{file}.jpg");
+
+            if (!fileinfo.Exists)
+            {
+                context.Result = Response.Error.FileUnavailable;
+                return;
+            }
+
+            context.Result = new PhysicalFileResult(fileinfo.FullName, "image/jpeg");
         }
 
-        var fileinfo = new FileInfo($"{GlobalConfig.Config.DataPath}/source/songs/{file}.jpg");
-
-        if (!fileinfo.Exists)
-        {
-            context.Result = new JsonResult(Response.Error.FileUnavailable) { StatusCode = 404 };
-            return;
-        }
-
-        context.Result = new PhysicalFileResult(fileinfo.FullName, "image/jpeg");
         base.OnActionExecuting(context);
     }
 }

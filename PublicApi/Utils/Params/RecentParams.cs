@@ -1,8 +1,10 @@
-﻿namespace ArcaeaUnlimitedAPI.PublicApi.Params;
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace ArcaeaUnlimitedAPI.PublicApi.Params;
 
 internal sealed record RecentParams(string Recent) : IParams<int>
 {
-    public int Validate(out Response? error)
+    public int Validate(out JsonResult? error)
     {
         error = null;
         var recentCount = 1;

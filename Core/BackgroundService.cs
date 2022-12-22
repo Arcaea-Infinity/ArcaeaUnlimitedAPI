@@ -70,7 +70,7 @@ internal static class BackgroundService
             if (!File.Exists(apkpth))
             {
                 Console.WriteLine($"Downloading arcaea_{version}.apk");
-                Console.WriteLine($" - from `{info.Url}`  ");
+                Console.WriteLine($" - from `{info.Url}`");
                 Console.WriteLine($" - save to `{apkpth}`");
                 Console.WriteLine("Note: If it is slow to download, you can also download the apk manually,");
                 Console.WriteLine("close this program and place it in the specified location then restart it.");

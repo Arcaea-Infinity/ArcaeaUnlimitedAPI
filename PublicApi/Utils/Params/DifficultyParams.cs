@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ArcaeaUnlimitedAPI.PublicApi.Params;
 
@@ -15,7 +16,7 @@ internal sealed record DifficultyParams(string Difficulty) : IParams<sbyte>
         List.TryAdd(3, new[] { "3", "byn", "byd", "beyond" });
     }
 
-    public sbyte Validate(out Response? error)
+    public sbyte Validate(out JsonResult? error)
     {
         error = null;
 
