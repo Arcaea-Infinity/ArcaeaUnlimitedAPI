@@ -15,10 +15,10 @@ public sealed partial class PublicApi
     [DifficultyConverter(Order = 2)]
     [ChartConverter(Order = 3)]
     [HttpGet("assets/preview")]
-    public object GetPreviewAssets([BindNever] ArcaeaCharts chart)
+    public ActionResult GetPreviewAssets([BindNever] ArcaeaCharts chart)
     {
         FileInfo fileinfo = new($"{GlobalConfig.Config.DataPath}/source/preview/{chart.SongID}/{chart.RatingClass}.jpeg");
-        if (!fileinfo.Exists) return NotFound(Error.FileUnavailable);
+        if (!fileinfo.Exists) return Error.FileUnavailable;
 
         return PhysicalFile(fileinfo.FullName, "image/jpeg");
     }

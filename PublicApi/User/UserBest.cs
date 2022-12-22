@@ -16,7 +16,7 @@ public sealed partial class PublicApi
     [DifficultyConverter(Order = 4, IgnoreError = false)]
     [ChartConverter(Order = 5)]
     [HttpGet("user/best")]
-    public async Task<object> GetUserBest(
+    public async Task<JsonResult> GetUserBest(
         [BindNever] [FromQuery] PlayerInfo player,
         [BindNever] [FromQuery] ArcaeaCharts chart,
         [BindNever] string currentTokenID,
@@ -27,9 +27,9 @@ public sealed partial class PublicApi
 
         try
         {
-            TaskCompletionSource<(UserBestResponse? bestdata, Response? error)>? task = UserBestConcurrent.GetTask(key);
+            TaskCompletionSource<(UserBestResponse? bestdata, JsonResult? error)>? task = UserBestConcurrent.GetTask(key);
             UserBestResponse? response;
-            Response? errorresp;
+            JsonResult? errorresp;
 
             if (task is null)
             {
@@ -50,7 +50,7 @@ public sealed partial class PublicApi
         }
     }
 
-    private static Response GetResponse(
+    private static JsonResult GetResponse(
         UserBestResponse response,
         bool withrecent,
         bool withsonginfo,
@@ -73,7 +73,7 @@ public sealed partial class PublicApi
         return Success(ret);
     }
 
-    private static async Task<(UserBestResponse? response, Response? error)> QueryUserBest(PlayerInfo player, ArcaeaCharts chart, string tokenid)
+    private static async Task<(UserBestResponse? response, JsonResult? error)> QueryUserBest(PlayerInfo player, ArcaeaCharts chart, string tokenid)
     {
         AccountInfo? account = null;
 

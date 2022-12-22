@@ -12,7 +12,7 @@ public sealed partial class PublicApi
     [EnableCors]
     [OverflowConverter]
     [HttpGet("data/theory")]
-    public object GetTheoryBests(
+    public JsonResult GetTheoryBests(
         [BindNever] int overflow,
         bool withrecent = false,
         bool withsonginfo = false,

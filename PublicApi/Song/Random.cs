@@ -9,7 +9,7 @@ public sealed partial class PublicApi
 {
     [EnableCors]
     [HttpGet("song/random")]
-    public object GetSongRandom(int? start, int? end, bool withsonginfo = false)
+    public JsonResult GetSongRandom(int? start, int? end, bool withsonginfo = false)
     {
         if (start is null && end is null)
         {

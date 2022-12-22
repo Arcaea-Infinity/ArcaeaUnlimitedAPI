@@ -1,10 +1,11 @@
 ﻿using ArcaeaUnlimitedAPI.Beans;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ArcaeaUnlimitedAPI.PublicApi.Params;
 
 internal sealed record SongInfoParams(string SongName, string SongID) : IParams<ArcaeaSong>
 {
-    public ArcaeaSong? Validate(out Response? error)
+    public ArcaeaSong? Validate(out JsonResult? error)
     {
         error = null;
 

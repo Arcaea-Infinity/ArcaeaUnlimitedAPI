@@ -9,6 +9,6 @@ public sealed partial class PublicApi
 {
     [APIStatusCheck(Order = 0)]
     [HttpGet("data/cert")]
-    public object GetCert()
+    public JsonResult GetCert()
         => Success(new { entry = Config.ApiEntry, version = Config.Appversion, cert = ArcaeaFetch.Base64Cert, password = Config.CertPassword });
 }

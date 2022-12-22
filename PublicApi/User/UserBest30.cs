@@ -13,7 +13,7 @@ public sealed partial class PublicApi
     [PlayerInfoConverter(Order = 2)]
     [OverflowConverter(Order = 3)]
     [HttpGet("user/best30")]
-    public async Task<object> GetUserBest30(
+    public async Task<JsonResult> GetUserBest30(
         [BindNever] PlayerInfo player,
         [BindNever] int overflow,
         [BindNever] string currentTokenID,
@@ -22,9 +22,9 @@ public sealed partial class PublicApi
     {
         try
         {
-            TaskCompletionSource<(UserBest30Response? b30data, Response? error)>? task = UserBest30Concurrent.GetTask(player.Code);
+            TaskCompletionSource<(UserBest30Response? b30data, JsonResult? error)>? task = UserBest30Concurrent.GetTask(player.Code);
             UserBest30Response? response;
-            Response? errorresp;
+            JsonResult? errorresp;
 
             if (task is null)
             {
@@ -45,7 +45,7 @@ public sealed partial class PublicApi
         }
     }
 
-    private static Response GetResponse(
+    private static JsonResult GetResponse(
         UserBest30Response response,
         int overflowCount,
         bool withrecent,
@@ -82,7 +82,7 @@ public sealed partial class PublicApi
         return Success(ret);
     }
 
-    private static async Task<(UserBest30Response? response, Response? error)> QueryUserBest30(PlayerInfo player, string tokenid)
+    private static async Task<(UserBest30Response? response, JsonResult? error)> QueryUserBest30(PlayerInfo player, string tokenid)
     {
         AccountInfo? account = null;
         try

@@ -9,5 +9,5 @@ public sealed partial class PublicApi
 {
     [EnableCors]
     [HttpGet("song/list")]
-    public object GetSongList() => Success(new { songs = ArcaeaCharts.SongJsons.Values });
+    public JsonResult GetSongList() => Success(new { songs = ArcaeaCharts.SongJsons.Values });
 }

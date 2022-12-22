@@ -10,13 +10,13 @@ namespace ArcaeaUnlimitedAPI.PublicApi;
 [Route("/botarcapi/")]
 public sealed partial class PublicApi : ControllerBase
 {
-    private static readonly ConcurrentApiRequest<string, (UserInfoResponse? infodata, Response? error)> UserInfoConcurrent = new();
+    private static readonly ConcurrentApiRequest<string, (UserInfoResponse? infodata, JsonResult? error)> UserInfoConcurrent = new();
 
-    private static readonly ConcurrentApiRequest<(string, string, int), (UserBestResponse? bestdata, Response? error)> UserBestConcurrent = new();
+    private static readonly ConcurrentApiRequest<(string, string, int), (UserBestResponse? bestdata, JsonResult? error)> UserBestConcurrent = new();
 
-    private static readonly ConcurrentApiRequest<string, (UserBest30Response? b30data, Response? error)> UserBest30Concurrent = new();
+    private static readonly ConcurrentApiRequest<string, (UserBest30Response? b30data, JsonResult? error)> UserBest30Concurrent = new();
 
-    private static FriendsItem? RecordPlayers(AccountInfo account, PlayerInfo player, out Response? error)
+    private static FriendsItem? RecordPlayers(AccountInfo account, PlayerInfo player, out JsonResult? error)
     {
         error = null;
 
@@ -52,7 +52,11 @@ public sealed partial class PublicApi : ControllerBase
         return friend;
     }
 
-    [AuthorizationCheck(Order = 0)]
+    [AuthorizationCheck(Strict = true)]
     [HttpGet("stat")]
-    public object GetStat() => Success(new { fetch = QueryCounter.FetchCounter, query = QueryCounter.AuaQueryCounter });
+    public JsonResult GetStat() => Success(new { fetch = QueryCounter.FetchCounter, query = QueryCounter.AuaQueryCounter });
+
+    [HttpHead("montior")]
+    [HttpGet("montior")]
+    public ObjectResult GetMonitor() => new(null) { StatusCode = GlobalConfig.IllegalHash || GlobalConfig.NeedUpdate ? 500 : 200 };
 }

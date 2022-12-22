@@ -11,5 +11,5 @@ public sealed partial class PublicApi
     [EnableCors]
     [SongInfoConverter]
     [HttpGet("song/info")]
-    public object GetSongInfo([BindNever] ArcaeaSong song) => Success(song.ToJson());
+    public JsonResult GetSongInfo([BindNever] ArcaeaSong song) => Success(song.ToJson());
 }

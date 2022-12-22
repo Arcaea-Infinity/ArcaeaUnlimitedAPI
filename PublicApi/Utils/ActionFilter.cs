@@ -11,13 +11,13 @@ internal sealed class APIStatusCheck : ActionFilterAttribute
     {
         if (NeedUpdate)
         {
-            context.Result = new JsonResult(Response.Error.NeedUpdate);
+            context.Result = Response.Error.NeedUpdate;
             return;
         }
 
         if (IllegalHash)
         {
-            context.Result = new JsonResult(Response.Error.IllegalHash);
+            context.Result = Response.Error.IllegalHash;
             return;
         }
     }
@@ -52,12 +52,12 @@ internal sealed class AuthorizationCheck : ActionFilterAttribute
         }
         else if (Strict)
         {
-            context.Result = new ObjectResult(null) { StatusCode = 404 };
+            context.Result = PublicApi.NullNotFound;
             return;
         }
         else if (RateLimiter.IsExceeded(context.HttpContext.Connection.RemoteIpAddress?.ToString()))
         {
-            context.Result = new ObjectResult(Response.Error.QuotaExceeded) { StatusCode = 429 };
+            context.Result = Response.Error.QuotaExceeded;
             return;
         }
 
