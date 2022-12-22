@@ -48,15 +48,22 @@ internal static class BackgroundService
     internal static void ArcUpdate()
     {
         if (Interlocked.CompareExchange(ref _running, 1, 0) != 0) return;
-        
+
+        Console.WriteLine("Checking for updates......it will take a long time.");
+
         ZipArchive? apk = null;
-        
+
         try
         {
             var info = GetLatestVersion().Result;
             if (info?.Url is null || Version == info.Version) return;
 
-            if (Config.Appversion != info.Version) NeedUpdate = true;
+            if (Config.Appversion != info.Version)
+            {
+                NeedUpdate = true;
+                Console.WriteLine($"Current config version: {Config.Appversion}]\nNewest version: {info.Version}");
+            }
+
             var version = info.Version;
             var apkpth = Path.Combine(Config.DataPath, "update", $"arcaea_{version}.apk");
 
@@ -85,7 +92,7 @@ internal static class BackgroundService
             }
 
             Console.WriteLine("Download complete, start to extract the apk file.");
-         
+
             try
             {
                 apk = ZipFile.OpenRead(apkpth);
@@ -176,6 +183,7 @@ internal static class BackgroundService
         {
             apk?.Dispose();
             Interlocked.Exchange(ref _running, 0);
+            Console.WriteLine("Update task completed.");
         }
     }
 
@@ -195,7 +203,7 @@ internal static class BackgroundService
             File.WriteAllBytes(Path.Combine(Config.DataPath, Config.CertFileName), decrypt.GetCert());
 
             Config.WriteConfig();
-            
+
             _configTimer = new(1800000);
             _configTimer.Elapsed += (_, _) => Reload("apiconfig.json");
             _configTimer.AutoReset = false;

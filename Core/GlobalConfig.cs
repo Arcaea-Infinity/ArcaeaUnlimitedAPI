@@ -93,21 +93,8 @@ internal static class GlobalConfig
                 Console.WriteLine("Register account task completed.");
             }
         }
-
-        if (BackgroundService.Version != Config.Appversion)
-        {
-            Console.WriteLine("The assets version is not the same as the config version.");
-            Console.WriteLine($"Current config version: {Config.Appversion}, Assets version: {BackgroundService.Version}");
-            Console.WriteLine("Do you want to update assets? (y/n)");
-            Console.WriteLine("[Note: Whether you choose to update or not, daily scheduled tasks will automatically check for versions and update assets.]");
-            if (Console.ReadKey().Key == ConsoleKey.Y)
-            {
-                Console.WriteLine();
-                Console.WriteLine("Update task running...This will take a long time.");
-                BackgroundService.ArcUpdate();
-                Console.WriteLine("Update task completed.");
-            }
-        }
+        
+        BackgroundService.ArcUpdate();
 
         Console.Clear();
     }
