@@ -254,7 +254,7 @@ internal static class ArcaeaFetch
         _apientry = Config.ApiEntry;
         _node = Config.Node;
         var fileName = Path.Combine(Config.DataPath, Config.CertFileName);
-        Base64Cert =  Convert.ToBase64String(File.ReadAllBytes(fileName));
+        Base64Cert = Convert.ToBase64String(File.ReadAllBytes(fileName));
         var certificate = new X509Certificate2(fileName, Config.CertPassword);
         var handler = new HttpClientHandler();
         handler.ClientCertificates.Add(certificate);
