@@ -48,7 +48,9 @@ internal static class BackgroundService
     internal static void ArcUpdate()
     {
         if (Interlocked.CompareExchange(ref _running, 1, 0) != 0) return;
-
+        
+        ZipArchive? apk = null;
+        
         try
         {
             var info = GetLatestVersion().Result;
@@ -83,8 +85,18 @@ internal static class BackgroundService
             }
 
             Console.WriteLine("Download complete, start to extract the apk file.");
-
-            var apk = ZipFile.OpenRead(apkpth);
+         
+            try
+            {
+                apk = ZipFile.OpenRead(apkpth);
+                ArgumentNullException.ThrowIfNull(apk);
+            }
+            catch
+            {
+                File.Delete(apkpth);
+                Console.WriteLine("ZipFile.OpenRead failed.");
+                throw;
+            }
 
             var molnight = $"{Config.DataPath}/source/songs/melodyoflove_night.jpg";
             if (!File.Exists(molnight)) apk.GetEntry("assets/songs/dl_melodyoflove/base_night.jpg")!.ExtractToFile(molnight);
@@ -162,6 +174,7 @@ internal static class BackgroundService
         }
         finally
         {
+            apk?.Dispose();
             Interlocked.Exchange(ref _running, 0);
         }
     }
