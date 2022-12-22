@@ -95,7 +95,6 @@ internal static class GlobalConfig
         }
         
         BackgroundService.ArcUpdate();
-
         Console.Clear();
     }
 
