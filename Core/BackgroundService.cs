@@ -215,11 +215,11 @@ internal static class BackgroundService
     {
         using var downloader = new DownloadService(new()
                                                    {
-                                                       BufferBlockSize = 8000,
-                                                       ChunkCount = 16,
+                                                       BufferBlockSize = 80000,
+                                                       ChunkCount = 1,
                                                        MaxTryAgainOnFailover = 10,
                                                        OnTheFlyDownload = false,
-                                                       ParallelDownload = true,
+                                                       ParallelDownload = false,
                                                        Timeout = 5000
                                                    });
 
