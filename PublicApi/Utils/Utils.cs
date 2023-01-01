@@ -56,7 +56,7 @@ public sealed partial class PublicApi : ControllerBase
     [HttpGet("stat")]
     public JsonResult GetStat() => Success(new { fetch = QueryCounter.FetchCounter, query = QueryCounter.AuaQueryCounter });
 
-    [HttpHead("montior")]
-    [HttpGet("montior")]
-    public ObjectResult GetMonitor() => new(null) { StatusCode = GlobalConfig.IllegalHash || GlobalConfig.NeedUpdate ? 500 : 200 };
+    [HttpHead("mont")]
+    [HttpGet("mont")]
+    public ObjectResult GetMonitor() => new(null) { StatusCode = GlobalConfig.IllegalHash || GlobalConfig.NeedUpdate ? 500 : 204 };
 }
