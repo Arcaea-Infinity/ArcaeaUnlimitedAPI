@@ -1,5 +1,4 @@
 ﻿using ArcaeaUnlimitedAPI.Core;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using static ArcaeaUnlimitedAPI.Core.GlobalConfig;
 
