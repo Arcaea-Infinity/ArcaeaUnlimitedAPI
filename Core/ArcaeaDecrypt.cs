@@ -10,8 +10,7 @@ internal sealed unsafe class ArcaeaDecrypt
 
     private static readonly byte[] CertBytes = { 0x43, 0xD1, 0x4B, 0x08, 0x8C, 0xBB, 0xAE, 0x0E, 0xDC, 0x76, 0xF9, 0x21, 0xDE, 0x23, 0x6E, 0x4A },
                                    EndpointBytes = { 0x1B, 0x27, 0x39, 0x1A, 0xFD, 0x80, 0x82, 0x11 },
-                                   SaltBytes = { 0x20, 0x1C, 0x20, 0x6E },
-                                   RetBytes = { 0xc0, 0x03, 0x5f, 0xd6 };
+                                   SaltBytes = { 0x20, 0x1C, 0x20, 0x6E };
 
     private byte[] _lib = null!;
 
@@ -40,32 +39,22 @@ internal sealed unsafe class ArcaeaDecrypt
         {
             for (var pos = posEor - 40; pos < posEor + 40; pos += 4)
             {
-                var inst = Parse(pos);
-
-                if (SequenceEqual(_lib, RetBytes, pos)) break;
-
-                int based, imm;
-                if (inst[0] == '1' && inst[3..8] == "10000")
-                {
-                    imm = Convert.ToInt32($"{inst[8..27]}{inst[1..3]}", 2) << 12;
-                    based = pos & ~0xfff;
-                    pos += 4;
-                }
-                else
-                {
-                    continue;
-                }
-
-                inst = Parse(pos);
-
-                if (inst[..10] == "1001000100" && inst[22..27] == inst[27..32])
-                {
-                    var imm12 = Convert.ToInt32(inst[10..22], 2);
-                    var loc = based + imm + imm12 - 0x2000;
-                    var decryptBytes = DecryptBytes(_lib[loc..(loc + 32)]);
-                    if (ls.Any(i => i.SequenceEqual(decryptBytes))) continue;
-                    ls.Add(decryptBytes);
-                }
+                var insn = ParseInstruction(pos);
+                if (insn == 0xD65F03C0 /* RET */) break;
+                
+                if ((insn & 0x9F000000) != 0x90000000) continue;
+                
+                var adrpImm = ((pos >> 12) + ((Slice(insn, 5, 19) << 2) | Slice(insn, 29, 2))) << 12;
+                insn = ParseInstruction(pos += 4);
+                if ((insn & 0x7FC00000) != 0x11000000) continue;
+                
+                var addImm = Slice(insn, 10, 12);
+                if (Slice(insn, 0, 5) != Slice(insn, 5, 5)) continue;
+                
+                var saltAddr = (int)(adrpImm + addImm - 0x2000);
+                var decrypted = DecryptBytes(_lib[saltAddr..(saltAddr + 32)]);
+                if (ls.Any(i => i.SequenceEqual(decrypted))) continue;
+                ls.Add(decrypted);
             }
         }
 
@@ -97,8 +86,7 @@ internal sealed unsafe class ArcaeaDecrypt
         // ReSharper disable once LoopCanBeConvertedToQuery
         for (var i = 0; i < eor.Length; ++i)
         {
-            if (lib[offset + i] != eor[i])
-                return false;
+            if (lib[offset + i] != eor[i]) return false;
         }
 
         return true;
@@ -108,22 +96,13 @@ internal sealed unsafe class ArcaeaDecrypt
     {
         for (var pos = 0; pos < _lib.Length; pos += 4)
         {
-            if (SequenceEqual(_lib, eor, pos))
-                yield return pos;
+            if (SequenceEqual(_lib, eor, pos)) yield return pos;
         }
     }
 
-    private string Parse(int pos)
-    {
-        var sb = new StringBuilder();
-        for (var i = 3; i >= 0; --i)
-        {
-            var b = _lib[pos + i];
-            for (var j = 0; j < 8; j++) sb.Append((b >> (7 - j)) & 1);
-        }
+    private uint ParseInstruction(int pos) => BitConverter.ToUInt32(_lib[pos..(pos + 4)]);
 
-        return sb.ToString();
-    }
+    private static long Slice(uint n, int offset, int size = 1) => (n >> offset) & ((1 << size) - 1);
 
     private class DecryptContext
     {
