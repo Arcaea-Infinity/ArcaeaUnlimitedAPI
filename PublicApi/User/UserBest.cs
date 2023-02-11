@@ -91,7 +91,7 @@ public sealed partial class PublicApi
             foreach (var record in friendRank)
             {
                 record.Potential = player.Potential;
-                DatabaseManager.Bests.InsertOrReplace(record);
+                // DatabaseManager.Bests.InsertOrReplace(record);
             }
 
             // calculate song rating

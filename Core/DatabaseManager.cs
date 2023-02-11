@@ -11,7 +11,7 @@ internal static class DatabaseManager
                                                     Account = GetLazyConnection("arcaccount"),
                                                     Player = GetLazyConnection("arcplayer"),
                                                     Record = GetLazyConnection("arcrecord"),
-                                                    Bests = GetLazyConnection("arcbests"),
+                                                    // Bests = GetLazyConnection("arcbests"),
                                                     Best30 = GetLazyConnection("arcbest30");
 
     internal static void Init()
@@ -22,7 +22,7 @@ internal static class DatabaseManager
         Account.Value.Execute(GetSql<AccountInfo>());
         Player.Value.Execute(GetSql<PlayerInfo>());
         Record.Value.Execute(GetSql<Records>());
-        Bests.Value.Execute(GetSql<Records>());
+        // Bests.Value.Execute(GetSql<Records>());
         Best30.Value.Execute(GetSql<UserBest30Response>());
     }
 
