@@ -94,7 +94,7 @@ internal sealed class PollingBestsHelper
             {
                 i.Potential = _friend.Rating;
                 i.Rating = Utils.CalcSongRating(i.Score, chart.Rating);
-                DatabaseManager.Bests.InsertOrReplace(i);
+                // DatabaseManager.Bests.InsertOrReplace(i);
             }
 
             var record = result.FirstOrDefault(i => i.UserID == _friend.UserID);
