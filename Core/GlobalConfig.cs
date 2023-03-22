@@ -50,11 +50,11 @@ internal static class GlobalConfig
             Environment.Exit(0);
         }
 
-        Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("apiconfig.json"))!;
+        Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText(apiconfig))!;
 
         var tokens = Path.Combine(AppContext.BaseDirectory, "tokens.json");
         if (!File.Exists(tokens)) File.WriteAllText(tokens, "[]");
-        Tokens = JsonConvert.DeserializeObject<HashSet<string>>(File.ReadAllText("tokens.json"))!;
+        Tokens = JsonConvert.DeserializeObject<HashSet<string>>(File.ReadAllText(tokens))!;
 
         Directory.CreateDirectory(Path.Combine(Config.DataPath, "log"));
         Directory.CreateDirectory(Path.Combine(Config.DataPath, "database"));
@@ -72,7 +72,7 @@ internal static class GlobalConfig
             Console.WriteLine("cert file not found, get infomation from main server...");
 
             Dictionary<string, string> json = CertResponse.GetContent();
-            File.WriteAllBytes(Config.CertFileName, Convert.FromBase64String(json["cert"]));
+            File.WriteAllBytes(arccert, Convert.FromBase64String(json["cert"]));
 
             Console.WriteLine("cert file created.");
         }
@@ -93,7 +93,7 @@ internal static class GlobalConfig
                 Console.WriteLine("Register account task completed.");
             }
         }
-        
+
         BackgroundService.ArcUpdate();
         Console.Clear();
     }
@@ -103,12 +103,12 @@ internal static class GlobalConfig
         switch (fileName)
         {
             case "apiconfig.json":
-                Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText("apiconfig.json"))!;
+                Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "apiconfig.json")))!;
                 ArcaeaFetch.Init();
                 break;
 
             case "tokens.json":
-                Tokens = JsonConvert.DeserializeObject<HashSet<string>>(File.ReadAllText("tokens.json"))!;
+                Tokens = JsonConvert.DeserializeObject<HashSet<string>>(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "tokens.json")))!;
                 break;
         }
     }
