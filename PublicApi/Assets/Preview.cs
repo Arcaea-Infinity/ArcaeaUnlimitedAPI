@@ -17,7 +17,7 @@ public sealed partial class PublicApi
     [HttpGet("assets/preview")]
     public ActionResult GetPreviewAssets([BindNever] ArcaeaCharts chart)
     {
-        FileInfo fileinfo = new($"{GlobalConfig.Config.DataPath}/source/preview/{chart.SongID}/{chart.RatingClass}.jpeg");
+        FileInfo fileinfo = new($"{GlobalConfig.Config.DataPath}/source/preview/{chart.SongID}_{chart.RatingClass}.jpg");
         if (!fileinfo.Exists) return Error.FileUnavailable;
 
         return PhysicalFile(fileinfo.FullName, "image/jpeg");
