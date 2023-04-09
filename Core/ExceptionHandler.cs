@@ -6,7 +6,7 @@ namespace ArcaeaUnlimitedAPI.Core;
 
 internal static class ExceptionHandler
 {
-    internal static readonly string InternalErrorOccurred
+    private static readonly string InternalErrorOccurred
         = JsonConvert.SerializeObject(new Response() { Status = -233, Message = "internal error occurred" },
                                       new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
 

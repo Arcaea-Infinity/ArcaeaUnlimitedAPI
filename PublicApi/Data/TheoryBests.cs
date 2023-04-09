@@ -39,6 +39,7 @@ public sealed partial class PublicApi
 
         var results = new List<Records>();
 
+        // ReSharper disable once LoopCanBePartlyConvertedToQuery
         foreach (var chart in ArcaeaCharts.SortedCharts)
         {
             if (results.Count >= count) break;

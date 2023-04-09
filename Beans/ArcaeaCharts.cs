@@ -27,7 +27,7 @@ public sealed partial class ArcaeaCharts
     {
         if (string.IsNullOrWhiteSpace(alias)) return default;
 
-        if (AliasCache.ContainsKey(alias)) return AliasCache[alias];
+        if (AliasCache.TryGetValue(alias, out List<ArcaeaSong>? query)) return query;
 
         var data = GetById(alias) ?? GetByName(Songs, alias) ?? GetByAlias(alias);
 

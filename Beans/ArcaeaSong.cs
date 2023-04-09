@@ -13,11 +13,11 @@ public sealed class ArcaeaSong : List<ArcaeaCharts>, IEquatable<ArcaeaSong>
 
     internal object ToJson(bool usejsonlist = true)
     {
-        if (usejsonlist && ArcaeaCharts.SongJsons.ContainsKey(SongID)) return ArcaeaCharts.SongJsons[SongID];
+        if (usejsonlist && ArcaeaCharts.SongJsons.TryGetValue(SongID, out var json)) return json;
 
         var obj = new
                   {
-                      song_id = SongID, difficulties = this, alias = ArcaeaCharts.Aliases.ContainsKey(SongID) ? ArcaeaCharts.Aliases[SongID] : new()
+                      song_id = SongID, difficulties = this, alias = ArcaeaCharts.Aliases.TryGetValue(SongID, out List<string>? alias) ? alias : new()
                   };
         ArcaeaCharts.SongJsons.TryAdd(SongID, obj);
         return obj;
