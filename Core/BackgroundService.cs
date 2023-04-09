@@ -20,10 +20,10 @@ internal static class BackgroundService
     private static Timer _timer = null!;
     private static Timer _configTimer = null!;
 
-    internal static string Version
+    private static string Version
     {
         get => _version ??= File.ReadAllText($"{Config.DataPath}/arcversion");
-        private set
+        set
         {
             _version = value;
             File.WriteAllText($"{Config.DataPath}/arcversion", value);
