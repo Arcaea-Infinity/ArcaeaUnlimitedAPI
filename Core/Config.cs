@@ -26,6 +26,9 @@ public class ConfigItem
 
     [JsonProperty("open_register")]
     public bool? OpenRegister { get; set; } = false;
+    
+    [JsonProperty("auto_update")]
+    public bool? AutoUpdate { get; set; } = true;
 
     [JsonProperty("quota")]
     public int Quota { get; set; } = 10;
