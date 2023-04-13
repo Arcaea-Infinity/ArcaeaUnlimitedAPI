@@ -107,6 +107,7 @@ internal static class GlobalConfig
             case "apiconfig.json":
                 Config = JsonConvert.DeserializeObject<ConfigItem>(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "apiconfig.json")))!;
                 ArcaeaFetch.Init();
+                BackgroundService.Init();
                 break;
 
             case "tokens.json":
