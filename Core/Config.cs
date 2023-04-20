@@ -23,6 +23,9 @@ public class ConfigItem
 
     [JsonProperty("data_path")]
     public string DataPath { get; set; }
+    
+    [JsonProperty("image_gen_url")]
+    public string ImageGenUrl { get; set; }
 
     [JsonProperty("open_register")]
     public bool? OpenRegister { get; set; } = false;

@@ -15,7 +15,7 @@ public sealed class Response
     [JsonProperty("content")]
     public object? Content { get; set; }
 
-    internal static JsonResult Success(object data) => new(new Response() { Status = 0, Content = data });
+    internal static JsonResult Success(object data) => new(new Response() { Status = 0, Content = data }) { StatusCode = 200 };
 
     private static JsonResult Exception(
         int errorCode,
@@ -161,5 +161,10 @@ public sealed class Response
         ///     errorCode = -27
         /// </summary>
         internal static readonly JsonResult IllegalHash = Exception(-27, "illegal hash, please contact maintainer", 503);
+
+        /// <summary>
+        ///     errorCode = -28
+        /// </summary>
+        internal static readonly JsonResult ImageServerError = Exception(-28, "image server error", 503);
     }
 }

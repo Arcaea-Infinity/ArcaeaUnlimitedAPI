@@ -1,5 +1,6 @@
 using System.Net;
 using ArcaeaUnlimitedAPI.Core;
+using ArcaeaUnlimitedAPI.PublicApi;
 using Microsoft.AspNetCore.HttpOverrides;
 using Newtonsoft.Json;
 using BackgroundService = ArcaeaUnlimitedAPI.Core.BackgroundService;
@@ -16,6 +17,7 @@ ServicePointManager.ReusePort = true;
 GlobalConfig.Init();
 DatabaseManager.Init();
 ArcaeaFetch.Init();
+ImageGen.Init();
 BackgroundService.Init();
 ConfigWatcher.Init();
 
