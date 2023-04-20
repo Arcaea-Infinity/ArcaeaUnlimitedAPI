@@ -15,3 +15,5 @@
 Core/ArcaeaHash.cs
 PublicApi/Assets/Preview.cs
 PublicApi/Data/Challenge.cs
+PublicApi/Image/Image.cs
+PublicApi/Utils/ImageGen.cs
